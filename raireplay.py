@@ -1,8 +1,11 @@
 #! /usr/bin/python
 
+from __future__ import print_function
+
 import json
 import sys
 import os
+import argparse
 
 from datetime import date
 from datetime import timedelta
@@ -51,7 +54,7 @@ def process(filename, db):
                     db[pid] = p
 
 
-def download(db):
+def download(db, type):
     g = URLGrabber()
     today = date.today()
 
@@ -64,22 +67,33 @@ def download(db):
             url = base_url + "/" + filename
             local_name = os.path.join(root_folder, filename) 
 
-            if not os.path.exists(local_name):
-                print "Getting filename..."
-                g.urlgrab(url, filename = local_name)
+            if type == "always" or (type == "update" and not os.path.exists(local_name)):
+                print("Getting " + filename + "...", end = "")
+                filename = g.urlgrab(url, filename = local_name)
+                print("OK")
 
-            process(local_name, db)
+            if os.path.exists(local_name):
+                process(local_name, db)
 
 
 def display(db):
     for p in db.itervalues():
-        print p.pid, p.name
+        print(p.pid, p.name)
 
 
 def main():
+
+    parser = argparse.ArgumentParser(description = "Rai Replay")
+    parser.add_argument("--download", action = "store", default = "update", help = "always, [update], never")
+    parser.add_argument("--display", action = "store_true", default = False)
+
+    args = parser.parse_args()
+
     db = {}
-    download(db)
-    display(db)
+    download(db, args.download)
+
+    if args.display:
+        display(db)
 
 
 main()
