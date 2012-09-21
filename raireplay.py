@@ -12,19 +12,33 @@ from datetime import timedelta
 from urlgrabber.grabber import URLGrabber
 
 root_folder = os.path.expanduser("~/.raireplay")
-channels = ["RaiUno", "RaiDue", "RaiTre", "RaiCinque"]
+channels = {"1": "RaiUno", "2": "RaiDue", "3": "RaiTre", "31": "RaiCinque"}
 base_url = "http://www.rai.it/dl/portale/html/palinsesti/replaytv/static"
 
 
 class Program:
-    def __init__(self, date, time, pid, minutes, name, h264, tablet):
+    def __init__(self, channel, date, time, pid, minutes, name, desc, h264, tablet):
+        self.channel = channel
         self.date = date
         self.time = time
         self.pid = pid
         self.minutes = minutes
         self.name = name.encode('utf-8')
+        self.desc = desc
         self.h264 = h264
         self.tablet = tablet
+
+
+    def display(self):
+        print("Channel:", channels[self.channel])
+        print("PID:", self.pid)
+        print("Name:", self.name)
+        print("Description:", self.desc)
+        print("Date:", self.date)
+        print("Time:", self.time)
+        print("Length:", self.minutes, "minutes")
+        print("h264:", self.h264)
+        print("tablet:", self.tablet)
 
 
 def process(filename, db):
@@ -37,10 +51,14 @@ def process(filename, db):
         if k1 == "defaultBannerVars":
             continue
 
+        channel = k1
+
         for k2, v2 in v1.iteritems():
             for key, value in v2.iteritems():
                 name = value["t"]
+                desc = value["d"]
                 secs = value["l"]
+
                 minutes = 0
                 if secs != "":
                     minutes = int(secs) / 60 
@@ -50,7 +68,13 @@ def process(filename, db):
                 pid = value["i"]
 
                 if h264 != "" or tablet != "":
-                    p = Program(k2, key, pid, minutes, name, h264, tablet)
+                    p = Program(channel, k2, key, pid, minutes, name, desc, h264, tablet)
+
+                    if pid in db:
+                        print("WARNING: duplicate pid", pid)
+#                        db[pid].display()
+#                        p.display()
+
                     db[pid] = p
 
 
@@ -62,7 +86,7 @@ def download(db, type):
         day = today - timedelta(days = x)
         str_date = day.strftime("_%Y_%m_%d")
 
-        for channel in channels:
+        for channel in channels.itervalues():
             filename = channel + str_date + ".html"
             url = base_url + "/" + filename
             local_name = os.path.join(root_folder, filename) 
@@ -75,25 +99,40 @@ def download(db, type):
             if os.path.exists(local_name):
                 process(local_name, db)
 
+    print()
 
-def display(db):
+
+def list(db):
     for p in db.itervalues():
-        print(p.pid, p.name)
+        print(p.pid + ":", p.date, p.name)
+
+
+def display(item):
+    item.display()
 
 
 def main():
 
     parser = argparse.ArgumentParser(description = "Rai Replay")
-    parser.add_argument("--download", action = "store", default = "update", help = "always, [update], never")
-    parser.add_argument("--display", action = "store_true", default = False)
+    parser.add_argument("--download", action = "store", default = "update",choices = ["always", "update", "never"],
+                        help = "Default is update")
+    parser.add_argument("--list", action = "store_true", default = False)
+    parser.add_argument("pid", nargs = "?")
 
     args = parser.parse_args()
 
     db = {}
     download(db, args.download)
 
-    if args.display:
-        display(db)
+    if args.list:
+        list(db)
 
+    if args.pid != None:
+        display(db[args.pid])
+    else:
+        print()
+        print("INFO:", len(db), "programmes")
+
+    print()
 
 main()
