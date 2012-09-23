@@ -6,39 +6,37 @@ import json
 import sys
 import os
 import argparse
+import urlgrabber.grabber
+import urlgrabber.progress
 
 from datetime import date
 from datetime import timedelta
-from urlgrabber.grabber import URLGrabber
+from asi import Program
 
-root_folder = os.path.expanduser("~/.raireplay")
+rootFolder = os.path.expanduser("~/.raireplay")
+dataFolder = os.path.join(rootFolder, "data")
+programFolder = os.path.join(rootFolder, "programs")
 channels = {"1": "RaiUno", "2": "RaiDue", "3": "RaiTre", "31": "RaiCinque"}
-base_url = "http://www.rai.it/dl/portale/html/palinsesti/replaytv/static"
+baseUrl = "http://www.rai.it/dl/portale/html/palinsesti/replaytv/static"
 
+def parseItem(channel, date, time, value):
+    name = value["t"]
+    desc = value["d"]
+    secs = value["l"]
 
-class Program:
-    def __init__(self, channel, date, time, pid, minutes, name, desc, h264, tablet):
-        self.channel = channel
-        self.date = date
-        self.time = time
-        self.pid = pid
-        self.minutes = minutes
-        self.name = name.encode('utf-8')
-        self.desc = desc
-        self.h264 = h264
-        self.tablet = tablet
+    minutes = 0
+    if secs != "":
+        minutes = int(secs) / 60
 
+    h264 = value["h264"]
+    tablet = value["urlTablet"]
+    pid = value["i"]
 
-    def display(self):
-        print("Channel:", channels[self.channel])
-        print("PID:", self.pid)
-        print("Name:", self.name)
-        print("Description:", self.desc)
-        print("Date:", self.date)
-        print("Time:", self.time)
-        print("Length:", self.minutes, "minutes")
-        print("h264:", self.h264)
-        print("tablet:", self.tablet)
+    if h264 != "" or tablet != "":
+        p = Program.Program(channels[channel], date, time, pid, minutes, name, desc, h264, tablet)
+        return p
+
+    return None
 
 
 def process(filename, db):
@@ -53,51 +51,40 @@ def process(filename, db):
 
         channel = k1
 
-        for k2, v2 in v1.iteritems():
-            for key, value in v2.iteritems():
-                name = value["t"]
-                desc = value["d"]
-                secs = value["l"]
+        for date, v2 in v1.iteritems():
+            for time, value in v2.iteritems():
+                p = parseItem(channel, date, time, value)
 
-                minutes = 0
-                if secs != "":
-                    minutes = int(secs) / 60 
+                if p != None:
+                    if p.pid in db:
+                        print("WARNING: duplicate pid", p.pid)
+                        #                        db[pid].display()
+                        #                        p.display()
 
-                h264 = value["h264"]
-                tablet = value["urlTablet"]
-                pid = value["i"]
-
-                if h264 != "" or tablet != "":
-                    p = Program(channel, k2, key, pid, minutes, name, desc, h264, tablet)
-
-                    if pid in db:
-                        print("WARNING: duplicate pid", pid)
-#                        db[pid].display()
-#                        p.display()
-
-                    db[pid] = p
+                    db[p.pid] = p
 
 
 def download(db, type):
-    g = URLGrabber()
+    if not os.path.exists(dataFolder):
+        os.makedirs(dataFolder)
+
+    g = urlgrabber.grabber.URLGrabber(progress_obj = urlgrabber.progress.TextMeter())
     today = date.today()
 
     for x in range(1, 8):
         day = today - timedelta(days = x)
-        str_date = day.strftime("_%Y_%m_%d")
+        strDate = day.strftime("_%Y_%m_%d")
 
         for channel in channels.itervalues():
-            filename = channel + str_date + ".html"
-            url = base_url + "/" + filename
-            local_name = os.path.join(root_folder, filename) 
+            filename = channel + strDate + ".html"
+            url = baseUrl + "/" + filename
+            localName = os.path.join(dataFolder, filename)
 
-            if type == "always" or (type == "update" and not os.path.exists(local_name)):
-                print("Getting " + filename + "...", end = "")
-                filename = g.urlgrab(url, filename = local_name)
-                print("OK")
+            if type == "always" or (type == "update" and not os.path.exists(localName)):
+                filename = g.urlgrab(url, filename = localName)
 
-            if os.path.exists(local_name):
-                process(local_name, db)
+            if os.path.exists(localName):
+                process(localName, db)
 
     print()
 
@@ -114,9 +101,11 @@ def display(item):
 def main():
 
     parser = argparse.ArgumentParser(description = "Rai Replay")
-    parser.add_argument("--download", action = "store", default = "update",choices = ["always", "update", "never"],
+    parser.add_argument("--download", action = "store", default = "update", choices = ["always", "update", "never"],
                         help = "Default is update")
     parser.add_argument("--list", action = "store_true", default = False)
+    parser.add_argument("--get", action = "store_true", default = False)
+    parser.add_argument("--format", action = "store", default = "h264", choices = ["h264", "tablet"])
     parser.add_argument("pid", nargs = "?")
 
     args = parser.parse_args()
@@ -128,7 +117,10 @@ def main():
         list(db)
 
     if args.pid != None:
-        display(db[args.pid])
+        p = db[args.pid]
+        display(p)
+        if args.get:
+            p.download(programFolder, args.format)
     else:
         print()
         print("INFO:", len(db), "programmes")
