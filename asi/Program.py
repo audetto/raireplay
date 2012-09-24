@@ -34,10 +34,12 @@ class Program:
         if not os.path.exists(folder):
             os.makedirs(folder)
 
-        if self.h264 != "" and format == "h264":
+        if format == "h264":
             self.downloadH264(folder)
-        else:
+        elif format == "tablet":
             self.downloadTablet(folder)
+        elif format == None:
+            self.downloadH264(folder)
 
 
     def downloadH264(self, folder):
@@ -48,7 +50,39 @@ class Program:
 
 
     def downloadTablet(self, folder):
-        g = urlgrabber.grabber.URLGrabber(progress_obj = urlgrabber.progress.TextMeter())
+        g = urlgrabber.grabber.URLGrabber(progress_obj = urlgrabber.progress.TextMeter(), quote = 0)
         localFilename = os.path.join(folder, self.pid + ".m3u8")
         filename = g.urlgrab(self.tablet, filename = localFilename)
-        print("Got: ", filename)
+
+        with open(filename, "r") as m3u8:
+            magic = m3u8.readline().rstrip('\n')
+            if magic != "#EXTM3U":
+                print("Bad magic:" + magic)
+                return
+
+            for line in m3u8:
+                address = m3u8.next().rstrip('\n')
+                if "BANDWIDTH=1546000" in line:
+                    mp4address = self.tablet.rstrip("master.m3u8") + address
+
+                    localFilename = os.path.join(folder, self.pid + ".mp4.m3u8")
+                    filename = g.urlgrab(mp4address, filename = localFilename)
+
+                    with open(filename, "r") as mp4:
+                        magic = mp4.readline().rstrip('\n')
+                        if magic != "#EXTM3U":
+                            print("Bad magic:" + magic)
+                            return
+
+                        localFilename = os.path.join(folder, self.pid + ".ts")
+                        with open(localFilename, "wb") as output:
+
+                            for line in mp4:
+                                if "#EXTINF:" in line:
+                                    segment = mp4.next().rstrip('\n')
+                                    segmentAddress = self.tablet.rstrip("master.m3u8") + segment
+                                    seg = g.urlopen(segmentAddress)
+                                    data = seg.read()
+                                    output.write(data)
+
+                    return

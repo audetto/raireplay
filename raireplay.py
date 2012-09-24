@@ -105,7 +105,7 @@ def main():
                         help = "Default is update")
     parser.add_argument("--list", action = "store_true", default = False)
     parser.add_argument("--get", action = "store_true", default = False)
-    parser.add_argument("--format", action = "store", default = "h264", choices = ["h264", "tablet"])
+    parser.add_argument("--format", action = "store", choices = ["h264", "tablet"])
     parser.add_argument("pid", nargs = "?")
 
     args = parser.parse_args()
