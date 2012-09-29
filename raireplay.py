@@ -56,7 +56,7 @@ def process(filename, db):
 
                 if p != None:
                     if p.pid in db:
-                        print("WARNING: duplicate pid", p.pid)
+                        print("WARNING: duplicate pid {0}".format(p.pid))
                         #                        db[pid].display()
                         #                        p.display()
 
@@ -116,13 +116,16 @@ def main():
         list(db)
 
     if args.pid != None:
-        p = db[args.pid]
-        display(p)
-        if args.get:
-            p.download(programFolder, args.format)
+        if args.pid in db:
+            p = db[args.pid]
+            display(p)
+            if args.get:
+                p.download(programFolder, args.format)
+        else:
+            print("PID {0} not found".format(args.pid))
     else:
         print()
-        print("INFO:", len(db), "programmes")
+        print("INFO: {0} programmes found".format(len(db)))
 
     print()
 
