@@ -1,6 +1,10 @@
 from __future__ import print_function
 
+import sys
+sys.path.append('/home/andrea/projects/cvs/3rdParty/m3u8')
+
 import os
+import m3u8
 
 import urlgrabber.grabber
 import urlgrabber.progress
@@ -16,7 +20,7 @@ class Program:
         self.desc = desc
         self.h264 = h264
         self.tablet = tablet
-
+        self.m3 = None
 
     def display(self):
         print("Channel:", self.channel)
@@ -26,8 +30,17 @@ class Program:
         print("Date:", self.date)
         print("Time:", self.time)
         print("Length:", self.minutes, "minutes")
+        print()
         print("h264:", self.h264)
+        print()
         print("tablet:", self.tablet)
+        m3 = self.getTabletPlaylist()
+
+        if m3.is_variant:
+            for playlist in m3.playlists:
+                format = "\tProgram: {0:>2}, Bandwidth: {1:>10}, Codecs: {2}"
+                line = format.format(playlist.stream_info.program_id, playlist.stream_info.bandwidth, playlist.stream_info.codecs)
+                print(line)
 
 
     def download(self, folder, format):
@@ -49,40 +62,33 @@ class Program:
         print("Got: ", filename)
 
 
-    def downloadTablet(self, folder):
-        g = urlgrabber.grabber.URLGrabber(progress_obj = urlgrabber.progress.TextMeter(), quote = 0)
-        localFilename = os.path.join(folder, self.pid + ".m3u8")
-        filename = g.urlgrab(self.tablet, filename = localFilename)
+    def getTabletPlaylist(self):
+        if self.m3 == None:
+            self.m3 = m3u8.load(self.tablet)
+        return self.m3
 
-        with open(filename, "r") as m3u8:
-            magic = m3u8.readline().rstrip('\n')
-            if magic != "#EXTM3U":
-                print("Bad magic:" + magic)
+
+    def downloadTablet(self, folder):
+        m3 = self.getTabletPlaylist()
+        if m3.is_variant:
+            playlist = m3.playlists[0]
+            uri = playlist.baseuri + "/" + playlist.uri
+            item = m3u8.load(uri)
+            if not m3.is_variant:
+                print("m3u8 @ {0} is not a playlist".format(uri))
                 return
 
-            for line in m3u8:
-                address = m3u8.next().rstrip('\n')
-                if "BANDWIDTH=1546000" in line:
-                    mp4address = self.tablet.rstrip("master.m3u8") + address
+            g = urlgrabber.grabber.URLGrabber(progress_obj = urlgrabber.progress.TextMeter(), quote = 0)
+            localFilename = os.path.join(folder, self.pid + ".ts")
+            out = open(localFilename, "a")
 
-                    localFilename = os.path.join(folder, self.pid + ".mp4.m3u8")
-                    filename = g.urlgrab(mp4address, filename = localFilename)
+            print()
+            print("Saving {0} as {1}".format(self.pid, localFilename))
 
-                    with open(filename, "r") as mp4:
-                        magic = mp4.readline().rstrip('\n')
-                        if magic != "#EXTM3U":
-                            print("Bad magic:" + magic)
-                            return
+            for seg in item.segments:
+                uri = seg.baseuri + "/" + seg.uri
+                s = g.urlopen(uri)
+                out.write(s.read())
 
-                        localFilename = os.path.join(folder, self.pid + ".ts")
-                        with open(localFilename, "wb") as output:
-
-                            for line in mp4:
-                                if "#EXTINF:" in line:
-                                    segment = mp4.next().rstrip('\n')
-                                    segmentAddress = self.tablet.rstrip("master.m3u8") + segment
-                                    seg = g.urlopen(segmentAddress)
-                                    data = seg.read()
-                                    output.write(data)
-
-                    return
+            print()
+            print("Saved {0} as {1}".format(self.pid, localFilename))
