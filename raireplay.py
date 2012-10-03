@@ -32,6 +32,7 @@ def parseItem(channel, date, time, value):
     pid = value["i"]
 
     if h264 != "" or tablet != "":
+        tablet = tablet.replace(",800,1500,.mp4.csmil", ",400,800,1500,.mp4.csmil")
         p = Program.Program(channels[channel], date, time, pid, minutes, name, desc, h264, tablet)
         return p
 
