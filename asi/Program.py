@@ -9,6 +9,8 @@ import m3u8
 import urlgrabber.grabber
 import urlgrabber.progress
 
+from asi import Meter
+
 class Program:
     def __init__(self, channel, date, time, pid, minutes, name, desc, h264, tablet):
         self.channel = channel
@@ -78,17 +80,20 @@ class Program:
                 print("m3u8 @ {0} is not a playlist".format(uri))
                 return
 
-            g = urlgrabber.grabber.URLGrabber(progress_obj = urlgrabber.progress.TextMeter(), quote = 0)
             localFilename = os.path.join(folder, self.pid + ".ts")
-            out = open(localFilename, "a")
+            out = open(localFilename, "wb")
 
             print()
             print("Saving {0} as {1}".format(self.pid, localFilename))
 
+            numberOfFiles = len(item.segments)
+            progress = Meter.Meter(numberOfFiles, self.pid + ".ts")
+            g = urlgrabber.grabber.URLGrabber(progress_obj = progress, quote = 0)
+
             for seg in item.segments:
                 uri = seg.baseuri + "/" + seg.uri
-                s = g.urlopen(uri)
-                out.write(s.read())
+                s = g.urlread(uri)
+                out.write(s)
 
             print()
             print("Saved {0} as {1}".format(self.pid, localFilename))
