@@ -60,7 +60,13 @@ class Program:
     def downloadH264(self, folder):
         g = urlgrabber.grabber.URLGrabber(progress_obj = urlgrabber.progress.TextMeter())
         localFilename = os.path.join(folder, self.pid + ".mp4")
+
+        print()
+        print("Saving {0} as {1}".format(self.pid, localFilename))
+
         filename = g.urlgrab(self.h264, filename = localFilename)
+
+        print()
         print("Saved {0} as {1}".format(self.pid, filename))
 
 
