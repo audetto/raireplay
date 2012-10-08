@@ -32,7 +32,14 @@ class Meter(urlgrabber.progress.TextMeter):
 
     def start(self, filename = None, url = None, basename = None, size = None, now = None, text = None):
         estimatedTotal = self.addFile(size, now)
-        urlgrabber.progress.TextMeter.start(self, filename, url, basename, estimatedTotal, self.now, self.name)
+        if self.filesSoFar == 1:
+            urlgrabber.progress.TextMeter.start(self, filename, url, basename, estimatedTotal, self.now, self.name)
+        else:
+            # update total
+            # a bit of a hack. Copied from URLGrabber source code
+            self.size = estimatedTotal
+            self.fsize = urlgrabber.progress.format_number(estimatedTotal) + 'B'
+            self.re.total = estimatedTotal
 
     def end(self, amount_read, now = None):
         # otherwise we get a new line after each file
