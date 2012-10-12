@@ -4,6 +4,7 @@ import sys
 sys.path.append('/home/andrea/projects/cvs/3rdParty/m3u8')
 
 import os
+import urlparse
 import m3u8
 
 import urlgrabber.grabber
@@ -11,8 +12,38 @@ import urlgrabber.progress
 
 from asi import Meter
 
+def getFullUrl(tablet, phone):
+    if tablet == "":
+        return phone
+
+    if phone == "":
+        return tablet
+
+    posOfFirstCommaT = tablet.find(",")
+    posOfLastCommaT  = tablet.rfind(",")
+    midTablet = tablet[posOfFirstCommaT + 1 : posOfLastCommaT]
+
+    posOfFirstCommaP = phone.find(",")
+    posOfLastCommaP  = phone.rfind(",")
+    midPhone = phone[posOfFirstCommaP + 1 : posOfLastCommaP]
+
+    tabletSizes = midTablet.split(",")
+    phoneSizes  = midPhone.split(",")
+
+    sizes = set()
+    sizes.update(tabletSizes)
+    sizes.update(phoneSizes)
+
+    fullUrl = tablet[0 : posOfFirstCommaT]
+    for s in sorted(sizes, key = int):
+        fullUrl = fullUrl + "," + s
+    fullUrl = fullUrl + tablet[posOfLastCommaT :]
+
+    return fullUrl
+
+
 class Program:
-    def __init__(self, channel, date, time, pid, minutes, name, desc, h264, tablet):
+    def __init__(self, channel, date, time, pid, minutes, name, desc, h264, tablet, smartPhone):
         self.channel = channel
         self.date = date
         self.time = time
@@ -21,10 +52,15 @@ class Program:
         self.name = name.encode('utf-8')
         self.desc = desc
         self.h264 = h264
-        self.tablet = tablet
+        self.ts = getFullUrl(tablet, smartPhone)
+
         self.m3 = None
 
+
     def display(self):
+        width = urlgrabber.progress.terminal_width()
+
+        print("=" * width)
         print("Channel:", self.channel)
         print("PID:", self.pid)
         print("Name:", self.name)
@@ -32,17 +68,20 @@ class Program:
         print("Date:", self.date)
         print("Time:", self.time)
         print("Length:", self.minutes, "minutes")
+        print("Filename: ", self.getFilename())
         print()
         print("h264:", self.h264)
-        print()
-        print("tablet:", self.tablet)
+        print("ts:  ", self.ts)
+
         m3 = self.getTabletPlaylist()
 
-        if m3.is_variant:
+        if m3 != None and m3.is_variant:
+            print()
             for playlist in m3.playlists:
                 format = "\tProgram: {0:>2}, Bandwidth: {1:>10}, Codecs: {2}"
                 line = format.format(playlist.stream_info.program_id, playlist.stream_info.bandwidth, playlist.stream_info.codecs)
                 print(line)
+            print()
 
 
     def download(self, folder, format):
@@ -51,7 +90,7 @@ class Program:
 
         if format == "h264":
             self.downloadH264(folder)
-        elif format == "tablet":
+        elif format == "ts":
             self.downloadTablet(folder)
         elif format == None:
             self.downloadH264(folder)
@@ -59,7 +98,7 @@ class Program:
 
     def downloadH264(self, folder):
         g = urlgrabber.grabber.URLGrabber(progress_obj = urlgrabber.progress.TextMeter())
-        localFilename = os.path.join(folder, self.pid + ".mp4")
+        localFilename = os.path.join(folder, self.getFilename() + ".mp4")
 
         print()
         print("Saving {0} as {1}".format(self.pid, localFilename))
@@ -72,8 +111,25 @@ class Program:
 
     def getTabletPlaylist(self):
         if self.m3 == None:
-            self.m3 = m3u8.load(self.tablet)
+            if self.ts != "":
+                self.m3 = m3u8.load(self.ts)
+
         return self.m3
+
+
+    def getFilename(self):
+
+        if self.ts == "":
+            return self.pid
+
+        fullName = os.path.split(os.path.split(urlparse.urlsplit(self.ts).path)[0])[1]
+        tmp = fullName.split(",")[0]
+        posOfDash = tmp.rfind("-")
+        nice = tmp[0 : posOfDash]
+
+        filename = self.pid + "-" + nice
+
+        return filename
 
 
     def downloadTablet(self, folder):
@@ -86,7 +142,7 @@ class Program:
                 print("m3u8 @ {0} is not a playlist".format(uri))
                 return
 
-            localFilename = os.path.join(folder, self.pid + ".ts")
+            localFilename = os.path.join(folder, self.getFilename() + ".ts")
             out = open(localFilename, "wb")
 
             print()

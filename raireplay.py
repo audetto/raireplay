@@ -29,11 +29,11 @@ def parseItem(channel, date, time, value):
 
     h264 = value["h264"]
     tablet = value["urlTablet"]
+    smartPhone = value["urlSmartPhone"]
     pid = value["i"]
 
-    if h264 != "" or tablet != "":
-        tablet = tablet.replace(",800,1500,.mp4.csmil", ",400,800,1500,.mp4.csmil")
-        p = Program.Program(channels[channel], date, time, pid, minutes, name, desc, h264, tablet)
+    if h264 != "" or tablet != "" or smartPhone != "" :
+        p = Program.Program(channels[channel], date, time, pid, minutes, name, desc, h264, tablet, smartPhone)
         return p
 
     return None
@@ -105,8 +105,8 @@ def main():
                         help = "Default is update")
     parser.add_argument("--list", action = "store_true", default = False)
     parser.add_argument("--get", action = "store_true", default = False)
-    parser.add_argument("--format", action = "store", choices = ["h264", "tablet"])
-    parser.add_argument("pid", nargs = "?")
+    parser.add_argument("--format", action = "store", choices = ["h264", "ts"])
+    parser.add_argument("pid", nargs = "*")
 
     args = parser.parse_args()
 
@@ -116,14 +116,15 @@ def main():
     if args.list:
         list(db)
 
-    if args.pid != None:
-        if args.pid in db:
-            p = db[args.pid]
-            display(p)
-            if args.get:
-                p.download(programFolder, args.format)
-        else:
-            print("PID {0} not found".format(args.pid))
+    if len(args.pid) > 0:
+        for pid in args.pid:
+            if pid in db:
+                p = db[pid]
+                display(p)
+                if args.get:
+                    p.download(programFolder, args.format)
+            else:
+                print("PID {0} not found".format(pid))
     else:
         print()
         print("INFO: {0} programmes found".format(len(db)))
