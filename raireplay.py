@@ -90,8 +90,8 @@ def download(db, type):
 
 
 def list(db):
-    for p in db.itervalues():
-        print(p.pid + ":", p.date, p.name)
+    for p in sorted(db.itervalues(), key = lambda x: x.datetime):
+        print(p.short())
 
 
 def display(item):

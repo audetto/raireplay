@@ -6,6 +6,7 @@ sys.path.append('/home/andrea/projects/cvs/3rdParty/m3u8')
 import os
 import urlparse
 import m3u8
+import time
 
 import urlgrabber.grabber
 import urlgrabber.progress
@@ -43,18 +44,23 @@ def getFullUrl(tablet, phone):
 
 
 class Program:
-    def __init__(self, channel, date, time, pid, minutes, name, desc, h264, tablet, smartPhone):
+    def __init__(self, channel, date, hour, pid, minutes, name, desc, h264, tablet, smartPhone):
         self.channel = channel
-        self.date = date
-        self.time = time
         self.pid = pid
         self.minutes = minutes
         self.name = name.encode('utf-8')
         self.desc = desc
         self.h264 = h264
         self.ts = getFullUrl(tablet, smartPhone)
+        self.datetime = time.strptime(date + " " + hour, "%Y-%m-%d %H:%M")
 
         self.m3 = None
+
+
+    def short(self):
+        ts = time.strftime("%Y-%m-%d %H:%M", self.datetime)
+        str = self.pid + ": " + ts + " " + self.name.decode('utf-8')
+        return str.encode('utf-8')
 
 
     def display(self):
@@ -65,8 +71,7 @@ class Program:
         print("PID:", self.pid)
         print("Name:", self.name)
         print("Description:", self.desc)
-        print("Date:", self.date)
-        print("Time:", self.time)
+        print("Date:", time.strftime("%Y-%m-%d %H:%M", self.datetime))
         print("Length:", self.minutes, "minutes")
         print("Filename: ", self.getFilename())
         print()
