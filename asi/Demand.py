@@ -35,7 +35,7 @@ class VideoHTMLParser(HTMLParser):
             if val != None:
                 self.title = val
 
-            val = self.extract(attrs, "programmatv")
+            val = self.extract(attrs, "programmaTV")
             if val != None:
                 self.program = val
 
