@@ -11,6 +11,7 @@ import urlgrabber.progress
 from datetime import date
 from datetime import timedelta
 from asi import Program
+from asi import Demand
 
 rootFolder = os.path.expanduser("~/.raireplay")
 dataFolder = os.path.join(rootFolder, "data")
@@ -106,6 +107,7 @@ def main():
     parser.add_argument("--list", action = "store_true", default = False)
     parser.add_argument("--get", action = "store_true", default = False)
     parser.add_argument("--format", action = "store", choices = ["h264", "ts"])
+    parser.add_argument("--url", action = "store", help = "RAI On Demand")
     parser.add_argument("pid", nargs = "*")
 
     args = parser.parse_args()
@@ -125,6 +127,9 @@ def main():
                     p.download(programFolder, args.format)
             else:
                 print("PID {0} not found".format(pid))
+    elif args.url != None:
+        d = Demand.Demand(args.url)
+        d.display()
     else:
         print()
         print("INFO: {0} programmes found".format(len(db)))
