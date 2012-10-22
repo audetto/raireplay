@@ -48,7 +48,7 @@ class Program:
         self.channel = channel
         self.pid = pid
         self.minutes = minutes
-        self.name = name.encode('utf-8')
+        self.name = name
         self.desc = desc
         self.h264 = h264
         self.ts = getFullUrl(tablet, smartPhone)
@@ -59,8 +59,8 @@ class Program:
 
     def short(self):
         ts = time.strftime("%Y-%m-%d %H:%M", self.datetime)
-        str = self.pid + ": " + ts + " " + self.name.decode('utf-8')
-        return str.encode('utf-8')
+        str = self.pid + ": " + ts + " " + self.name
+        return str
 
 
     def display(self):

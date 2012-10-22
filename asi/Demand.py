@@ -57,7 +57,7 @@ class Demand:
         self.url = url
 
         g = urlgrabber.grabber.URLGrabber()
-        content = g.urlread(self.url)
+        content = g.urlread(self.url).decode("latin1")
 
         parser = VideoHTMLParser()
         parser.feed(content)

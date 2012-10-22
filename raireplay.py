@@ -2,7 +2,9 @@
 
 from __future__ import print_function
 
+import sys
 import json
+import codecs
 import os
 import argparse
 import urlgrabber.grabber
@@ -41,7 +43,7 @@ def parseItem(channel, date, time, value):
 
 
 def process(filename, db):
-    f = open(filename, "r")
+    f = codecs.open(filename, "r", encoding="latin1")
     o = json.load(f)
 
     for k1, v1 in o.iteritems():
@@ -136,4 +138,11 @@ def main():
 
     print()
 
+# is this required??? seems a bit of pythonic nonsense
+# all RAI html is encoded in "latin1" (decoded as we read)
+#
+# and it seems that redirecting the output requires a "latin1" terminal
+# done here
+
+sys.stdout = codecs.getwriter("latin1")(sys.stdout)
 main()
