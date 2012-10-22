@@ -16,6 +16,8 @@ from xml.etree import ElementTree
 # Ref1=http://wms1.rai.it/raiunocdn/raiuno/79221.wmv?MSWMExt=.asf
 # Ref2=http://92.122.190.142:80/raiunocdn/raiuno/79221.wmv?MSWMExt=.asf
 
+invalid = "http://creativemedia3.rai.it/video_no_available.mp4"
+
 # create a subclass and override the handler methods
 class VideoHTMLParser(HTMLParser):
     def __init__(self):
@@ -70,15 +72,19 @@ class Demand:
 
         content = g.urlread(self.videourl)
 
-        root = ElementTree.fromstring(content)
-        self.asf = root[0][0].attrib.get("HREF")
+        if content == invalid:
+            self.asf = invalid
+            self.mms = invalid
+        else:
+            root = ElementTree.fromstring(content)
+            self.asf = root[0][0].attrib.get("HREF")
 
-        # use urlgrab to mak eit work with Configparser
-        content = g.urlgrab(self.asf)
-        config = ConfigParser.ConfigParser()
-        config.read(content)
-        self.mms = config.get("Reference", "ref1")
-        self.mms = self.mms.replace("http://", "mms://")
+            # use urlgrab to make it work with ConfigParser
+            content = g.urlgrab(self.asf)
+            config = ConfigParser.ConfigParser()
+            config.read(content)
+            self.mms = config.get("Reference", "ref1")
+            self.mms = self.mms.replace("http://", "mms://")
 
     def display(self):
         width = urlgrabber.progress.terminal_width()
