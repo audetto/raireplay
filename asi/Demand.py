@@ -16,34 +16,55 @@ from xml.etree import ElementTree
 # Ref1=http://wms1.rai.it/raiunocdn/raiuno/79221.wmv?MSWMExt=.asf
 # Ref2=http://92.122.190.142:80/raiunocdn/raiuno/79221.wmv?MSWMExt=.asf
 
+# this one needs videoPath
+# http://www.rai.tv/dl/RaiTV/programmi/media/ContentItem-6278dcf9-0225-456c-b4cf-71978200400a.html
+#
+# here we can get away with videoUrl
+# http://www.rai.tv/dl/RaiTV/programmi/media/ContentItem-b9812490-7243-4545-a5fc-843bf46ec3c9.html
+
 invalid = "http://creativemedia3.rai.it/video_no_available.mp4"
+
+class Obj:
+    pass
 
 # create a subclass and override the handler methods
 class VideoHTMLParser(HTMLParser):
     def __init__(self):
         HTMLParser.__init__(self)
-        self.videourl = None
-        self.title = None
-        self.program = None
-        self.description = None
+
+        self.values = Obj()
+        self.values.videoUrl = None
+        self.values.title = None
+        self.values.program = None
+        self.values.description = None
+        self.values.videoPath = None
 
     def handle_starttag(self, tag, attrs):
         if tag == "meta":
             val = self.extract(attrs, "videourl")
             if val != None:
-                self.videourl = val
+                self.values.videoUrl = val
 
             val = self.extract(attrs, "title")
             if val != None:
-                self.title = val
+                self.values.title = val
 
             val = self.extract(attrs, "programmaTV")
             if val != None:
-                self.program = val
+                self.values.program = val
 
             val = self.extract(attrs, "description")
             if val != None:
-                self.description = val
+                self.values.description = val
+
+        elif tag == "param":
+            if len(attrs) > 0:
+                if attrs[0][0] == "value":
+                    path = attrs[0][1]
+                    if path.find("videoPath") == 0:
+                        firstEqual = path.find("=")
+                        firstComma = path.find(",")
+                        self.values.videoPath = path[firstEqual + 1: firstComma]
 
     def extract(self, attrs, name):
         if len(attrs) > 1:
@@ -62,15 +83,15 @@ class Demand:
         parser = VideoHTMLParser()
         parser.feed(content)
 
-        self.videourl    = parser.videourl
-        self.title       = parser.title
-        self.program     = parser.program
-        self.description = parser.description
+        self.values = parser.values
+
+        if self.values.videoUrl == None:
+            self.values.videoUrl = self.values.videoPath
 
         #sometimes we get .mp4 which does not work
-        self.videourl = self.videourl.replace("relinkerServlet.mp4", "relinkerServlet.htm")
+        self.values.videoUrl = self.values.videoUrl.replace("relinkerServlet.mp4", "relinkerServlet.htm")
 
-        content = g.urlread(self.videourl)
+        content = g.urlread(self.values.videoUrl)
 
         if content == invalid:
             self.asf = invalid
@@ -90,11 +111,11 @@ class Demand:
         width = urlgrabber.progress.terminal_width()
 
         print("=" * width)
-        print("title:      ", self.title)
-        print("program:    ", self.program)
-        print("description:", self.description)
+        print("title:      ", self.values.title)
+        print("program:    ", self.values.program)
+        print("description:", self.values.description)
         print()
         print("url:        ", self.url)
-        print("videourl:   ", self.videourl)
+        print("videourl:   ", self.values.videoUrl)
         print("asf:        ", self.asf)
         print("mms:        ", self.mms)
