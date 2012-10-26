@@ -27,15 +27,13 @@ from asi import Utils
 
 invalid = "http://creativemedia3.rai.it/video_no_available.mp4"
 
-class Obj:
-    pass
 
 # create a subclass and override the handler methods
 class VideoHTMLParser(HTMLParser):
     def __init__(self):
         HTMLParser.__init__(self)
 
-        self.values = Obj()
+        self.values = Utils.Obj()
         self.values.videoUrl = None
         self.values.title = None
         self.values.program = None

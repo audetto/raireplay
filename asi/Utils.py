@@ -3,6 +3,11 @@ import urlparse
 import codecs
 import urlgrabber.grabber
 
+
+class Obj:
+    pass
+
+
 def httpFilename(url):
     name = os.path.split(urlparse.urlsplit(url).path)[1]
     return name

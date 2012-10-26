@@ -7,6 +7,7 @@ import codecs
 import argparse
 
 from asi import Program
+from asi import Page
 from asi import Demand
 from asi import Config
 
@@ -19,7 +20,8 @@ def main():
     parser.add_argument("--list", action = "store_true", default = False)
     parser.add_argument("--get", action = "store_true", default = False)
     parser.add_argument("--format", action = "store", choices = ["h264", "ts"])
-    parser.add_argument("--url", action = "store", help = "RAI On Demand")
+    parser.add_argument("--item", action = "store", help = "RAI On Demand Item")
+    parser.add_argument("--page", action = "store", help = "RAI On Demand Page")
     parser.add_argument("pid", nargs = "*")
 
     args = parser.parse_args()
@@ -39,9 +41,11 @@ def main():
                     p.download(Config.programFolder, args.format)
             else:
                 print("PID {0} not found".format(pid))
-    elif args.url != None:
-        d = Demand.Demand(args.url, Config.urlFolder, args.download)
+    elif args.item != None:
+        d = Demand.Demand(args.item, Config.itemFolder, args.download)
         d.display()
+    elif args.page != None:
+        d = Page.Page(args.page, Config.pageFolder, args.download)
     else:
         print()
         print("INFO: {0} programmes found".format(len(db)))
