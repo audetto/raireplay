@@ -3,100 +3,12 @@
 from __future__ import print_function
 
 import sys
-import json
 import codecs
-import os
 import argparse
-import urlgrabber.grabber
-import urlgrabber.progress
-
-from datetime import date
-from datetime import timedelta
 
 from asi import Program
 from asi import Demand
-from asi import Utils
-
-rootFolder = os.path.expanduser("~/.raireplay")
-dataFolder = os.path.join(rootFolder, "data")
-replayFolder = os.path.join(dataFolder, "replay")
-urlFolder = os.path.join(dataFolder, "url")
-
-programFolder = os.path.join(rootFolder, "programs")
-channels = {"1": "RaiUno", "2": "RaiDue", "3": "RaiTre", "31": "RaiCinque"}
-baseUrl = "http://www.rai.it/dl/portale/html/palinsesti/replaytv/static"
-
-def parseItem(channel, date, time, value):
-    name = value["t"]
-    desc = value["d"]
-    secs = value["l"]
-
-    minutes = 0
-    if secs != "":
-        minutes = int(secs) / 60
-
-    h264 = value["h264"]
-    tablet = value["urlTablet"]
-    smartPhone = value["urlSmartPhone"]
-    pid = value["i"]
-
-    if h264 != "" or tablet != "" or smartPhone != "" :
-        p = Program.Program(channels[channel], date, time, pid, minutes, name, desc, h264, tablet, smartPhone)
-        return p
-
-    return None
-
-
-def process(f, db):
-    o = json.load(f)
-
-    for k1, v1 in o.iteritems():
-        if k1 == "now":
-            continue
-        if k1 == "defaultBannerVars":
-            continue
-
-        channel = k1
-
-        for date, v2 in v1.iteritems():
-            for time, value in v2.iteritems():
-                p = parseItem(channel, date, time, value)
-
-                if p != None:
-                    if p.pid in db:
-                        print("WARNING: duplicate pid {0}".format(p.pid))
-                        #                        db[pid].display()
-                        #                        p.display()
-
-                    db[p.pid] = p
-
-
-def download(db, type):
-    g = urlgrabber.grabber.URLGrabber(progress_obj = urlgrabber.progress.TextMeter())
-    today = date.today()
-
-    for x in range(1, 8):
-        day = today - timedelta(days = x)
-        strDate = day.strftime("_%Y_%m_%d")
-
-        for channel in channels.itervalues():
-            filename = channel + strDate + ".html"
-            url = baseUrl + "/" + filename
-            localName = os.path.join(replayFolder, filename)
-
-            f = Utils.download(g, url, localName, type, "latin1")
-            process(f, db)
-
-    print()
-
-
-def list(db):
-    for p in sorted(db.itervalues(), key = lambda x: x.datetime):
-        print(p.short())
-
-
-def display(item):
-    item.display()
+from asi import Config
 
 
 def main():
@@ -112,29 +24,23 @@ def main():
 
     args = parser.parse_args()
 
-    if not os.path.exists(replayFolder):
-        os.makedirs(replayFolder)
-
-    if not os.path.exists(urlFolder):
-        os.makedirs(urlFolder)
-
     db = {}
-    download(db, args.download)
+    Program.download(db, Config.replayFolder, args.download)
 
     if args.list:
-        list(db)
+        Program.list(db)
 
     if len(args.pid) > 0:
         for pid in args.pid:
             if pid in db:
                 p = db[pid]
-                display(p)
+                Program.display(p)
                 if args.get:
-                    p.download(programFolder, args.format)
+                    p.download(Config.programFolder, args.format)
             else:
                 print("PID {0} not found".format(pid))
     elif args.url != None:
-        d = Demand.Demand(args.url, urlFolder, args.download)
+        d = Demand.Demand(args.url, Config.urlFolder, args.download)
         d.display()
     else:
         print()

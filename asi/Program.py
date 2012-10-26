@@ -7,12 +7,20 @@ import os
 import urlparse
 import m3u8
 import time
+import json
+
+from datetime import date
+from datetime import timedelta
+
 
 import urlgrabber.grabber
 import urlgrabber.progress
 
 from asi import Meter
 from asi import Utils
+
+baseUrl = "http://www.rai.it/dl/portale/html/palinsesti/replaytv/static"
+channels = {"1": "RaiUno", "2": "RaiDue", "3": "RaiTre", "31": "RaiCinque"}
 
 def getFullUrl(tablet, phone):
     if tablet == "":
@@ -42,6 +50,79 @@ def getFullUrl(tablet, phone):
     fullUrl = fullUrl + tablet[posOfLastCommaT :]
 
     return fullUrl
+
+
+def parseItem(channel, date, time, value):
+    name = value["t"]
+    desc = value["d"]
+    secs = value["l"]
+
+    minutes = 0
+    if secs != "":
+        minutes = int(secs) / 60
+
+    h264 = value["h264"]
+    tablet = value["urlTablet"]
+    smartPhone = value["urlSmartPhone"]
+    pid = value["i"]
+
+    if h264 != "" or tablet != "" or smartPhone != "" :
+        p = Program(channels[channel], date, time, pid, minutes, name, desc, h264, tablet, smartPhone)
+        return p
+
+    return None
+
+
+def process(f, db):
+    o = json.load(f)
+
+    for k1, v1 in o.iteritems():
+        if k1 == "now":
+            continue
+        if k1 == "defaultBannerVars":
+            continue
+
+        channel = k1
+
+        for date, v2 in v1.iteritems():
+            for time, value in v2.iteritems():
+                p = parseItem(channel, date, time, value)
+
+                if p != None:
+                    if p.pid in db:
+                        print("WARNING: duplicate pid {0}".format(p.pid))
+                        #                        db[pid].display()
+                        #                        p.display()
+
+                    db[p.pid] = p
+
+
+def download(db, replayFolder, type):
+    g = urlgrabber.grabber.URLGrabber(progress_obj = urlgrabber.progress.TextMeter())
+    today = date.today()
+
+    for x in range(1, 8):
+        day = today - timedelta(days = x)
+        strDate = day.strftime("_%Y_%m_%d")
+
+        for channel in channels.itervalues():
+            filename = channel + strDate + ".html"
+            url = baseUrl + "/" + filename
+            localName = os.path.join(replayFolder, filename)
+
+            f = Utils.download(g, url, localName, type, "latin1")
+            process(f, db)
+
+    print()
+
+
+def list(db):
+    for p in sorted(db.itervalues(), key = lambda x: x.datetime):
+        print(p.short())
+
+
+def display(item):
+    item.display()
 
 
 class Program:
