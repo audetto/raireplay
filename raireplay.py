@@ -12,11 +12,16 @@ import urlgrabber.progress
 
 from datetime import date
 from datetime import timedelta
+
 from asi import Program
 from asi import Demand
+from asi import Utils
 
 rootFolder = os.path.expanduser("~/.raireplay")
 dataFolder = os.path.join(rootFolder, "data")
+replayFolder = os.path.join(dataFolder, "replay")
+urlFolder = os.path.join(dataFolder, "url")
+
 programFolder = os.path.join(rootFolder, "programs")
 channels = {"1": "RaiUno", "2": "RaiDue", "3": "RaiTre", "31": "RaiCinque"}
 baseUrl = "http://www.rai.it/dl/portale/html/palinsesti/replaytv/static"
@@ -42,8 +47,7 @@ def parseItem(channel, date, time, value):
     return None
 
 
-def process(filename, db):
-    f = codecs.open(filename, "r", encoding="latin1")
+def process(f, db):
     o = json.load(f)
 
     for k1, v1 in o.iteritems():
@@ -68,9 +72,6 @@ def process(filename, db):
 
 
 def download(db, type):
-    if not os.path.exists(dataFolder):
-        os.makedirs(dataFolder)
-
     g = urlgrabber.grabber.URLGrabber(progress_obj = urlgrabber.progress.TextMeter())
     today = date.today()
 
@@ -81,13 +82,10 @@ def download(db, type):
         for channel in channels.itervalues():
             filename = channel + strDate + ".html"
             url = baseUrl + "/" + filename
-            localName = os.path.join(dataFolder, filename)
+            localName = os.path.join(replayFolder, filename)
 
-            if type == "always" or (type == "update" and not os.path.exists(localName)):
-                filename = g.urlgrab(url, filename = localName)
-
-            if os.path.exists(localName):
-                process(localName, db)
+            f = Utils.download(g, url, localName, type, "latin1")
+            process(f, db)
 
     print()
 
@@ -114,6 +112,12 @@ def main():
 
     args = parser.parse_args()
 
+    if not os.path.exists(replayFolder):
+        os.makedirs(replayFolder)
+
+    if not os.path.exists(urlFolder):
+        os.makedirs(urlFolder)
+
     db = {}
     download(db, args.download)
 
@@ -130,7 +134,7 @@ def main():
             else:
                 print("PID {0} not found".format(pid))
     elif args.url != None:
-        d = Demand.Demand(args.url)
+        d = Demand.Demand(args.url, urlFolder, args.download)
         d.display()
     else:
         print()

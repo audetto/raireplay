@@ -1,5 +1,6 @@
 from __future__ import print_function
 
+import os.path
 import urlgrabber.grabber
 import urlgrabber.progress
 
@@ -7,6 +8,8 @@ import ConfigParser
 
 from HTMLParser import HTMLParser
 from xml.etree import ElementTree
+
+from asi import Utils
 
 # <meta name="videourl" content="....." />
 
@@ -74,14 +77,17 @@ class VideoHTMLParser(HTMLParser):
         return None
 
 class Demand:
-    def __init__(self, url):
+    def __init__(self, url, folder, type):
         self.url = url
 
         g = urlgrabber.grabber.URLGrabber()
-        content = g.urlread(self.url).decode("latin1")
+
+        localFilename = os.path.join(folder, Utils.httpFilename(self.url))
+
+        f = Utils.download(g, self.url, localFilename, type, "latin1")
 
         parser = VideoHTMLParser()
-        parser.feed(content)
+        parser.feed(f.read())
 
         self.values = parser.values
 

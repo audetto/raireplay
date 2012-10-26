@@ -12,6 +12,7 @@ import urlgrabber.grabber
 import urlgrabber.progress
 
 from asi import Meter
+from asi import Utils
 
 def getFullUrl(tablet, phone):
     if tablet == "":
@@ -127,7 +128,7 @@ class Program:
         if self.ts == "":
             return self.pid
 
-        fullName = os.path.split(os.path.split(urlparse.urlsplit(self.ts).path)[0])[1]
+        fullName = Utils.httpFilename(self.ts)
         tmp = fullName.split(",")[0]
         posOfDash = tmp.rfind("-")
         nice = tmp[0 : posOfDash]
