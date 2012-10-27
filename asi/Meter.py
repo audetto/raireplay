@@ -4,6 +4,14 @@ import time
 
 import urlgrabber.progress
 
+# progress class for URLgrabber
+# that "concatenates" many files.
+# we want to have a global progress constrained by:
+# we know the number of files
+# we do not know the total size
+# we estimate the size based on the previous files
+# assuming they are about the same lenght
+
 class Meter(urlgrabber.progress.TextMeter):
     def __init__(self, numberOfFiles, name):
         urlgrabber.progress.TextMeter.__init__(self)

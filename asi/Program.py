@@ -22,6 +22,8 @@ from asi import Utils
 baseUrl = "http://www.rai.it/dl/portale/html/palinsesti/replaytv/static"
 channels = {"1": "RaiUno", "2": "RaiDue", "3": "RaiTre", "31": "RaiCinque"}
 
+# tablet and phone url contain an overlapping set of bitrates
+# this function makes the union of the 2
 def getFullUrl(tablet, phone):
     if tablet == "":
         return phone
@@ -195,8 +197,9 @@ class Program:
         return self.m3
 
 
+    # use RAI m3u8 url to get a "nice" filename
+    # as opposed to only use the pid
     def getFilename(self):
-
         if self.ts == "":
             return self.pid
 

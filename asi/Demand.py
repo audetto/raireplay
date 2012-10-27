@@ -28,7 +28,6 @@ from asi import Utils
 
 invalid = "http://creativemedia3.rai.it/video_no_available.mp4"
 
-
 # create a subclass and override the handler methods
 class VideoHTMLParser(HTMLParser):
     def __init__(self):
@@ -98,12 +97,15 @@ class Demand:
 
         urlScheme = urlparse.urlsplit(self.values.videoUrl).scheme
         if urlScheme == "mms":
+            # if it is already mms, don't look further
             self.asf = None
             self.mms = self.values.videoUrl
         else:
+            # search for the mms url
             content = g.urlread(self.values.videoUrl)
 
             if content == invalid:
+                # is this the case of videos only available in Italy?
                 self.asf = invalid
                 self.mms = invalid
             else:

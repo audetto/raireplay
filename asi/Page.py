@@ -16,6 +16,7 @@ baseUrl = "http://www.rai.tv"
 # http://www.rai.tv/StatisticheProxy/proxyPost.jsp?action=getLastContentByTag&numContents=12&tags=PageOB:Page-054bcd53-df7e-42c3-805b-dbe6e90bc817&domain=RaiTv&xsl=rai_tv-statisticheN&_=1351111295981
 
 
+# returns the url that requests the list of ContentItems behind a Page-xxx page
 def getDataUrl(page):
     n = 1000 # just get them all
     url = "http://www.rai.tv/StatisticheProxy/proxyPost.jsp?action=getLastContentByTag&numContents={0}&tags=PageOB:{1}&domain=RaiTv".format(n, page)
