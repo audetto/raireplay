@@ -200,7 +200,7 @@ class Program:
         if self.ts == "":
             return self.pid
 
-        fullName = Utils.httpFilename(self.ts)
+        fullName = os.path.split(os.path.split(urlparse.urlsplit(self.ts).path)[0])[1]
         tmp = fullName.split(",")[0]
         posOfDash = tmp.rfind("-")
         nice = tmp[0 : posOfDash]
