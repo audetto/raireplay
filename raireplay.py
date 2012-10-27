@@ -12,31 +12,49 @@ from asi import Demand
 from asi import Config
 
 
+def list(db):
+    for p in sorted(db.itervalues(), key = lambda x: x.datetime):
+        print(p.short())
+
+
+def display(item):
+    item.display()
+
+
 def main():
 
     parser = argparse.ArgumentParser(description = "Rai Replay")
     parser.add_argument("--download", action = "store", default = "update", choices = ["always", "update", "never"],
                         help = "Default is update")
+    parser.add_argument("--format", action = "store", choices = ["h264", "ts"])
+
+    parser.add_argument("--page",   action = "store", help = "RAI On Demand Page")
+    parser.add_argument("--replay", action = "store_true", default = False, help = "RAI Replay")
+
     parser.add_argument("--list", action = "store_true", default = False)
     parser.add_argument("--get", action = "store_true", default = False)
-    parser.add_argument("--format", action = "store", choices = ["h264", "ts"])
-    parser.add_argument("--item", action = "store", help = "RAI On Demand Item")
-    parser.add_argument("--page", action = "store", help = "RAI On Demand Page")
     parser.add_argument("pid", nargs = "*")
+
+    parser.add_argument("--item", action = "store", help = "RAI On Demand Item")
 
     args = parser.parse_args()
 
     db = {}
-    Program.download(db, Config.replayFolder, args.download)
+
+    if args.replay:
+        Program.download(db, Config.replayFolder, args.download)
+
+    if args.page != None:
+        Page.download(db, args.page, Config.pageFolder, args.download)
 
     if args.list:
-        Program.list(db)
+        list(db)
 
     if len(args.pid) > 0:
         for pid in args.pid:
             if pid in db:
                 p = db[pid]
-                Program.display(p)
+                display(p)
                 if args.get:
                     p.download(Config.programFolder, args.format)
             else:
@@ -44,8 +62,6 @@ def main():
     elif args.item != None:
         d = Demand.Demand(args.item, Config.itemFolder, args.download)
         d.display()
-    elif args.page != None:
-        d = Page.Page(args.page, Config.pageFolder, args.download)
     else:
         print()
         print("INFO: {0} programmes found".format(len(db)))

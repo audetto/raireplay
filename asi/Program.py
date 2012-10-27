@@ -116,15 +116,6 @@ def download(db, replayFolder, type):
     print()
 
 
-def list(db):
-    for p in sorted(db.itervalues(), key = lambda x: x.datetime):
-        print(p.short())
-
-
-def display(item):
-    item.display()
-
-
 class Program:
     def __init__(self, channel, date, hour, pid, minutes, name, desc, h264, tablet, smartPhone):
         self.channel = channel
@@ -141,7 +132,7 @@ class Program:
 
     def short(self):
         ts = time.strftime("%Y-%m-%d %H:%M", self.datetime)
-        str = self.pid + ": " + ts + " " + self.name
+        str = unicode("{0:>6}: {1} {2}").format(self.pid, ts, self.name)
         return str
 
 
@@ -155,7 +146,7 @@ class Program:
         print("Description:", self.desc)
         print("Date:", time.strftime("%Y-%m-%d %H:%M", self.datetime))
         print("Length:", self.minutes, "minutes")
-        print("Filename: ", self.getFilename())
+        print("Filename:", self.getFilename())
         print()
         print("h264:", self.h264)
         print("ts:  ", self.ts)

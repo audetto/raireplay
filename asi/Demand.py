@@ -3,6 +3,7 @@ from __future__ import print_function
 import os.path
 import urlgrabber.grabber
 import urlgrabber.progress
+import urlparse
 
 import ConfigParser
 
@@ -95,21 +96,26 @@ class Demand:
         #sometimes we get .mp4 which does not work
         self.values.videoUrl = self.values.videoUrl.replace("relinkerServlet.mp4", "relinkerServlet.htm")
 
-        content = g.urlread(self.values.videoUrl)
-
-        if content == invalid:
-            self.asf = invalid
-            self.mms = invalid
+        urlScheme = urlparse.urlsplit(self.values.videoUrl).scheme
+        if urlScheme == "mms":
+            self.asf = None
+            self.mms = self.values.videoUrl
         else:
-            root = ElementTree.fromstring(content)
-            self.asf = root[0][0].attrib.get("HREF")
+            content = g.urlread(self.values.videoUrl)
 
-            # use urlgrab to make it work with ConfigParser
-            content = g.urlgrab(self.asf)
-            config = ConfigParser.ConfigParser()
-            config.read(content)
-            self.mms = config.get("Reference", "ref1")
-            self.mms = self.mms.replace("http://", "mms://")
+            if content == invalid:
+                self.asf = invalid
+                self.mms = invalid
+            else:
+                root = ElementTree.fromstring(content)
+                self.asf = root[0][0].attrib.get("HREF")
+
+                # use urlgrab to make it work with ConfigParser
+                content = g.urlgrab(self.asf)
+                config = ConfigParser.ConfigParser()
+                config.read(content)
+                self.mms = config.get("Reference", "ref1")
+                self.mms = self.mms.replace("http://", "mms://")
 
     def display(self):
         width = urlgrabber.progress.terminal_width()
