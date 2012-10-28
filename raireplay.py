@@ -17,8 +17,21 @@ def list(db):
         print(p.short())
 
 
-def display(item):
-    item.display()
+def displayOrGet(item, list, get, format):
+    if list:
+        print(item.short())
+    else:
+        item.display()
+    if get:
+        item.download(Config.programFolder, format)
+
+
+def find(db, match, subset):
+    match = match.lower()
+    for p in db.itervalues():
+        s = p.short().lower()
+        if s.find(match) != -1:
+            subset.add(p)
 
 
 def main():
@@ -47,21 +60,24 @@ def main():
     if args.page != None:
         Page.download(db, args.page, Config.pageFolder, args.download)
 
-    if args.list:
-        list(db)
-
     if len(args.pid) > 0:
+        subset = set()
         for pid in args.pid:
             if pid in db:
-                p = db[pid]
-                display(p)
-                if args.get:
-                    p.download(Config.programFolder, args.format)
+                subset.add(db[pid])
             else:
-                print("PID {0} not found".format(pid))
+                find(db, pid, subset)
+
+            for p in sorted(subset, key = lambda x: x.datetime):
+                displayOrGet(p, args.list, args.get, args.format)
+
     elif args.item != None:
         d = Demand.Demand(args.item, Config.itemFolder, args.download)
         d.display()
+
+    elif args.list:
+        list(db)
+
     else:
         print()
         print("INFO: {0} programmes found".format(len(db)))
