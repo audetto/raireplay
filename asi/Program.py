@@ -230,7 +230,7 @@ class Program:
             print("Saving {0} as {1}".format(self.pid, localFilename))
 
             numberOfFiles = len(item.segments)
-            progress = Meter.Meter(numberOfFiles, self.pid + ".ts")
+            progress = Meter.Meter(numberOfFiles, self.getFilename() + ".ts")
             g = urlgrabber.grabber.URLGrabber(progress_obj = progress, quote = 0)
 
             for seg in item.segments:
