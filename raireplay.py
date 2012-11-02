@@ -26,12 +26,15 @@ def displayOrGet(item, list, get, format):
         item.download(Config.programFolder, format)
 
 
-def find(db, match, subset):
-    match = match.lower()
-    for p in db.itervalues():
-        s = p.short().lower()
-        if s.find(match) != -1:
-            subset.add(p)
+def find(db, pid, subset):
+    if pid in db:
+        subset.add(db[pid])
+    else:
+        match = pid.lower()
+        for p in db.itervalues():
+            s = p.short().lower()
+            if s.find(match) != -1:
+                subset.add(p)
 
 
 def main():
@@ -63,10 +66,7 @@ def main():
     if len(args.pid) > 0:
         subset = set()
         for pid in args.pid:
-            if pid in db:
-                subset.add(db[pid])
-            else:
-                find(db, pid, subset)
+            find(db, pid, subset)
 
             for p in sorted(subset, key = lambda x: x.datetime):
                 displayOrGet(p, args.list, args.get, args.format)
