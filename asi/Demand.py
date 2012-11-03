@@ -1,133 +1,56 @@
 from __future__ import print_function
 
+import json
 import os.path
+
 import urlgrabber.grabber
 import urlgrabber.progress
-import urlparse
-
-import ConfigParser
-
-from HTMLParser import HTMLParser
-from xml.etree import ElementTree
 
 from asi import Utils
 
-# <meta name="videourl" content="....." />
+url = "http://www.rai.tv/dl/RaiTV/programmi/ricerca/ContentSet-6445de64-d321-476c-a890-ae4ed32c729e-darivedere.html"
+baseUrl = "http://www.rai.tv"
 
-# <ASX VERSION="3.0"><ENTRY><REF HREF="http://wms1.rai.it/raiunocdn/raiuno/79221.wmv" /></ENTRY></ASX>
+def process(f, db):
+    o = json.load(f)
 
-# [Reference]
-# Ref1=http://wms1.rai.it/raiunocdn/raiuno/79221.wmv?MSWMExt=.asf
-# Ref2=http://92.122.190.142:80/raiunocdn/raiuno/79221.wmv?MSWMExt=.asf
+    pid = 0
 
-# this one needs videoPath
-# http://www.rai.tv/dl/RaiTV/programmi/media/ContentItem-6278dcf9-0225-456c-b4cf-71978200400a.html
-#
-# here we can get away with videoUrl
-# http://www.rai.tv/dl/RaiTV/programmi/media/ContentItem-b9812490-7243-4545-a5fc-843bf46ec3c9.html
+    for v in o:
+        p = Group(pid, v["title"], v["linkDemand"], v["date"])
+        db[str(pid)] = p
+        pid = pid + 1
 
-invalid = "http://creativemedia3.rai.it/video_no_available.mp4"
 
-# create a subclass and override the handler methods
-class VideoHTMLParser(HTMLParser):
-    def __init__(self):
-        HTMLParser.__init__(self)
+def download(db, folder, type):
+    page = Utils.httpFilename(url)
 
-        self.values = Utils.Obj()
-        self.values.videoUrl = None
-        self.values.title = None
-        self.values.program = None
-        self.values.description = None
-        self.values.videoPath = None
+    g = urlgrabber.grabber.URLGrabber()
 
-    def handle_starttag(self, tag, attrs):
-        if tag == "meta":
-            val = self.extract(attrs, "videourl")
-            if val != None:
-                self.values.videoUrl = val
+    localFilename = os.path.join(folder, page)
+    f = Utils.download(g, url, localFilename, type, "raw-unicode-escape")
 
-            val = self.extract(attrs, "title")
-            if val != None:
-                self.values.title = val
+    process(f, db)
 
-            val = self.extract(attrs, "programmaTV")
-            if val != None:
-                self.values.program = val
 
-            val = self.extract(attrs, "description")
-            if val != None:
-                self.values.description = val
+class Group:
+    def __init__(self, pid, title, link, date):
+        self.pid = pid
+        self.title = title
+        self.url = baseUrl + link
+        self.datetime = float(date)
 
-        elif tag == "param":
-            if len(attrs) > 0:
-                if attrs[0][0] == "value":
-                    path = attrs[0][1]
-                    if path.find("videoPath") == 0:
-                        firstEqual = path.find("=")
-                        firstComma = path.find(",")
-                        self.values.videoPath = path[firstEqual + 1: firstComma]
 
-    def extract(self, attrs, name):
-        if len(attrs) > 1:
-            if attrs[0][0] == "name" and attrs[0][1] == name:
-                if attrs[1][0] == "content":
-                    return attrs[1][1]
-        return None
+    def short(self):
+        str = unicode("{0:>6}: {1}").format(self.pid, self.title)
+        return str
 
-class Demand:
-    def __init__(self, url, folder, type):
-        self.url = url
-
-        g = urlgrabber.grabber.URLGrabber()
-
-        localFilename = os.path.join(folder, Utils.httpFilename(self.url))
-
-        f = Utils.download(g, self.url, localFilename, type, "latin1")
-
-        parser = VideoHTMLParser()
-        parser.feed(f.read())
-
-        self.values = parser.values
-
-        if self.values.videoUrl == None:
-            self.values.videoUrl = self.values.videoPath
-
-        #sometimes we get .mp4 which does not work
-        self.values.videoUrl = self.values.videoUrl.replace("relinkerServlet.mp4", "relinkerServlet.htm")
-
-        urlScheme = urlparse.urlsplit(self.values.videoUrl).scheme
-        if urlScheme == "mms":
-            # if it is already mms, don't look further
-            self.asf = None
-            self.mms = self.values.videoUrl
-        else:
-            # search for the mms url
-            content = g.urlread(self.values.videoUrl)
-
-            if content == invalid:
-                # is this the case of videos only available in Italy?
-                self.asf = invalid
-                self.mms = invalid
-            else:
-                root = ElementTree.fromstring(content)
-                self.asf = root[0][0].attrib.get("HREF")
-
-                # use urlgrab to make it work with ConfigParser
-                content = g.urlgrab(self.asf)
-                config = ConfigParser.ConfigParser()
-                config.read(content)
-                self.mms = config.get("Reference", "ref1")
-                self.mms = self.mms.replace("http://", "mms://")
 
     def display(self):
         width = urlgrabber.progress.terminal_width()
 
         print("=" * width)
-        print("title:      ", self.values.title)
-        print("program:    ", self.values.program)
-        print("description:", self.values.description)
+        print("Title:", self.title)
+        print("URL:", self.url)
+
         print()
-        print("url:        ", self.url)
-        print("videourl:   ", self.values.videoUrl)
-        print("asf:        ", self.asf)
-        print("mms:        ", self.mms)

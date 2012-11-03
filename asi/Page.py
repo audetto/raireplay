@@ -50,7 +50,7 @@ class Item:
         print("Description:", self.description)
         print("Date:", time.strftime("%Y-%m-%d %H:%M", self.datetime))
         print("Length:", self.length)
-        print("Url:", self.url)
+        print("URL:", self.url)
         print()
 
 

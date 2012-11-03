@@ -144,7 +144,7 @@ class Program:
         print("=" * width)
         print("Channel:", self.channel)
         print("PID:", self.pid)
-        print("Name:", self.name)
+        print("Title:", self.name)
         print("Description:", self.desc)
         print("Date:", time.strftime("%Y-%m-%d %H:%M", self.datetime))
         print("Length:", self.minutes, "minutes")

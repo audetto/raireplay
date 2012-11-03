@@ -8,6 +8,7 @@ import argparse
 
 from asi import Program
 from asi import Page
+from asi import Item
 from asi import Demand
 from asi import Config
 
@@ -46,6 +47,7 @@ def main():
 
     parser.add_argument("--page",   action = "store", help = "RAI On Demand Page")
     parser.add_argument("--replay", action = "store_true", default = False, help = "RAI Replay")
+    parser.add_argument("--ondemand", action = "store_true", default = False, help = "RAI On Demand List")
 
     parser.add_argument("--list", action = "store_true", default = False)
     parser.add_argument("--get", action = "store_true", default = False)
@@ -63,6 +65,9 @@ def main():
     if args.page != None:
         Page.download(db, args.page, Config.pageFolder, args.download)
 
+    if args.ondemand:
+        Demand.download(db, Config.demandFolder, args.download)
+
     if len(args.pid) > 0:
         subset = set()
         for pid in args.pid:
@@ -72,7 +77,7 @@ def main():
                 displayOrGet(p, args.list, args.get, args.format)
 
     elif args.item != None:
-        d = Demand.Demand(args.item, Config.itemFolder, args.download)
+        d = Item.Demand(args.item, Config.itemFolder, args.download)
         d.display()
 
     elif args.list:
@@ -89,6 +94,8 @@ def main():
 #
 # and it seems that redirecting the output requires a "latin1" terminal
 # done here
+if sys.stdout.encoding == None:
+    sys.stdout = codecs.getwriter("latin1")(sys.stdout, "ignore")
+# otherwise we leave it unchanged (it should be UTF-8 when printing to the console)
 
-sys.stdout = codecs.getwriter("latin1")(sys.stdout)
 main()
