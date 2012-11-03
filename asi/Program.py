@@ -112,7 +112,7 @@ def download(db, replayFolder, type):
             url = baseUrl + "/" + filename
             localName = os.path.join(replayFolder, filename)
 
-            f = Utils.download(g, url, localName, type, "latin1")
+            f = Utils.download(g, url, localName, type, "utf-8")
             process(f, db)
 
     print()

@@ -23,6 +23,11 @@ def getDataUrl(page):
     return url
 
 
+def getWebFromID(id):
+    web = "/dl/RaiTV/programmi/media/{0}.html".format(id)
+    return web
+
+
 class Item:
     def __init__(self, pid, data):
         self.pid           = pid
@@ -30,7 +35,10 @@ class Item:
         self.length        = data.findtext("durata")
         self.title         = data.findtext("titolo")
         self.description   = data.findtext("descrizione")
-        self.url           = baseUrl + data.findtext("web")
+        web =  data.findtext("web")
+        if web == None:
+            web = getWebFromID(self.id)
+        self.url           = baseUrl + web
         strTime            = data.findtext("dataultimavisita")
         self.datetime      = time.strptime(strTime, "%d/%m/%Y %H:%M:%S")
 
@@ -63,11 +71,10 @@ def download(db, url, folder, type):
     g = urlgrabber.grabber.URLGrabber()
 
     localFilename = os.path.join(folder, page + ".xml")
-    f = Utils.download(g, dataUrl, localFilename, type, None)
+    f = Utils.download(g, dataUrl, localFilename, type, "utf-8")
 
-    # RAI says it is UTF-8 but it is not!
-    # and ElementTree does not like unicode, it prefers byte strings
-    root = ElementTree.fromstring(f.read().strip().decode("latin1").encode("utf-8"))
+    # ElementTree does not like unicode, it prefers byte strings
+    root = ElementTree.fromstring(f.read().strip().encode("utf-8"))
 
     pid = 0
 

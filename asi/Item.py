@@ -82,10 +82,10 @@ class Demand:
 
         localFilename = os.path.join(folder, Utils.httpFilename(self.url))
 
-        f = Utils.download(g, self.url, localFilename, type, "latin1")
+        f = Utils.download(g, self.url, localFilename, type, "utf-8")
 
         parser = VideoHTMLParser()
-        parser.feed(f.read())
+        parser.feed(f.read().encode("utf-8"))
 
         self.values = parser.values
 
