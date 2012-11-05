@@ -90,12 +90,11 @@ def main():
     print()
 
 # is this required??? seems a bit of pythonic nonsense
-# all RAI html is encoded in "latin1" (decoded as we read)
+# all RAI html is encoded in "utf-8" (decoded as we read)
 #
-# and it seems that redirecting the output requires a "latin1" terminal
+# and it seems that redirecting the output (e.g. "| less") requires am explicit encoding
 # done here
 if sys.stdout.encoding == None:
-    sys.stdout = codecs.getwriter("latin1")(sys.stdout, "ignore")
-# otherwise we leave it unchanged (it should be UTF-8 when printing to the console)
+    sys.stdout = codecs.getwriter("utf-8")(sys.stdout, "ignore")
 
 main()

@@ -39,6 +39,7 @@ class VideoHTMLParser(HTMLParser):
         self.values.program = None
         self.values.description = None
         self.values.videoPath = None
+        self.values.type = None
 
     def handle_starttag(self, tag, attrs):
         if tag == "meta":
@@ -57,6 +58,10 @@ class VideoHTMLParser(HTMLParser):
             val = self.extract(attrs, "description")
             if val != None:
                 self.values.description = val
+
+            val = self.extract(attrs, "tipo")
+            if val != None:
+                self.values.type = val
 
         elif tag == "param":
             if len(attrs) > 0:
@@ -85,9 +90,16 @@ class Demand:
         f = Utils.download(g, self.url, localFilename, type, "utf-8")
 
         parser = VideoHTMLParser()
-        parser.feed(f.read().encode("utf-8"))
+        parser.feed(f.read())
 
         self.values = parser.values
+
+        if self.values.type != "Video":
+            # this is a case of a Photogallery
+            self.url = None
+            self.asf = None
+            self.mms = None
+            return
 
         if self.values.videoUrl == None:
             self.values.videoUrl = self.values.videoPath
@@ -124,6 +136,7 @@ class Demand:
 
         print("=" * width)
         print("Title:      ", self.values.title)
+        print("Type:       ", self.values.type)
         print("Program:    ", self.values.program)
         print("Description:", self.values.description)
         print()
