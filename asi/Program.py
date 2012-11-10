@@ -12,8 +12,6 @@ import json
 from datetime import date
 from datetime import timedelta
 
-
-import urlgrabber.grabber
 import urlgrabber.progress
 
 from asi import Meter
@@ -99,8 +97,9 @@ def process(f, db):
                     db[p.pid] = p
 
 
-def download(db, replayFolder, type):
-    g = urlgrabber.grabber.URLGrabber(progress_obj = urlgrabber.progress.TextMeter())
+def download(db, grabber, replayFolder, type):
+    progress_obj = urlgrabber.progress.TextMeter()
+
     today = date.today()
 
     for x in range(1, 8):
@@ -112,7 +111,7 @@ def download(db, replayFolder, type):
             url = baseUrl + "/" + filename
             localName = os.path.join(replayFolder, filename)
 
-            f = Utils.download(g, url, localName, type, "utf-8")
+            f = Utils.download(grabber, progress_obj, url, localName, type, "utf-8")
             process(f, db)
 
     print()
@@ -164,26 +163,26 @@ class Program:
             print()
 
 
-    def download(self, folder, format):
+    def download(self, grabber, folder, format):
         if not os.path.exists(folder):
             os.makedirs(folder)
 
         if format == "h264":
-            self.downloadH264(folder)
+            self.downloadH264(grabber, folder)
         elif format == "ts":
-            self.downloadTablet(folder)
+            self.downloadTablet(grabber, folder)
         elif format == None:
-            self.downloadH264(folder)
+            self.downloadH264(grabber, folder)
 
 
-    def downloadH264(self, folder):
-        g = urlgrabber.grabber.URLGrabber(progress_obj = urlgrabber.progress.TextMeter())
+    def downloadH264(self, grabber, folder):
+        progress_obj = urlgrabber.progress.TextMeter()
         localFilename = os.path.join(folder, self.getFilename() + ".mp4")
 
         print()
         print("Saving {0} as {1}".format(self.pid, localFilename))
 
-        filename = g.urlgrab(self.h264, filename = localFilename)
+        filename = grabber.urlgrab(self.h264, filename = localFilename, progress_obj = progress_obj)
 
         print()
         print("Saved {0} as {1}".format(self.pid, filename))
@@ -213,7 +212,7 @@ class Program:
         return filename
 
 
-    def downloadTablet(self, folder):
+    def downloadTablet(self, grabber, folder):
         m3 = self.getTabletPlaylist()
         if m3.is_variant:
             playlist = m3.playlists[0]
@@ -231,11 +230,10 @@ class Program:
 
             numberOfFiles = len(item.segments)
             progress = Meter.Meter(numberOfFiles, self.getFilename() + ".ts")
-            g = urlgrabber.grabber.URLGrabber(progress_obj = progress, quote = 0)
 
             for seg in item.segments:
                 uri = seg.baseuri + "/" + seg.uri
-                s = g.urlread(uri)
+                s = grabber.urlread(uri, progress_obj = progress, quote = 0)
                 out.write(s)
 
             print()

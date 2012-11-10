@@ -12,19 +12,20 @@ from asi import Item
 from asi import Demand
 from asi import Config
 
+import urlgrabber.grabber
 
 def list(db):
     for p in sorted(db.itervalues(), key = lambda x: x.datetime):
         print(p.short())
 
 
-def displayOrGet(item, list, get, format):
+def displayOrGet(item, grabber, list, get, format):
     if list:
         print(item.short())
     else:
         item.display()
     if get:
-        item.download(Config.programFolder, format)
+        item.download(grabber, Config.programFolder, format)
 
 
 def find(db, pid, subset):
@@ -59,14 +60,16 @@ def main():
 
     db = {}
 
+    grabber = urlgrabber.grabber.URLGrabber()
+
     if args.replay:
-        Program.download(db, Config.replayFolder, args.download)
+        Program.download(db, grabber, Config.replayFolder, args.download)
 
     if args.page != None:
-        Page.download(db, args.page, Config.pageFolder, args.download)
+        Page.download(db, grabber, args.page, Config.pageFolder, args.download)
 
     if args.ondemand:
-        Demand.download(db, Config.demandFolder, args.download)
+        Demand.download(db, grabber, Config.demandFolder, args.download)
 
     if len(args.pid) > 0:
         subset = set()
@@ -74,10 +77,10 @@ def main():
             find(db, pid, subset)
 
             for p in sorted(subset, key = lambda x: x.datetime):
-                displayOrGet(p, args.list, args.get, args.format)
+                displayOrGet(p, grabber, args.list, args.get, args.format)
 
     elif args.item != None:
-        d = Item.Demand(args.item, Config.itemFolder, args.download)
+        d = Item.Demand(grabber, args.item, Config.itemFolder, args.download)
         d.display()
 
     elif args.list:

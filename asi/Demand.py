@@ -3,7 +3,6 @@ from __future__ import print_function
 import json
 import os.path
 
-import urlgrabber.grabber
 import urlgrabber.progress
 
 from asi import Utils
@@ -22,13 +21,11 @@ def process(f, db):
         pid = pid + 1
 
 
-def download(db, folder, type):
+def download(db, grabber, folder, type):
     page = Utils.httpFilename(url)
 
-    g = urlgrabber.grabber.URLGrabber()
-
     localFilename = os.path.join(folder, page)
-    f = Utils.download(g, url, localFilename, type, "raw-unicode-escape")
+    f = Utils.download(grabber, None, url, localFilename, type, "raw-unicode-escape")
 
     process(f, db)
 

@@ -1,7 +1,6 @@
 from __future__ import print_function
 
 import os.path
-import urlgrabber.grabber
 import urlgrabber.progress
 import urlparse
 
@@ -80,14 +79,12 @@ class VideoHTMLParser(HTMLParser):
         return None
 
 class Demand:
-    def __init__(self, url, folder, type):
+    def __init__(self, grabber, url, folder, type):
         self.url = url
-
-        g = urlgrabber.grabber.URLGrabber()
 
         localFilename = os.path.join(folder, Utils.httpFilename(self.url))
 
-        f = Utils.download(g, self.url, localFilename, type, "utf-8")
+        f = Utils.download(grabber, None, self.url, localFilename, type, "utf-8")
 
         parser = VideoHTMLParser()
         parser.feed(f.read())
@@ -114,7 +111,7 @@ class Demand:
             self.mms = self.values.videoUrl
         else:
             # search for the mms url
-            content = g.urlread(self.values.videoUrl)
+            content = grabber.urlread(self.values.videoUrl)
 
             if content == invalid:
                 # is this the case of videos only available in Italy?
@@ -125,7 +122,7 @@ class Demand:
                 self.asf = root[0][0].attrib.get("HREF")
 
                 # use urlgrab to make it work with ConfigParser
-                content = g.urlgrab(self.asf)
+                content = grabber.urlgrab(self.asf)
                 config = ConfigParser.ConfigParser()
                 config.read(content)
                 self.mms = config.get("Reference", "ref1")

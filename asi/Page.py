@@ -2,7 +2,6 @@ from __future__ import print_function
 
 import time
 import os.path
-import urlgrabber.grabber
 import urlgrabber.progress
 
 from xml.etree import ElementTree
@@ -62,16 +61,14 @@ class Item:
         print()
 
 
-def download(db, url, folder, type):
+def download(db, grabber, url, folder, type):
     page = Utils.httpFilename(url)
     page = os.path.splitext(page)[0]
 
     dataUrl = getDataUrl(page)
 
-    g = urlgrabber.grabber.URLGrabber()
-
     localFilename = os.path.join(folder, page + ".xml")
-    f = Utils.download(g, dataUrl, localFilename, type, "utf-8")
+    f = Utils.download(grabber, None, dataUrl, localFilename, type, "utf-8")
 
     # ElementTree does not like unicode, it prefers byte strings
     root = ElementTree.fromstring(f.read().strip().encode("utf-8"))
