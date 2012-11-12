@@ -6,6 +6,7 @@ import sys
 import codecs
 import argparse
 
+from asi import Info
 from asi import Program
 from asi import Page
 from asi import Item
@@ -42,9 +43,12 @@ def find(db, pid, subset):
 def main():
 
     parser = argparse.ArgumentParser(description = "Rai Replay")
+
     parser.add_argument("--download", action = "store", default = "update", choices = ["always", "update", "never"],
                         help = "Default is update")
     parser.add_argument("--format", action = "store", choices = ["h264", "ts"])
+    parser.add_argument("--info", action = "store_true", default = False)
+    parser.add_argument("--tor", action = "store_true", default = False)
 
     parser.add_argument("--page",   action = "store", help = "RAI On Demand Page")
     parser.add_argument("--replay", action = "store_true", default = False, help = "RAI Replay")
@@ -60,7 +64,17 @@ def main():
 
     db = {}
 
-    grabber = urlgrabber.grabber.URLGrabber()
+    proxy = None
+
+    if args.tor:
+        # we use privoxy to access tor
+        proxy = { "http" : "http://127.0.0.1:8118" }
+
+    grabber = urlgrabber.grabber.URLGrabber(proxies = proxy)
+
+    if args.info:
+        Info.display(grabber, Config.rootFolder)
+        return
 
     if args.replay:
         Program.download(db, grabber, Config.replayFolder, args.download)
