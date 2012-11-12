@@ -6,10 +6,13 @@ import codecs
 class Obj:
     pass
 
+baseUrl = "http://www.rai.tv"
+
 
 def httpFilename(url):
     name = os.path.split(urlparse.urlsplit(url).path)[1]
     return name
+
 
 def download(grabber, progress, url, localName, type, encoding):
     exists = os.path.exists(localName)
@@ -26,3 +29,8 @@ def download(grabber, progress, url, localName, type, encoding):
         f = codecs.open(localName, "r", encoding = encoding)
 
     return f
+
+
+def getWebFromID(id):
+    web = "/dl/RaiTV/programmi/media/{0}.html".format(id)
+    return web

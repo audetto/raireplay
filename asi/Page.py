@@ -8,23 +8,15 @@ from xml.etree import ElementTree
 
 from asi import Utils
 
-baseUrl = "http://www.rai.tv"
-
 # example: without xls we get a nice XML,
 # numContent is compulsory, but it seems a big number is accepted and gives the whole list
 # http://www.rai.tv/StatisticheProxy/proxyPost.jsp?action=getLastContentByTag&numContents=12&tags=PageOB:Page-054bcd53-df7e-42c3-805b-dbe6e90bc817&domain=RaiTv&xsl=rai_tv-statisticheN&_=1351111295981
-
 
 # returns the url that requests the list of ContentItems behind a Page-xxx page
 def getDataUrl(page):
     n = 1000 # just get them all
     url = "http://www.rai.tv/StatisticheProxy/proxyPost.jsp?action=getLastContentByTag&numContents={0}&tags=PageOB:{1}&domain=RaiTv".format(n, page)
     return url
-
-
-def getWebFromID(id):
-    web = "/dl/RaiTV/programmi/media/{0}.html".format(id)
-    return web
 
 
 class Item:
@@ -36,8 +28,8 @@ class Item:
         self.description   = data.findtext("descrizione")
         web =  data.findtext("web")
         if web == None:
-            web = getWebFromID(self.id)
-        self.url           = baseUrl + web
+            web = Utils.getWebFromID(self.id)
+        self.url           = Utils.baseUrl + web
         strTime            = data.findtext("dataultimavisita")
         self.datetime      = time.strptime(strTime, "%d/%m/%Y %H:%M:%S")
 

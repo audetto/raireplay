@@ -39,6 +39,7 @@ class VideoHTMLParser(HTMLParser):
         self.values.description = None
         self.values.videoPath = None
         self.values.type = None
+        self.values.page = None
 
     def handle_starttag(self, tag, attrs):
         if tag == "meta":
@@ -61,6 +62,10 @@ class VideoHTMLParser(HTMLParser):
             val = self.extract(attrs, "tipo")
             if val != None:
                 self.values.type = val
+
+            val = self.extract(attrs, "idPageProgramma")
+            if val != None:
+                self.values.page = Utils.baseUrl + Utils.getWebFromID(val)
 
         elif tag == "param":
             if len(attrs) > 0:
@@ -136,6 +141,7 @@ class Demand:
         print("Type:       ", self.values.type)
         print("Program:    ", self.values.program)
         print("Description:", self.values.description)
+        print("Page:       ", self.values.page)
         print()
         print("URL:        ", self.url)
         print("videourl:   ", self.values.videoUrl)
