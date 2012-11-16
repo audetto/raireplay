@@ -6,6 +6,8 @@ import urlparse
 
 import ConfigParser
 
+import libmimms.core
+
 from HTMLParser import HTMLParser
 from xml.etree import ElementTree
 
@@ -147,3 +149,15 @@ class Demand:
         print("videourl:   ", self.values.videoUrl)
         print("asf:        ", self.asf)
         print("mms:        ", self.mms)
+
+    def download(self, grabber, folder, format):
+        options = Utils.Obj()
+        options.quiet        = False
+        options.url          = self.mms
+        options.resume       = False
+        options.bandwidth    = 1e6
+        options.filename     = os.path.join(folder, "abc")
+        options.clobber      = True
+        options.time         = 0
+
+        libmimms.core.download(options)
