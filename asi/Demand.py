@@ -21,11 +21,14 @@ def process(f, db):
         pid = pid + 1
 
 
-def download(db, grabber, folder, type):
+def download(db, grabber, folder, downType):
     page = Utils.httpFilename(url)
 
     localFilename = os.path.join(folder, page)
-    f = Utils.download(grabber, None, url, localFilename, type, "raw-unicode-escape")
+
+    progress_obj = urlgrabber.progress.TextMeter()
+
+    f = Utils.download(grabber, progress_obj, url, localFilename, downType, "raw-unicode-escape", True)
 
     process(f, db)
 

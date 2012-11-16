@@ -53,14 +53,14 @@ class Item:
         print()
 
 
-def download(db, grabber, url, folder, type):
+def download(db, grabber, url, folder, downType):
     page = Utils.httpFilename(url)
     page = os.path.splitext(page)[0]
 
     dataUrl = getDataUrl(page)
 
     localFilename = os.path.join(folder, page + ".xml")
-    f = Utils.download(grabber, None, dataUrl, localFilename, type, "utf-8")
+    f = Utils.download(grabber, None, dataUrl, localFilename, downType, "utf-8")
 
     # ElementTree does not like unicode, it prefers byte strings
     root = ElementTree.fromstring(f.read().strip().encode("utf-8"))

@@ -97,7 +97,7 @@ def process(f, db):
                     db[p.pid] = p
 
 
-def download(db, grabber, replayFolder, type):
+def download(db, grabber, replayFolder, downType):
     progress_obj = urlgrabber.progress.TextMeter()
 
     today = date.today()
@@ -111,7 +111,7 @@ def download(db, grabber, replayFolder, type):
             url = baseUrl + "/" + filename
             localName = os.path.join(replayFolder, filename)
 
-            f = Utils.download(grabber, progress_obj, url, localName, type, "utf-8")
+            f = Utils.download(grabber, progress_obj, url, localName, downType, "utf-8")
             process(f, db)
 
     print()

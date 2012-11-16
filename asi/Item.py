@@ -84,19 +84,19 @@ class VideoHTMLParser(HTMLParser):
         return None
 
 class Demand:
-    def __init__(self, grabber, url, folder, type):
+    def __init__(self, grabber, url, folder, downType):
         self.url = url
 
         localFilename = os.path.join(folder, Utils.httpFilename(self.url))
 
-        f = Utils.download(grabber, None, self.url, localFilename, type, "utf-8")
+        f = Utils.download(grabber, None, self.url, localFilename, downType, "utf-8")
 
         parser = VideoHTMLParser()
         parser.feed(f.read())
 
         self.values = parser.values
 
-        if self.values.type != "Video":
+        if self.values.type != None and self.values.type != "Video":
             # this is a case of a Photogallery
             self.url = None
             self.asf = None
