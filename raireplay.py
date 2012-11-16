@@ -94,8 +94,8 @@ def main():
                 displayOrGet(p, grabber, args.list, args.get, args.format)
 
     elif args.item != None:
-        d = Item.Demand(grabber, args.item, Config.itemFolder, args.download)
-        d.display()
+        p = Item.Demand(grabber, args.item, Config.itemFolder, args.download)
+        displayOrGet(p, grabber, args.list, args.get, args.format)
 
     elif args.list:
         list(db)
