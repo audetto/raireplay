@@ -31,13 +31,13 @@ def displayOrGet(item, grabber, list, get, format):
 
 def find(db, pid, subset):
     if pid in db:
-        subset.add(db[pid])
+        subset[pid] = db[pid]
     else:
         match = pid.lower()
-        for p in db.itervalues():
+        for pid, p in db.iteritems():
             s = p.short().lower()
             if s.find(match) != -1:
-                subset.add(p)
+                subset[pid] = p
 
 
 def main():
@@ -53,6 +53,8 @@ def main():
     parser.add_argument("--page",   action = "store", help = "RAI On Demand Page")
     parser.add_argument("--replay", action = "store_true", default = False, help = "RAI Replay")
     parser.add_argument("--ondemand", action = "store_true", default = False, help = "RAI On Demand List")
+
+    parser.add_argument("--forward", action = "append")
 
     parser.add_argument("--list", action = "store_true", default = False)
     parser.add_argument("--get", action = "store_true", default = False)
@@ -73,28 +75,45 @@ def main():
     grabber = urlgrabber.grabber.URLGrabber(proxies = proxy)
 
     if args.info:
-        Info.display(grabber, Config.rootFolder)
+        Info.display(grabber)
         return
 
-    if args.replay:
-        Program.download(db, grabber, Config.replayFolder, args.download)
-
     if args.page != None:
-        Page.download(db, grabber, args.page, Config.pageFolder, args.download)
+        Page.download(db, grabber, args.page, args.download)
 
     if args.ondemand:
-        Demand.download(db, grabber, Config.demandFolder, args.download)
+        Demand.download(db, grabber, args.download)
 
-    if len(args.pid) > 0:
-        subset = set()
+    if args.forward != None:
+        forwards = args.forward
+        while forwards:
+            subset = {}
+            p = find(db, forwards[0], subset)
+            if len(subset) == 1:
+                # continue forward calculation
+                db = {}
+                p = next(subset.itervalues())
+                p.forward(db, grabber, args.download)
+                forwards = forwards[1:] # continue with one element less
+            else:
+                print("Too many/few ({0}) items selected during while processing forward '{1}'".format(len(subset), forwards[0]))
+                # replace the db with the subset and display it
+                db = subset
+                break
+
+    if args.replay:
+        Program.download(db, grabber, args.download)
+
+    if args.pid:
+        subset = {}
         for pid in args.pid:
             find(db, pid, subset)
 
-            for p in sorted(subset, key = lambda x: x.datetime):
+            for p in sorted(subset.itervalues(), key = lambda x: x.datetime):
                 displayOrGet(p, grabber, args.list, args.get, args.format)
 
     elif args.item != None:
-        p = Item.Demand(grabber, args.item, Config.itemFolder, args.download)
+        p = Item.Demand(grabber, args.item, args.download)
         displayOrGet(p, grabber, args.list, args.get, args.format)
 
     elif args.list:

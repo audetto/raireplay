@@ -16,6 +16,7 @@ import urlgrabber.progress
 
 from asi import Meter
 from asi import Utils
+from asi import Config
 
 baseUrl = "http://www.rai.it/dl/portale/html/palinsesti/replaytv/static"
 channels = {"1": "RaiUno", "2": "RaiDue", "3": "RaiTre", "31": "RaiCinque"}
@@ -97,10 +98,12 @@ def process(f, db):
                     db[p.pid] = p
 
 
-def download(db, grabber, replayFolder, downType):
+def download(db, grabber, downType):
     progress_obj = urlgrabber.progress.TextMeter()
 
     today = date.today()
+
+    folder = Config.replayFolder
 
     for x in range(1, 8):
         day = today - timedelta(days = x)
@@ -109,7 +112,7 @@ def download(db, grabber, replayFolder, downType):
         for channel in channels.itervalues():
             filename = channel + strDate + ".html"
             url = baseUrl + "/" + filename
-            localName = os.path.join(replayFolder, filename)
+            localName = os.path.join(folder, filename)
 
             f = Utils.download(grabber, progress_obj, url, localName, downType, "utf-8")
             process(f, db)

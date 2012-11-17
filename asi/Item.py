@@ -3,6 +3,7 @@ from __future__ import print_function
 import os.path
 import urlgrabber.progress
 import urlparse
+import time
 
 import ConfigParser
 
@@ -12,6 +13,7 @@ from HTMLParser import HTMLParser
 from xml.etree import ElementTree
 
 from asi import Utils
+from asi import Config
 
 # <meta name="videourl" content="....." />
 
@@ -42,6 +44,7 @@ class VideoHTMLParser(HTMLParser):
         self.values.videoPath = None
         self.values.type = None
         self.values.page = None
+        self.values.date = None
 
     def handle_starttag(self, tag, attrs):
         if tag == "meta":
@@ -65,6 +68,10 @@ class VideoHTMLParser(HTMLParser):
             if val != None:
                 self.values.type = val
 
+            val = self.extract(attrs, "itemDate")
+            if val != None:
+                self.values.date = val
+
             val = self.extract(attrs, "idPageProgramma")
             if val != None:
                 self.values.page = Utils.baseUrl + Utils.getWebFromID(val)
@@ -86,9 +93,11 @@ class VideoHTMLParser(HTMLParser):
         return None
 
 class Demand:
-    def __init__(self, grabber, url, folder, downType):
+    def __init__(self, grabber, url, downType, pid = 0):
         self.url = url
+        self.pid = pid
 
+        folder = Config.itemFolder
         localFilename = os.path.join(folder, Utils.httpFilename(self.url))
 
         f = Utils.download(grabber, None, self.url, localFilename, downType, "utf-8")
@@ -97,6 +106,9 @@ class Demand:
         parser.feed(f.read())
 
         self.values = parser.values
+
+        if self.values.date != None:
+            self.datetime = time.strptime(self.values.date, "%d/%m/%Y")
 
         if self.values.type != None and self.values.type != "Video":
             # this is a case of a Photogallery
@@ -135,6 +147,7 @@ class Demand:
                 self.mms = config.get("Reference", "ref1")
                 self.mms = self.mms.replace("http://", "mms://")
 
+
     def display(self):
         width = urlgrabber.progress.terminal_width()
 
@@ -150,6 +163,13 @@ class Demand:
         print("asf:        ", self.asf)
         print("mms:        ", self.mms)
 
+
+    def short(self):
+        ts = time.strftime("%Y-%m-%d %H:%M", self.datetime)
+        str = unicode("{0:>6}: {1} {2}").format(self.pid, ts, self.values.title)
+        return str
+
+
     def download(self, grabber, folder, format):
         options = Utils.Obj()
         options.quiet        = False
@@ -161,3 +181,7 @@ class Demand:
         options.time         = 0
 
         libmimms.core.download(options)
+
+
+    def forward(self, db, grabber, downType):
+        raise Exception("Forward selection must terminate here.")

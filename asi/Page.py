@@ -7,6 +7,8 @@ import urlgrabber.progress
 from xml.etree import ElementTree
 
 from asi import Utils
+from asi import Config
+from asi import Item
 
 # example: without xls we get a nice XML,
 # numContent is compulsory, but it seems a big number is accepted and gives the whole list
@@ -19,7 +21,7 @@ def getDataUrl(page):
     return url
 
 
-class Item:
+class Elem:
     def __init__(self, pid, data):
         self.pid           = pid
         self.id            = data.findtext("localid")
@@ -53,12 +55,18 @@ class Item:
         print()
 
 
-def download(db, grabber, url, folder, downType):
+    def forward(self, db, grabber, downType):
+        p = Item.Demand(grabber, self.url, downType, self.pid)
+        db[str(self.pid)] = p
+
+
+def download(db, grabber, url, downType):
     page = Utils.httpFilename(url)
     page = os.path.splitext(page)[0]
 
     dataUrl = getDataUrl(page)
 
+    folder = Config.pageFolder
     localFilename = os.path.join(folder, page + ".xml")
     f = Utils.download(grabber, None, dataUrl, localFilename, downType, "utf-8")
 
@@ -69,7 +77,7 @@ def download(db, grabber, url, folder, downType):
 
     for child in root:
         if child.tag == "content":
-            it = Item(pid, child)
+            it = Elem(pid, child)
             # use str() as a key for consistency with --replay
             db[str(pid)] = it
             pid = pid + 1

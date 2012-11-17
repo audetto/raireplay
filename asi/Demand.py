@@ -6,6 +6,8 @@ import os.path
 import urlgrabber.progress
 
 from asi import Utils
+from asi import Config
+from asi import Page
 
 url = "http://www.rai.tv/dl/RaiTV/programmi/ricerca/ContentSet-6445de64-d321-476c-a890-ae4ed32c729e-darivedere.html"
 baseUrl = "http://www.rai.tv"
@@ -21,9 +23,10 @@ def process(f, db):
         pid = pid + 1
 
 
-def download(db, grabber, folder, downType):
+def download(db, grabber, downType):
     page = Utils.httpFilename(url)
 
+    folder = Config.demandFolder
     localFilename = os.path.join(folder, page)
 
     progress_obj = urlgrabber.progress.TextMeter()
@@ -54,3 +57,6 @@ class Group:
         print("URL:", self.url)
 
         print()
+
+    def forward(self, db, grabber, downType):
+        Page.download(db, grabber, self.url, downType)
