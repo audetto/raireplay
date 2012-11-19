@@ -133,4 +133,5 @@ def main():
 if sys.stdout.encoding == None:
     sys.stdout = codecs.getwriter("utf-8")(sys.stdout, "ignore")
 
-main()
+if __name__ == '__main__':
+    main()
