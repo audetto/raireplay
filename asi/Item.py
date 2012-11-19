@@ -156,6 +156,7 @@ class Demand:
         print("Type:       ", self.values.type)
         print("Program:    ", self.values.program)
         print("Description:", self.values.description)
+        print("Filename:   ", self.getFilename())
         print("Page:       ", self.values.page)
         print()
         print("URL:        ", self.url)
@@ -176,7 +177,7 @@ class Demand:
         options.url          = self.mms
         options.resume       = False
         options.bandwidth    = 1e6
-        options.filename     = os.path.join(folder, "abc")
+        options.filename     = os.path.join(folder,  getFilename(self))
         options.clobber      = True
         options.time         = 0
 
@@ -185,3 +186,11 @@ class Demand:
 
     def forward(self, db, grabber, downType):
         raise Exception("Forward selection must terminate here.")
+
+    def getFilename(self):
+        translateTo = u"_"
+        charactersToRemove = u" ^"
+        translateTable = dict((ord(char), translateTo) for char in charactersToRemove)
+        name = self.values.title.translate(translateTable)
+        # they are normally .wmv
+        return name + ".wmv"
