@@ -58,5 +58,5 @@ class Group:
 
         print()
 
-    def forward(self, db, grabber, downType):
+    def follow(self, db, grabber, downType):
         Page.download(db, grabber, self.url, downType)

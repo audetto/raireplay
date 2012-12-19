@@ -177,15 +177,15 @@ class Demand:
         options.url          = self.mms
         options.resume       = False
         options.bandwidth    = 1e6
-        options.filename     = os.path.join(folder,  getFilename(self))
+        options.filename     = os.path.join(folder, self.getFilename())
         options.clobber      = True
         options.time         = 0
 
         libmimms.core.download(options)
 
 
-    def forward(self, db, grabber, downType):
-        raise Exception("Forward selection must terminate here.")
+    def follow(self, db, grabber, downType):
+        raise Exception("Follow selection must terminate here.")
 
     def getFilename(self):
         translateTo = u"_"

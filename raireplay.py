@@ -54,7 +54,7 @@ def main():
     parser.add_argument("--replay", action = "store_true", default = False, help = "RAI Replay")
     parser.add_argument("--ondemand", action = "store_true", default = False, help = "RAI On Demand List")
 
-    parser.add_argument("--forward", action = "append")
+    parser.add_argument("--follow", action = "append")
 
     parser.add_argument("--list", action = "store_true", default = False)
     parser.add_argument("--get", action = "store_true", default = False)
@@ -75,7 +75,7 @@ def main():
     grabber = urlgrabber.grabber.URLGrabber(proxies = proxy)
 
     if args.info:
-        Info.display(grabber)
+        Info.display(grabber, Config.rootFolder)
         return
 
     if args.page != None:
@@ -84,19 +84,19 @@ def main():
     if args.ondemand:
         Demand.download(db, grabber, args.download)
 
-    if args.forward != None:
-        forwards = args.forward
-        while forwards:
+    if args.follow != None:
+        follows = args.follow
+        while follows:
             subset = {}
-            p = find(db, forwards[0], subset)
+            p = find(db, follows[0], subset)
             if len(subset) == 1:
-                # continue forward calculation
+                # continue follow calculation
                 db = {}
                 p = next(subset.itervalues())
-                p.forward(db, grabber, args.download)
-                forwards = forwards[1:] # continue with one element less
+                p.follow(db, grabber, args.download)
+                follows = follows[1:] # continue with one element less
             else:
-                print("Too many/few ({0}) items selected during while processing forward '{1}'".format(len(subset), forwards[0]))
+                print("Too many/few ({0}) items selected during while processing follow '{1}'".format(len(subset), follows[0]))
                 # replace the db with the subset and display it
                 db = subset
                 break

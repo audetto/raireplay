@@ -55,7 +55,7 @@ class Elem:
         print()
 
 
-    def forward(self, db, grabber, downType):
+    def follow(self, db, grabber, downType):
         p = Item.Demand(grabber, self.url, downType, self.pid)
         db[str(self.pid)] = p
 
