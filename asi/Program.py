@@ -14,7 +14,6 @@ from datetime import timedelta
 
 import urlgrabber.progress
 
-from asi import Meter
 from asi import Utils
 from asi import Config
 
@@ -217,27 +216,4 @@ class Program:
 
     def downloadTablet(self, grabber, folder):
         m3 = self.getTabletPlaylist()
-        if m3.is_variant:
-            playlist = m3.playlists[0]
-            uri = playlist.baseuri + "/" + playlist.uri
-            item = m3u8.load(uri)
-            if not m3.is_variant:
-                print("m3u8 @ {0} is not a playlist".format(uri))
-                return
-
-            localFilename = os.path.join(folder, self.getFilename() + ".ts")
-            out = open(localFilename, "wb")
-
-            print()
-            print("Saving {0} as {1}".format(self.pid, localFilename))
-
-            numberOfFiles = len(item.segments)
-            progress = Meter.Meter(numberOfFiles, self.getFilename() + ".ts")
-
-            for seg in item.segments:
-                uri = seg.baseuri + "/" + seg.uri
-                s = grabber.urlread(uri, progress_obj = progress, quote = 0)
-                out.write(s)
-
-            print()
-            print("Saved {0} as {1}".format(self.pid, localFilename))
+        Utils.downloadM3U8(grabber, m3, folder, self.pid, self.getFilename())

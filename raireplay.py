@@ -12,6 +12,7 @@ from asi import Page
 from asi import Item
 from asi import Demand
 from asi import Config
+from asi import Pluzz
 
 import urlgrabber.grabber
 
@@ -49,10 +50,12 @@ def main():
     parser.add_argument("--format", action = "store", choices = ["h264", "ts"])
     parser.add_argument("--info", action = "store_true", default = False)
     parser.add_argument("--tor", action = "store_true", default = False)
+    parser.add_argument("--proxy", action = "store")
 
     parser.add_argument("--page",   action = "store", help = "RAI On Demand Page")
     parser.add_argument("--replay", action = "store_true", default = False, help = "RAI Replay")
     parser.add_argument("--ondemand", action = "store_true", default = False, help = "RAI On Demand List")
+    parser.add_argument("--pluzz", action = "store", help = "Pluzz France Television")
 
     parser.add_argument("--follow", action = "append")
 
@@ -71,6 +74,10 @@ def main():
     if args.tor:
         # we use privoxy to access tor
         proxy = { "http" : "http://127.0.0.1:8118" }
+    else:
+        if args.proxy != None:
+            proxy = { "http" : args.proxy }
+
 
     grabber = urlgrabber.grabber.URLGrabber(proxies = proxy)
 
@@ -103,6 +110,9 @@ def main():
 
     if args.replay:
         Program.download(db, grabber, args.download)
+
+    if args.pluzz != None:
+        Pluzz.process(args.pluzz, db)
 
     if args.pid:
         subset = {}

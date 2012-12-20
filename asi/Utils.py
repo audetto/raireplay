@@ -1,16 +1,20 @@
+from __future__ import print_function
+
 import os.path
 import urlparse
+import m3u8
 import codecs
 import time
 
 from datetime import timedelta
 from datetime import datetime
 
+from asi import Meter
+
 class Obj:
     pass
 
 baseUrl = "http://www.rai.tv"
-
 
 def httpFilename(url):
     name = os.path.split(urlparse.urlsplit(url).path)[1]
@@ -44,3 +48,30 @@ def download(grabber, progress, url, localName, downType, encoding, checkTime = 
 def getWebFromID(id):
     web = "/dl/RaiTV/programmi/media/{0}.html".format(id)
     return web
+
+
+def downloadM3U8(grabber, m3, folder, pid, filename):
+    if m3.is_variant:
+        playlist = m3.playlists[0]
+        uri = playlist.baseuri + "/" + playlist.uri
+        item = m3u8.load(uri)
+        if not m3.is_variant:
+            print("m3u8 @ {0} is not a playlist".format(uri))
+            return
+
+        localFilename = os.path.join(folder, filename + ".ts")
+        out = open(localFilename, "wb")
+
+        print()
+        print("Saving {0} as {1}".format(pid, localFilename))
+
+        numberOfFiles = len(item.segments)
+        progress = Meter.Meter(numberOfFiles, filename + ".ts")
+
+        for seg in item.segments:
+            uri = seg.baseuri + "/" + seg.uri
+            s = grabber.urlread(uri, progress_obj = progress, quote = 0)
+            out.write(s)
+
+        print()
+        print("Saved {0} as {1}".format(pid, localFilename))
