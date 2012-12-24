@@ -99,6 +99,7 @@ class Program:
         print("Description:", self.desc)
         print("Date:", time.strftime("%Y-%m-%d %H:%M", self.datetime))
         print("Length:", self.minutes, "minutes")
+        print("Filename:", self.getFilename())
         print()
         print("url:", self.url)
 
@@ -118,4 +119,11 @@ class Program:
             os.makedirs(folder)
 
         m3 = self.getTabletPlaylist()
-        Utils.downloadM3U8(grabber, m3, bwidth, folder, self.pid, "xxx")
+        name = self.getFilename();
+        Utils.downloadM3U8(grabber, m3, bwidth, folder, self.pid, name)
+
+
+    def getFilename(self):
+        name = Utils.makeFilename(self.name)
+        name = self.pid + "-" + name
+        return name

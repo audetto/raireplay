@@ -188,9 +188,6 @@ class Demand:
         raise Exception("Follow selection must terminate here.")
 
     def getFilename(self):
-        translateTo = u"_"
-        charactersToRemove = u" ^"
-        translateTable = dict((ord(char), translateTo) for char in charactersToRemove)
-        name = self.values.title.translate(translateTable)
+        name = Utils.makeFilename(self.values.title)
         # they are normally .wmv
         return name + ".wmv"

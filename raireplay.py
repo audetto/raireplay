@@ -38,7 +38,7 @@ def find(db, pid, subset):
         match = pid.lower()
         for pid, p in db.iteritems():
             s = p.short().lower()
-            s = Utils.remove_accents(s)
+            s = Utils.removeAccents(s)
             if s.find(match) != -1:
                 subset[pid] = p
 
@@ -52,7 +52,7 @@ def main():
     parser.add_argument("--format", action = "store", choices = ["h264", "ts"])
     parser.add_argument("--bwidth", action = "store")
     parser.add_argument("--info", action = "store_true", default = False)
-    parser.add_argument("--tor", action = "store_true", default = False)
+    parser.add_argument("--tor", action = "store")
     parser.add_argument("--proxy", action = "store")
 
     parser.add_argument("--page",   action = "store", help = "RAI On Demand Page")
@@ -74,8 +74,9 @@ def main():
 
     proxy = None
 
-    if args.tor:
+    if args.tor != None:
         # we use privoxy to access tor
+        Utils.setTorExitNodes(args.tor)
         proxy = { "http" : "http://127.0.0.1:8118" }
     else:
         if args.proxy != None:

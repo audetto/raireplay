@@ -6,6 +6,7 @@ import m3u8
 import codecs
 import time
 import unicodedata
+import telnetlib
 
 from datetime import timedelta
 from datetime import datetime
@@ -71,7 +72,7 @@ def downloadM3U8(grabber, m3, bwidth, folder, pid, filename):
             return
 
         uri = playlist.baseuri + "/" + playlist.uri
-        item = m3u8.load(uri)
+        item = load_m3u8_from_url(grabber, uri)
         if not m3.is_variant:
             print("m3u8 @ {0} is not a playlist".format(uri))
             return
@@ -94,7 +95,7 @@ def downloadM3U8(grabber, m3, bwidth, folder, pid, filename):
         print("Saved {0} as {1}".format(pid, localFilename))
 
 
-def remove_accents(input_str):
+def removeAccents(input_str):
     nkfd_form = unicodedata.normalize('NFKD', unicode(input_str))
     result = u"".join([c for c in nkfd_form if not unicodedata.combining(c)])
     return result
@@ -110,3 +111,19 @@ def load_m3u8_from_url(grabber, uri):
     basepath = os.path.normpath(parsed_url.path + '/..')
     baseuri = urlparse.urljoin(prefix, basepath)
     return m3u8.model.M3U8(content, baseuri=baseuri)
+
+
+def setTorExitNodes(country):
+    tn = telnetlib.Telnet("127.0.0.1", 9051)
+    tn.write('AUTHENTICATE ""\n')
+    tn.write("SETCONF ExitNodes={{{0}}}\n".format(country))
+    tn.write("QUIT\n")
+
+
+def makeFilename(input):
+    translateTo = u"_"
+    charactersToRemove = u" /:^"
+    translateTable = dict((ord(char), translateTo) for char in charactersToRemove)
+    name = input.translate(translateTable)
+    name = removeAccents(name)
+    return name
