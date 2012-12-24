@@ -8,6 +8,7 @@ replayFolder  = os.path.join(dataFolder, "replay")
 itemFolder    = os.path.join(dataFolder, "items")
 pageFolder    = os.path.join(dataFolder, "pages")
 demandFolder  = os.path.join(dataFolder, "demand")
+pluzzFolder   = os.path.join(dataFolder, "pluzz")
 
 programFolder = os.path.join(rootFolder, "programs")
 
@@ -22,6 +23,9 @@ if not os.path.exists(pageFolder):
 
 if not os.path.exists(demandFolder):
     os.makedirs(demandFolder)
+
+if not os.path.exists(pluzzFolder):
+    os.makedirs(pluzzFolder)
 
 if not os.path.exists(programFolder):
     os.makedirs(programFolder)

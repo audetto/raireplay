@@ -4,9 +4,9 @@ import sys
 sys.path.append('/home/andrea/projects/cvs/3rdParty/m3u8')
 
 import os
-import m3u8
 import time
 import json
+import zipfile
 
 from datetime import date
 from datetime import timedelta
@@ -17,10 +17,11 @@ from asi import Meter
 from asi import Utils
 from asi import Config
 
+infoUrl = "http://webservices.francetelevisions.fr/catchup/flux/flux_main.zip"
 baseUrl = "http://medias2.francetv.fr/catchup-mobile"
 
 
-def parseItem(prog):
+def parseItem(grabber, prog):
     pid     = prog["id_diffusion"]
     date    = prog["date"]
     hour    = prog["heure"]
@@ -30,23 +31,40 @@ def parseItem(prog):
     name    = prog["titre"]
     minutes = prog["duree"]
 
-    p = Program( channel, date, hour, pid, minutes, name, desc, url)
+    p = Program(grabber, channel, date, hour, pid, minutes, name, desc, url)
 
     return p
 
 
-def process(f, db):
-    o = json.load(open(f))
+def process(grabber, f, db):
+    o = json.load(f)
 
     programmes = o["programmes"]
 
     for prog in programmes:
-        p = parseItem(prog)
+        p = parseItem(grabber, prog)
         db[p.pid] = p
 
 
+def download(db, grabber, downType):
+    progress_obj = urlgrabber.progress.TextMeter()
+    name = Utils.httpFilename(infoUrl)
+
+    folder = Config.pluzzFolder
+    localName = os.path.join(folder, name)
+
+    Utils.download(grabber, progress_obj, infoUrl, localName, downType, "utf-8", True)
+
+    z = zipfile.ZipFile(localName, "r")
+
+    for a in z.namelist():
+        if a.find("catch_up_") == 0:
+            f = z.open(a)
+            process(grabber, f, db)
+
 class Program:
-    def __init__(self, channel, date, hour, pid, minutes, name, desc, url):
+    def __init__(self, grabber, channel, date, hour, pid, minutes, name, desc, url):
+        self.grabber = grabber
         self.channel = channel
         self.pid = pid
         self.minutes = minutes
@@ -60,7 +78,7 @@ class Program:
 
     def getTabletPlaylist(self):
         if self.m3 == None:
-            self.m3 = m3u8.load(self.url)
+            self.m3 = Utils.load_m3u8_from_url(self.grabber, self.url)
 
         return self.m3
 
@@ -95,9 +113,9 @@ class Program:
             print()
 
 
-    def download(self, grabber, folder, format):
+    def download(self, grabber, folder, format, bwidth):
         if not os.path.exists(folder):
             os.makedirs(folder)
 
         m3 = self.getTabletPlaylist()
-        Utils.downloadM3U8(grabber, m3, folder, self.pid, "xxx")
+        Utils.downloadM3U8(grabber, m3, bwidth, folder, self.pid, "xxx")

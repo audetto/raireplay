@@ -52,7 +52,7 @@ def getFullUrl(tablet, phone):
     return fullUrl
 
 
-def parseItem(channel, date, time, value):
+def parseItem(grabber, channel, date, time, value):
     name = value["t"]
     desc = value["d"]
     secs = value["l"]
@@ -67,13 +67,13 @@ def parseItem(channel, date, time, value):
     pid = value["i"]
 
     if h264 != "" or tablet != "" or smartPhone != "" :
-        p = Program(channels[channel], date, time, pid, minutes, name, desc, h264, tablet, smartPhone)
+        p = Program(grabber, channels[channel], date, time, pid, minutes, name, desc, h264, tablet, smartPhone)
         return p
 
     return None
 
 
-def process(f, db):
+def process(grabber, f, db):
     o = json.load(f)
 
     for k1, v1 in o.iteritems():
@@ -86,7 +86,7 @@ def process(f, db):
 
         for date, v2 in v1.iteritems():
             for time, value in v2.iteritems():
-                p = parseItem(channel, date, time, value)
+                p = parseItem(grabber, channel, date, time, value)
 
                 if p != None:
                     if p.pid in db:
@@ -114,13 +114,14 @@ def download(db, grabber, downType):
             localName = os.path.join(folder, filename)
 
             f = Utils.download(grabber, progress_obj, url, localName, downType, "utf-8")
-            process(f, db)
+            process(grabber, f, db)
 
     print()
 
 
 class Program:
-    def __init__(self, channel, date, hour, pid, minutes, name, desc, h264, tablet, smartPhone):
+    def __init__(self, grabber, channel, date, hour, pid, minutes, name, desc, h264, tablet, smartPhone):
+        self.grabber = grabber
         self.channel = channel
         self.pid = pid
         self.minutes = minutes
@@ -159,20 +160,21 @@ class Program:
         if m3 != None and m3.is_variant:
             print()
             for playlist in m3.playlists:
-                format = "\tProgram: {0:>2}, Bandwidth: {1:>10}, Codecs: {2}"
-                line = format.format(playlist.stream_info.program_id, playlist.stream_info.bandwidth, playlist.stream_info.codecs)
+                format = "\tProgram: {0:>2}, Bandwidth: {1:>10}, Resolution: {2:>10}, Codecs: {3}"
+                line = format.format(playlist.stream_info.program_id, playlist.stream_info.bandwidth,
+                                     playlist.stream_info.resolution, playlist.stream_info.codecs)
                 print(line)
             print()
 
 
-    def download(self, grabber, folder, format):
+    def download(self, grabber, folder, format, bwidth):
         if not os.path.exists(folder):
             os.makedirs(folder)
 
         if format == "h264":
             self.downloadH264(grabber, folder)
         elif format == "ts":
-            self.downloadTablet(grabber, folder)
+            self.downloadTablet(grabber, folder, bwidth)
         elif format == None:
             self.downloadH264(grabber, folder)
 
@@ -193,7 +195,7 @@ class Program:
     def getTabletPlaylist(self):
         if self.m3 == None:
             if self.ts != "":
-                self.m3 = m3u8.load(self.ts)
+                self.m3 = Utils.load_m3u8_from_url(self.grabber, self.ts)
 
         return self.m3
 
@@ -214,6 +216,6 @@ class Program:
         return filename
 
 
-    def downloadTablet(self, grabber, folder):
+    def downloadTablet(self, grabber, folder, bwidth):
         m3 = self.getTabletPlaylist()
-        Utils.downloadM3U8(grabber, m3, folder, self.pid, self.getFilename())
+        Utils.downloadM3U8(grabber, m3, bwidth, folder, self.pid, self.getFilename())

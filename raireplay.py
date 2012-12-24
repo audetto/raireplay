@@ -13,6 +13,7 @@ from asi import Item
 from asi import Demand
 from asi import Config
 from asi import Pluzz
+from asi import Utils
 
 import urlgrabber.grabber
 
@@ -21,13 +22,13 @@ def list(db):
         print(p.short())
 
 
-def displayOrGet(item, grabber, list, get, format):
+def displayOrGet(item, grabber, list, get, format, bwidth):
     if list:
         print(item.short())
     else:
         item.display()
     if get:
-        item.download(grabber, Config.programFolder, format)
+        item.download(grabber, Config.programFolder, format, bwidth)
 
 
 def find(db, pid, subset):
@@ -37,6 +38,7 @@ def find(db, pid, subset):
         match = pid.lower()
         for pid, p in db.iteritems():
             s = p.short().lower()
+            s = Utils.remove_accents(s)
             if s.find(match) != -1:
                 subset[pid] = p
 
@@ -48,6 +50,7 @@ def main():
     parser.add_argument("--download", action = "store", default = "update", choices = ["always", "update", "never"],
                         help = "Default is update")
     parser.add_argument("--format", action = "store", choices = ["h264", "ts"])
+    parser.add_argument("--bwidth", action = "store")
     parser.add_argument("--info", action = "store_true", default = False)
     parser.add_argument("--tor", action = "store_true", default = False)
     parser.add_argument("--proxy", action = "store")
@@ -55,7 +58,7 @@ def main():
     parser.add_argument("--page",   action = "store", help = "RAI On Demand Page")
     parser.add_argument("--replay", action = "store_true", default = False, help = "RAI Replay")
     parser.add_argument("--ondemand", action = "store_true", default = False, help = "RAI On Demand List")
-    parser.add_argument("--pluzz", action = "store", help = "Pluzz France Television")
+    parser.add_argument("--pluzz", action = "store_true", default = False, help = "Pluzz France Television")
 
     parser.add_argument("--follow", action = "append")
 
@@ -79,7 +82,7 @@ def main():
             proxy = { "http" : args.proxy }
 
 
-    grabber = urlgrabber.grabber.URLGrabber(proxies = proxy)
+    grabber = urlgrabber.grabber.URLGrabber(proxies = proxy, quote = 0)
 
     if args.info:
         Info.display(grabber, Config.rootFolder)
@@ -111,8 +114,8 @@ def main():
     if args.replay:
         Program.download(db, grabber, args.download)
 
-    if args.pluzz != None:
-        Pluzz.process(args.pluzz, db)
+    if args.pluzz:
+        Pluzz.download(db, grabber, args.download)
 
     if args.pid:
         subset = {}
@@ -120,11 +123,11 @@ def main():
             find(db, pid, subset)
 
             for p in sorted(subset.itervalues(), key = lambda x: x.datetime):
-                displayOrGet(p, grabber, args.list, args.get, args.format)
+                displayOrGet(p, grabber, args.list, args.get, args.format, args.bwidth)
 
     elif args.item != None:
         p = Item.Demand(grabber, args.item, args.download)
-        displayOrGet(p, grabber, args.list, args.get, args.format)
+        displayOrGet(p, grabber, args.list, args.get, args.format, args.bwidth)
 
     elif args.list:
         list(db)

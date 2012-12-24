@@ -171,7 +171,7 @@ class Demand:
         return str
 
 
-    def download(self, grabber, folder, format):
+    def download(self, grabber, folder, format, bwidth):
         options = Utils.Obj()
         options.quiet        = False
         options.url          = self.mms
