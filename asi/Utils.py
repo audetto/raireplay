@@ -7,6 +7,7 @@ import codecs
 import time
 import unicodedata
 import telnetlib
+import urlgrabber.progress
 
 from datetime import timedelta
 from datetime import datetime
@@ -71,7 +72,7 @@ def downloadM3U8(grabber, m3, bwidth, folder, pid, filename):
             print("Cannot fin playlist with desired bandwidth")
             return
 
-        uri = playlist.baseuri + "/" + playlist.uri
+        uri = playlist.absolute_uri
         item = load_m3u8_from_url(grabber, uri)
         if not m3.is_variant:
             print("m3u8 @ {0} is not a playlist".format(uri))
@@ -87,12 +88,25 @@ def downloadM3U8(grabber, m3, bwidth, folder, pid, filename):
         progress = Meter.Meter(numberOfFiles, filename + ".ts")
 
         for seg in item.segments:
-            uri = seg.baseuri + "/" + seg.uri
+            uri = seg.absolute_uri
             s = grabber.urlread(uri, progress_obj = progress)
             out.write(s)
 
         print()
         print("Saved {0} as {1}".format(pid, localFilename))
+
+
+def downloadH264(grabber, folder, pid, url, filename):
+    progress_obj = urlgrabber.progress.TextMeter()
+    localFilename = os.path.join(folder, filename + ".mp4")
+
+    print()
+    print("Saving {0} as {1}".format(pid, localFilename))
+
+    filename = grabber.urlgrab(url, filename = localFilename, progress_obj = progress_obj)
+
+    print()
+    print("Saved {0} as {1}".format(pid, filename))
 
 
 def removeAccents(input_str):
@@ -122,8 +136,19 @@ def setTorExitNodes(country):
 
 def makeFilename(input):
     translateTo = u"_"
-    charactersToRemove = u" /:^"
+    charactersToRemove = u" /:^,"
     translateTable = dict((ord(char), translateTo) for char in charactersToRemove)
     name = input.translate(translateTable)
     name = removeAccents(name)
     return name
+
+
+def displayM3U8(m3):
+    if m3 != None and m3.is_variant:
+        print()
+        for playlist in m3.playlists:
+            format = "\tProgram: {0:>2}, Bandwidth: {1:>10}, Resolution: {2:>10}, Codecs: {3}"
+            line = format.format(playlist.stream_info.program_id, playlist.stream_info.bandwidth,
+                                 playlist.stream_info.resolution, playlist.stream_info.codecs)
+            print(line)
+        print()

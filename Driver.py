@@ -11,27 +11,46 @@ from asi import Utils
 
 import urlgrabber.grabber
 
-def list(db):
-    for p in sorted(db.itervalues(), key = lambda x: x.datetime):
-        print(p.short())
 
-
-def displayOrGet(item, grabber, list, get, format, bwidth):
+def displayOrGet(item, grabber, list, get, format, bwidth, html):
     if list:
-        print(item.short())
+        if html:
+            fmt = "<tr><td>{0}</td><td>{1}</td><td>{2}</td></tr>"
+        else:
+            fmt = "{0:>7}: {1} {2}"
+        print(item.short(unicode(fmt)))
+
     else:
         item.display()
+
     if get:
         item.download(grabber, Config.programFolder, format, bwidth)
+
+
+def listDisplayOrGet(items, grabber, list, get, format, bwidth, html):
+    if (list and html):
+        print("<!DOCTYPE HTML>")
+        print("<html>")
+        print('<head><meta charset="utf-8"></head>')
+        print("<body>")
+        print('<table border="1">')
+        print("<tr><td>PID</td><td>Time</td><td>Title</td></tr>")
+
+    for p in sorted(items.itervalues(), key = lambda x: x.datetime):
+        displayOrGet(p, grabber, list, get, format, bwidth, html)
+
+    if (list and html):
+        print("</table></body></html>")
 
 
 def find(db, pid, subset):
     if pid in db:
         subset[pid] = db[pid]
     else:
+        fmt = unicode("{2}")
         match = pid.lower()
         for pid, p in db.iteritems():
-            s = p.short().lower()
+            s = p.short(fmt).lower()
             s = Utils.removeAccents(s)
             if s.find(match) != -1:
                 subset[pid] = p
@@ -91,15 +110,14 @@ def process(args):
         for pid in args.pid:
             find(db, pid, subset)
 
-            for p in sorted(subset.itervalues(), key = lambda x: x.datetime):
-                displayOrGet(p, grabber, args.list, args.get, args.format, args.bwidth)
+        listDisplayOrGet(subset, grabber, args.list, args.get, args.format, args.bwidth, args.html)
 
     elif args.item != None:
         p = Item.Demand(grabber, args.item, args.download)
         displayOrGet(p, grabber, args.list, args.get, args.format, args.bwidth)
 
     elif args.list:
-        list(db)
+        listDisplayOrGet(db, grabber, args.list, args.get, args.format, args.bwidth, args.html)
 
     else:
         print()

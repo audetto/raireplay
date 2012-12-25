@@ -31,6 +31,8 @@ def main():
     parser.add_argument("--get", action = "store_true", default = False)
     parser.add_argument("pid", nargs = "*")
 
+    parser.add_argument("--html", action = "store_true", default = False)
+
     parser.add_argument("--item", action = "store", help = "RAI On Demand Item")
 
     args = parser.parse_args()

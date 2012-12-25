@@ -83,9 +83,9 @@ class Program:
         return self.m3
 
 
-    def short(self):
+    def short(self, fmt):
         ts = time.strftime("%Y-%m-%d %H:%M", self.datetime)
-        str = unicode("{0:>6}: {1} {2}").format(self.pid, ts, self.name)
+        str = fmt.format(self.pid, ts, self.name)
         return str
 
 
@@ -93,8 +93,8 @@ class Program:
         width = urlgrabber.progress.terminal_width()
 
         print("=" * width)
-        print("Channel:", self.channel)
         print("PID:", self.pid)
+        print("Channel:", self.channel)
         print("Title:", self.name)
         print("Description:", self.desc)
         print("Date:", time.strftime("%Y-%m-%d %H:%M", self.datetime))

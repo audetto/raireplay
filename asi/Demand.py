@@ -18,7 +18,7 @@ def process(f, db):
     pid = 0
 
     for v in o:
-        p = Group(pid, v["title"], v["linkDemand"], v["date"])
+        p = Group(pid, v["title"], v["linkDemand"], v["date"], v["editore"])
         db[str(pid)] = p
         pid = pid + 1
 
@@ -37,15 +37,16 @@ def download(db, grabber, downType):
 
 
 class Group:
-    def __init__(self, pid, title, link, date):
+    def __init__(self, pid, title, link, date, channel):
         self.pid = pid
         self.title = title
         self.url = baseUrl + link
         self.datetime = float(date)
+        self.channel = channel
 
 
-    def short(self):
-        str = unicode("{0:>6}: {1}").format(self.pid, self.title)
+    def short(self, fmt):
+        str = unicode(fmt).format(self.pid, None, self.title)
         return str
 
 
@@ -53,7 +54,9 @@ class Group:
         width = urlgrabber.progress.terminal_width()
 
         print("=" * width)
+        print("PID:", self.pid)
         print("Title:", self.title)
+        print("Channel:", self.channel)
         print("URL:", self.url)
 
         print()

@@ -134,9 +134,9 @@ class Program:
         self.m3 = None
 
 
-    def short(self):
+    def short(self, fmt):
         ts = time.strftime("%Y-%m-%d %H:%M", self.datetime)
-        str = unicode("{0:>6}: {1} {2}").format(self.pid, ts, self.name)
+        str = fmt.format(self.pid, ts, self.name)
         return str
 
 
@@ -144,8 +144,8 @@ class Program:
         width = urlgrabber.progress.terminal_width()
 
         print("=" * width)
-        print("Channel:", self.channel)
         print("PID:", self.pid)
+        print("Channel:", self.channel)
         print("Title:", self.name)
         print("Description:", self.desc)
         print("Date:", time.strftime("%Y-%m-%d %H:%M", self.datetime))
@@ -157,14 +157,7 @@ class Program:
 
         m3 = self.getTabletPlaylist()
 
-        if m3 != None and m3.is_variant:
-            print()
-            for playlist in m3.playlists:
-                format = "\tProgram: {0:>2}, Bandwidth: {1:>10}, Resolution: {2:>10}, Codecs: {3}"
-                line = format.format(playlist.stream_info.program_id, playlist.stream_info.bandwidth,
-                                     playlist.stream_info.resolution, playlist.stream_info.codecs)
-                print(line)
-            print()
+        Utils.displayM3U8(self.m3)
 
 
     def download(self, grabber, folder, format, bwidth):
@@ -180,16 +173,7 @@ class Program:
 
 
     def downloadH264(self, grabber, folder):
-        progress_obj = urlgrabber.progress.TextMeter()
-        localFilename = os.path.join(folder, self.getFilename() + ".mp4")
-
-        print()
-        print("Saving {0} as {1}".format(self.pid, localFilename))
-
-        filename = grabber.urlgrab(self.h264, filename = localFilename, progress_obj = progress_obj)
-
-        print()
-        print("Saved {0} as {1}".format(self.pid, filename))
+        Utils.downloadH264(grabber, folder, self.pid, self.h264, self.getFilename())
 
 
     def getTabletPlaylist(self):

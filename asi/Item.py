@@ -38,6 +38,9 @@ class VideoHTMLParser(HTMLParser):
 
         self.values = Utils.Obj()
         self.values.videoUrl = None
+        self.values.videoUrlMP4 = None
+        self.values.videoUrlH264 = None
+        self.values.videoUrlM3U8 = None
         self.values.title = None
         self.values.program = None
         self.values.description = None
@@ -51,6 +54,18 @@ class VideoHTMLParser(HTMLParser):
             val = self.extract(attrs, "videourl")
             if val != None:
                 self.values.videoUrl = val
+
+            val = self.extract(attrs, "videourl_mp4")
+            if val != None:
+                self.values.videoUrlMP4 = val
+
+            val = self.extract(attrs, "videourl_h264")
+            if val != None:
+                self.values.videoUrlH264 = val
+
+            val = self.extract(attrs, "videourl_m3u8")
+            if val != None:
+                self.values.videoUrlM3U8 = val
 
             val = self.extract(attrs, "title")
             if val != None:
@@ -94,8 +109,10 @@ class VideoHTMLParser(HTMLParser):
 
 class Demand:
     def __init__(self, grabber, url, downType, pid = 0):
+        self.grabber = grabber
         self.url = url
         self.pid = pid
+        self.m3 = None
 
         folder = Config.itemFolder
         localFilename = os.path.join(folder, Utils.httpFilename(self.url))
@@ -115,6 +132,7 @@ class Demand:
             self.url = None
             self.asf = None
             self.mms = None
+            self.filename = None
             return
 
         if self.values.videoUrl == None:
@@ -122,6 +140,9 @@ class Demand:
 
         #sometimes we get .mp4 which does not work
         self.values.videoUrl = self.values.videoUrl.replace("relinkerServlet.mp4", "relinkerServlet.htm")
+
+        #make a nice filename
+        self.filename = Utils.makeFilename(self.values.title)
 
         urlScheme = urlparse.urlsplit(self.values.videoUrl).scheme
         if urlScheme == "mms":
@@ -140,54 +161,85 @@ class Demand:
                 root = ElementTree.fromstring(content)
                 self.asf = root[0][0].attrib.get("HREF")
 
-                # use urlgrab to make it work with ConfigParser
-                content = grabber.urlgrab(self.asf)
-                config = ConfigParser.ConfigParser()
-                config.read(content)
-                self.mms = config.get("Reference", "ref1")
-                self.mms = self.mms.replace("http://", "mms://")
+                if self.asf != None:
+                    # use urlgrab to make it work with ConfigParser
+                    content = grabber.urlgrab(self.asf)
+                    config = ConfigParser.ConfigParser()
+                    config.read(content)
+                    self.mms = config.get("Reference", "ref1")
+                    self.mms = self.mms.replace("http://", "mms://")
+                else:
+                    self.mms = None
+
+
+    def getTabletPlaylist(self):
+        if self.m3 == None:
+            if self.values.videoUrlM3U8 != None:
+                self.m3 = Utils.load_m3u8_from_url(self.grabber, self.values.videoUrlM3U8)
+
+        return self.m3
 
 
     def display(self):
         width = urlgrabber.progress.terminal_width()
 
         print("=" * width)
+        print("PID:        ", self.pid)
         print("Title:      ", self.values.title)
         print("Type:       ", self.values.type)
         print("Program:    ", self.values.program)
         print("Description:", self.values.description)
-        print("Filename:   ", self.getFilename())
+        print("Filename:   ", self.filename)
         print("Page:       ", self.values.page)
         print()
         print("URL:        ", self.url)
         print("videourl:   ", self.values.videoUrl)
+        print("h264:       ", self.values.videoUrlH264)
+        print("m3u8:       ", self.values.videoUrlM3U8)
         print("asf:        ", self.asf)
         print("mms:        ", self.mms)
 
+        m3 = self.getTabletPlaylist()
 
-    def short(self):
+        Utils.displayM3U8(self.m3)
+
+
+    def short(self, fmt):
         ts = time.strftime("%Y-%m-%d %H:%M", self.datetime)
-        str = unicode("{0:>6}: {1} {2}").format(self.pid, ts, self.values.title)
+        str = fmt.format(self.pid, ts, self.values.title)
         return str
 
 
     def download(self, grabber, folder, format, bwidth):
+        if format == "h264":
+            self.downloadH264(grabber, folder)
+        elif format == "ts":
+            self.downloadTablet(grabber, folder, bwidth)
+        elif format == None:
+            self.downloadMMS(grabber, folder)
+
+
+    def downloadMMS(self, folder):
         options = Utils.Obj()
         options.quiet        = False
         options.url          = self.mms
         options.resume       = False
         options.bandwidth    = 1e6
-        options.filename     = os.path.join(folder, self.getFilename())
+        options.filename     = os.path.join(folder, self.filename + ".wmv")
         options.clobber      = True
         options.time         = 0
 
         libmimms.core.download(options)
 
 
+    def downloadTablet(self, grabber, folder, bwidth):
+        m3 = self.getTabletPlaylist()
+        Utils.downloadM3U8(grabber, m3, bwidth, folder, self.pid, self.filename)
+
+
+    def downloadH264(self, grabber, folder):
+        Utils.downloadH264(grabber, folder, self.pid, self.values.videoUrlH264, self.filename)
+
+
     def follow(self, db, grabber, downType):
         raise Exception("Follow selection must terminate here.")
-
-    def getFilename(self):
-        name = Utils.makeFilename(self.values.title)
-        # they are normally .wmv
-        return name + ".wmv"

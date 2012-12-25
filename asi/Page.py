@@ -32,13 +32,17 @@ class Elem:
         if web == None:
             web = Utils.getWebFromID(self.id)
         self.url           = Utils.baseUrl + web
-        strTime            = data.findtext("dataultimavisita")
-        self.datetime      = time.strptime(strTime, "%d/%m/%Y %H:%M:%S")
+        strTime            = data.findtext("datapubblicazione")
+        self.datetime      = time.strptime(strTime, "%d/%m/%Y")
+
+        # extra experimental data
+        self.h264          = data.findtext("h264")
+        self.m3u8          = data.findtext("m3u8")
 
 
-    def short(self):
+    def short(self, fmt):
         ts = time.strftime("%Y-%m-%d %H:%M", self.datetime)
-        str = unicode("{0:>6}: {1} {2}").format(self.pid, ts, self.title)
+        str = fmt.format(self.pid, ts, self.title)
         return str
 
 
@@ -52,6 +56,8 @@ class Elem:
         print("Date:", time.strftime("%Y-%m-%d %H:%M", self.datetime))
         print("Length:", self.length)
         print("URL:", self.url)
+        print("h264:", self.h264)
+        print("m3u8:", self.m3u8)
         print()
 
 
