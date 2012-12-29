@@ -78,6 +78,8 @@ class Program(Base.Base):
         self.minutes = minutes
 
         self.m3 = None
+        name = Utils.makeFilename(self.title)
+        self.filename = self.pid + "-" + name
 
 
     def getTabletPlaylist(self):
@@ -97,7 +99,7 @@ class Program(Base.Base):
         print("Description:", self.description)
         print("Date:", time.strftime("%Y-%m-%d %H:%M", self.datetime))
         print("Length:", self.minutes, "minutes")
-        print("Filename:", self.getFilename())
+        print("Filename:", self.filename)
         print()
         print("url:", self.ts)
 
@@ -110,18 +112,3 @@ class Program(Base.Base):
                 line = format.format(playlist.stream_info.program_id, playlist.stream_info.bandwidth, playlist.stream_info.codecs)
                 print(line)
             print()
-
-
-    def download(self, grabber, folder, format, bwidth):
-        if not os.path.exists(folder):
-            os.makedirs(folder)
-
-        m3 = self.getTabletPlaylist()
-        name = self.getFilename();
-        Utils.downloadM3U8(grabber, m3, bwidth, folder, self.pid, name)
-
-
-    def getFilename(self):
-        name = Utils.makeFilename(self.title)
-        name = self.pid + "-" + name
-        return name

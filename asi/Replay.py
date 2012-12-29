@@ -136,7 +136,7 @@ class Program(Base.Base):
         self.minutes = minutes
 
         self.m3 = None
-
+        self.filename = self.getFilename()
 
     def display(self):
         width = urlgrabber.progress.terminal_width()
@@ -148,7 +148,7 @@ class Program(Base.Base):
         print("Description:", self.description)
         print("Date:", time.strftime("%Y-%m-%d %H:%M", self.datetime))
         print("Length:", self.minutes, "minutes")
-        print("Filename:", self.getFilename())
+        print("Filename:", self.filename)
         print()
         print("h264:", self.h264)
         print("ts:  ", self.ts)
@@ -156,22 +156,6 @@ class Program(Base.Base):
         m3 = self.getTabletPlaylist()
 
         Utils.displayM3U8(self.m3)
-
-
-    def download(self, grabber, folder, format, bwidth):
-        if not os.path.exists(folder):
-            os.makedirs(folder)
-
-        if format == "h264":
-            self.downloadH264(grabber, folder)
-        elif format == "ts":
-            self.downloadTablet(grabber, folder, bwidth)
-        elif format == None:
-            self.downloadH264(grabber, folder)
-
-
-    def downloadH264(self, grabber, folder):
-        Utils.downloadH264(grabber, folder, self.pid, self.h264, self.getFilename())
 
 
     def getTabletPlaylist(self):
@@ -196,8 +180,3 @@ class Program(Base.Base):
         filename = self.pid + "-" + nice
 
         return filename
-
-
-    def downloadTablet(self, grabber, folder, bwidth):
-        m3 = self.getTabletPlaylist()
-        Utils.downloadM3U8(grabber, m3, bwidth, folder, self.pid, self.getFilename())

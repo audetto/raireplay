@@ -7,13 +7,12 @@ import time
 
 import ConfigParser
 
-import libmimms.core
-
 from HTMLParser import HTMLParser
 from xml.etree import ElementTree
 
 from asi import Utils
 from asi import Config
+from asi import Base
 
 # <meta name="videourl" content="....." />
 
@@ -107,8 +106,10 @@ class VideoHTMLParser(HTMLParser):
                     return attrs[1][1]
         return None
 
-class Demand:
+class Demand(Base.Base):
     def __init__(self, grabber, url, downType, pid = 0):
+        super(Demand, self).__init__()
+
         self.grabber = grabber
         self.url = url
         self.pid = pid
@@ -123,6 +124,9 @@ class Demand:
         parser.feed(f.read())
 
         self.values = parser.values
+
+        self.ts = self.values.videoUrlM3U8
+        self.h264 = self.values.videoUrlH264
 
         if self.values.date != None:
             self.datetime = time.strptime(self.values.date, "%d/%m/%Y")
@@ -202,43 +206,6 @@ class Demand:
         m3 = self.getTabletPlaylist()
 
         Utils.displayM3U8(self.m3)
-
-
-    def short(self, fmt):
-        ts = time.strftime("%Y-%m-%d %H:%M", self.datetime)
-        str = fmt.format(self.pid, ts, self.values.title)
-        return str
-
-
-    def download(self, grabber, folder, format, bwidth):
-        if format == "h264":
-            self.downloadH264(grabber, folder)
-        elif format == "ts":
-            self.downloadTablet(grabber, folder, bwidth)
-        elif format == None:
-            self.downloadMMS(grabber, folder)
-
-
-    def downloadMMS(self, folder):
-        options = Utils.Obj()
-        options.quiet        = False
-        options.url          = self.mms
-        options.resume       = False
-        options.bandwidth    = 1e6
-        options.filename     = os.path.join(folder, self.filename + ".wmv")
-        options.clobber      = True
-        options.time         = 0
-
-        libmimms.core.download(options)
-
-
-    def downloadTablet(self, grabber, folder, bwidth):
-        m3 = self.getTabletPlaylist()
-        Utils.downloadM3U8(grabber, m3, bwidth, folder, self.pid, self.filename)
-
-
-    def downloadH264(self, grabber, folder):
-        Utils.downloadH264(grabber, folder, self.pid, self.values.videoUrlH264, self.filename)
 
 
     def follow(self, db, grabber, downType):
