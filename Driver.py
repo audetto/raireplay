@@ -114,7 +114,7 @@ def process(args):
 
     elif args.item != None:
         p = Item.Demand(grabber, args.item, args.download)
-        displayOrGet(p, grabber, args.list, args.get, args.format, args.bwidth)
+        displayOrGet(p, grabber, args.list, args.get, args.format, args.bwidth, args.html)
 
     elif args.list:
         listDisplayOrGet(db, grabber, args.list, args.get, args.format, args.bwidth, args.html)
