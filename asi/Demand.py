@@ -8,6 +8,7 @@ import urlgrabber.progress
 from asi import Utils
 from asi import Config
 from asi import Page
+from asi import Base
 
 url = "http://www.rai.tv/dl/RaiTV/programmi/ricerca/ContentSet-6445de64-d321-476c-a890-ae4ed32c729e-darivedere.html"
 baseUrl = "http://www.rai.tv"
@@ -36,18 +37,16 @@ def download(db, grabber, downType):
     process(f, db)
 
 
-class Group:
+class Group(Base.Base):
     def __init__(self, pid, title, link, date, channel):
+        super(Group, self).__init__()
+
         self.pid = pid
         self.title = title
-        self.url = baseUrl + link
-        self.datetime = float(date)
+        self.somedate = float(date)
         self.channel = channel
 
-
-    def short(self, fmt):
-        str = unicode(fmt).format(self.pid, None, self.title)
-        return str
+        self.url = baseUrl + link
 
 
     def display(self):
@@ -60,6 +59,7 @@ class Group:
         print("URL:", self.url)
 
         print()
+
 
     def follow(self, db, grabber, downType):
         Page.download(db, grabber, self.url, downType)

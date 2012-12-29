@@ -16,6 +16,7 @@ import urlgrabber.progress
 from asi import Meter
 from asi import Utils
 from asi import Config
+from asi import Base
 
 infoUrl = "http://webservices.francetelevisions.fr/catchup/flux/flux_main.zip"
 baseUrl = "http://medias2.francetv.fr/catchup-mobile"
@@ -62,31 +63,28 @@ def download(db, grabber, downType):
             f = z.open(a)
             process(grabber, f, db)
 
-class Program:
-    def __init__(self, grabber, channel, date, hour, pid, minutes, name, desc, url):
-        self.grabber = grabber
-        self.channel = channel
+class Program(Base.Base):
+    def __init__(self, grabber, channel, date, hour, pid, minutes, title, desc, url):
+        super(Program, self).__init__()
+
         self.pid = pid
-        self.minutes = minutes
-        self.name = name
-        self.desc = desc
-        self.url = url
+        self.title = title
+        self.description = desc
+        self.channel = channel
         self.datetime = time.strptime(date + " " + hour, "%Y-%m-%d %H:%M")
+        self.ts = url
+
+        self.grabber = grabber
+        self.minutes = minutes
 
         self.m3 = None
 
 
     def getTabletPlaylist(self):
         if self.m3 == None:
-            self.m3 = Utils.load_m3u8_from_url(self.grabber, self.url)
+            self.m3 = Utils.load_m3u8_from_url(self.grabber, self.ts)
 
         return self.m3
-
-
-    def short(self, fmt):
-        ts = time.strftime("%Y-%m-%d %H:%M", self.datetime)
-        str = fmt.format(self.pid, ts, self.name)
-        return str
 
 
     def display(self):
@@ -95,13 +93,13 @@ class Program:
         print("=" * width)
         print("PID:", self.pid)
         print("Channel:", self.channel)
-        print("Title:", self.name)
-        print("Description:", self.desc)
+        print("Title:", self.title)
+        print("Description:", self.description)
         print("Date:", time.strftime("%Y-%m-%d %H:%M", self.datetime))
         print("Length:", self.minutes, "minutes")
         print("Filename:", self.getFilename())
         print()
-        print("url:", self.url)
+        print("url:", self.ts)
 
         m3 = self.getTabletPlaylist()
 
@@ -124,6 +122,6 @@ class Program:
 
 
     def getFilename(self):
-        name = Utils.makeFilename(self.name)
+        name = Utils.makeFilename(self.title)
         name = self.pid + "-" + name
         return name

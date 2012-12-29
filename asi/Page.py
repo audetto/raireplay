@@ -9,6 +9,7 @@ from xml.etree import ElementTree
 from asi import Utils
 from asi import Config
 from asi import Item
+from asi import Base
 
 # example: without xls we get a nice XML,
 # numContent is compulsory, but it seems a big number is accepted and gives the whole list
@@ -21,29 +22,27 @@ def getDataUrl(page):
     return url
 
 
-class Elem:
+class Elem(Base.Base):
     def __init__(self, pid, data):
+
+        super(Elem, self).__init__()
+
         self.pid           = pid
-        self.id            = data.findtext("localid")
-        self.length        = data.findtext("durata")
         self.title         = data.findtext("titolo")
         self.description   = data.findtext("descrizione")
-        web =  data.findtext("web")
-        if web == None:
-            web = Utils.getWebFromID(self.id)
-        self.url           = Utils.baseUrl + web
         strTime            = data.findtext("datapubblicazione")
         self.datetime      = time.strptime(strTime, "%d/%m/%Y")
 
         # extra experimental data
         self.h264          = data.findtext("h264")
-        self.m3u8          = data.findtext("m3u8")
+        self.ts            = data.findtext("m3u8")
 
-
-    def short(self, fmt):
-        ts = time.strftime("%Y-%m-%d %H:%M", self.datetime)
-        str = fmt.format(self.pid, ts, self.title)
-        return str
+        self.id            = data.findtext("localid")
+        self.length        = data.findtext("durata")
+        web =  data.findtext("web")
+        if web == None:
+            web = Utils.getWebFromID(self.id)
+        self.url           = Utils.baseUrl + web
 
 
     def display(self):
@@ -57,7 +56,7 @@ class Elem:
         print("Length:", self.length)
         print("URL:", self.url)
         print("h264:", self.h264)
-        print("m3u8:", self.m3u8)
+        print("m3u8:", self.ts)
         print()
 
 

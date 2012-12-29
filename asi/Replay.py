@@ -16,6 +16,7 @@ import urlgrabber.progress
 
 from asi import Utils
 from asi import Config
+from asi import Base
 
 baseUrl = "http://www.rai.it/dl/portale/html/palinsesti/replaytv/static"
 channels = {"1": "RaiUno", "2": "RaiDue", "3": "RaiTre", "31": "RaiCinque"}
@@ -119,25 +120,22 @@ def download(db, grabber, downType):
     print()
 
 
-class Program:
-    def __init__(self, grabber, channel, date, hour, pid, minutes, name, desc, h264, tablet, smartPhone):
-        self.grabber = grabber
-        self.channel = channel
+class Program(Base.Base):
+    def __init__(self, grabber, channel, date, hour, pid, minutes, title, desc, h264, tablet, smartPhone):
+        super(Program, self).__init__()
+
         self.pid = pid
-        self.minutes = minutes
-        self.name = name
-        self.desc = desc
+        self.title = title
         self.h264 = h264
+        self.description = desc
+        self.channel = channel
         self.ts = getFullUrl(tablet, smartPhone)
         self.datetime = time.strptime(date + " " + hour, "%Y-%m-%d %H:%M")
 
+        self.grabber = grabber
+        self.minutes = minutes
+
         self.m3 = None
-
-
-    def short(self, fmt):
-        ts = time.strftime("%Y-%m-%d %H:%M", self.datetime)
-        str = fmt.format(self.pid, ts, self.name)
-        return str
 
 
     def display(self):
@@ -146,8 +144,8 @@ class Program:
         print("=" * width)
         print("PID:", self.pid)
         print("Channel:", self.channel)
-        print("Title:", self.name)
-        print("Description:", self.desc)
+        print("Title:", self.title)
+        print("Description:", self.description)
         print("Date:", time.strftime("%Y-%m-%d %H:%M", self.datetime))
         print("Length:", self.minutes, "minutes")
         print("Filename:", self.getFilename())
