@@ -48,6 +48,7 @@ class VideoHTMLParser(HTMLParser):
         self.values.page = None
         self.values.date = None
 
+
     def handle_starttag(self, tag, attrs):
         if tag == "meta":
             val = self.extract(attrs, "videourl")
@@ -99,12 +100,14 @@ class VideoHTMLParser(HTMLParser):
                         firstComma = path.find(",")
                         self.values.videoPath = path[firstEqual + 1: firstComma]
 
+
     def extract(self, attrs, name):
         if len(attrs) > 1:
             if attrs[0][0] == "name" and attrs[0][1] == name:
                 if attrs[1][0] == "content":
                     return attrs[1][1]
         return None
+
 
 class Demand(Base.Base):
     def __init__(self, grabber, url, downType, pid = 0):
@@ -204,7 +207,6 @@ class Demand(Base.Base):
         print("mms:        ", self.mms)
 
         m3 = self.getTabletPlaylist()
-
         Utils.displayM3U8(self.m3)
 
 

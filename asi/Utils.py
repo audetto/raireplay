@@ -1,5 +1,8 @@
 from __future__ import print_function
 
+import sys
+sys.path.append('/home/andrea/projects/cvs/3rdParty/m3u8')
+
 import os.path
 import urlparse
 import m3u8
@@ -55,13 +58,18 @@ def getWebFromID(id):
 
 def findPlaylist(m3, bandwidth):
     b1 = int(bandwidth)
+
+    opt = None
+    dist = sys.maxint
+
     for p in m3.playlists:
         b2 = int(p.stream_info.bandwidth)
-        b2 = b2 / 1000 # remove rightmost 3 0s
-        b2 = (b2 / 100) * 100 # round to lowest 100
-        if b1 == b2:
-            return p
-    return None
+        d = abs(b2 - b1)
+        if d < dist:
+            dist = d
+            opt = p
+
+    return opt
 
 
 def downloadM3U8(grabber, m3, bwidth, folder, pid, filename):
@@ -71,6 +79,9 @@ def downloadM3U8(grabber, m3, bwidth, folder, pid, filename):
         if playlist == None:
             print("Cannot fin playlist with desired bandwidth")
             return
+
+        print("Downloading:")
+        print(playlist)
 
         uri = playlist.absolute_uri
         item = load_m3u8_from_url(grabber, uri)
@@ -129,7 +140,7 @@ def load_m3u8_from_url(grabber, uri):
 
 def setTorExitNodes(country):
     tn = telnetlib.Telnet("127.0.0.1", 9051)
-    tn.write('AUTHENTICATE ""\n')
+    tn.write('AUTHENTICATE "portachiusa"\n')
     tn.write("SETCONF ExitNodes={{{0}}}\n".format(country))
     tn.write("QUIT\n")
 

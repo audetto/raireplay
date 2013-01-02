@@ -1,11 +1,7 @@
 from __future__ import print_function
 
-import sys
-sys.path.append('/home/andrea/projects/cvs/3rdParty/m3u8')
-
 import os
 import urlparse
-import m3u8
 import time
 import json
 

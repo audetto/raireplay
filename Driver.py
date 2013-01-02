@@ -17,7 +17,7 @@ def displayOrGet(item, grabber, list, get, format, bwidth, html):
         if html:
             fmt = "<tr><td>{0}</td><td>{1}</td><td>{2}</td></tr>"
         else:
-            fmt = "{0:>7}: {1} {2}"
+            fmt = "{0:>9}: {1} {2}"
         print(item.short(unicode(fmt)))
 
     else:
