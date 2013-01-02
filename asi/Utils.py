@@ -76,10 +76,6 @@ def downloadM3U8(grabber, m3, bwidth, folder, pid, filename):
     if m3.is_variant:
         playlist = findPlaylist(m3, bwidth)
 
-        if playlist == None:
-            print("Cannot fin playlist with desired bandwidth")
-            return
-
         print("Downloading:")
         print(playlist)
 
