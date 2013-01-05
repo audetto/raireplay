@@ -134,11 +134,12 @@ class Demand(Base.Base):
         if self.values.date != None:
             self.datetime = time.strptime(self.values.date, "%d/%m/%Y")
 
+        self.asf = None
+        self.mms = None
+
         if self.values.type != None and self.values.type != "Video":
             # this is a case of a Photogallery
             self.url = None
-            self.asf = None
-            self.mms = None
             self.filename = None
             return
 
@@ -154,7 +155,6 @@ class Demand(Base.Base):
         urlScheme = urlparse.urlsplit(self.values.videoUrl).scheme
         if urlScheme == "mms":
             # if it is already mms, don't look further
-            self.asf = None
             self.mms = self.values.videoUrl
         else:
             # search for the mms url
@@ -166,17 +166,21 @@ class Demand(Base.Base):
                 self.mms = invalid
             else:
                 root = ElementTree.fromstring(content)
-                self.asf = root[0][0].attrib.get("HREF")
+                if root.tag == "ASX":
+                    self.asf = root.find("ENTRY").find("REF").attrib.get("HREF")
 
-                if self.asf != None:
-                    # use urlgrab to make it work with ConfigParser
-                    content = grabber.urlgrab(self.asf)
-                    config = ConfigParser.ConfigParser()
-                    config.read(content)
-                    self.mms = config.get("Reference", "ref1")
-                    self.mms = self.mms.replace("http://", "mms://")
+                    if self.asf != None:
+                        # use urlgrab to make it work with ConfigParser
+                        content = grabber.urlgrab(self.asf)
+                        config = ConfigParser.ConfigParser()
+                        config.read(content)
+                        self.mms = config.get("Reference", "ref1")
+                        self.mms = self.mms.replace("http://", "mms://")
+                elif root.tag == "playList":
+                    # adaptive streaming - unsupported
+                    pass
                 else:
-                    self.mms = None
+                    print("Unknown root tag: " + root.tag)
 
 
     def getTabletPlaylist(self):
