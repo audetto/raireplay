@@ -14,7 +14,7 @@ def main():
 
     parser.add_argument("--download", action = "store", default = "update", choices = ["always", "update", "never"],
                         help = "Default is update")
-    parser.add_argument("--format", action = "store", choices = ["h264", "ts"])
+    parser.add_argument("--format", action = "store", choices = ["h264", "ts", "mms"])
     parser.add_argument("--bwidth", action = "store")
     parser.add_argument("--info", action = "store_true", default = False)
     parser.add_argument("--tor", action = "store")

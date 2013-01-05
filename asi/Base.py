@@ -41,8 +41,17 @@ class Base(object):
             self.downloadH264(grabber, folder)
         elif format == "ts":
             self.downloadTablet(grabber, folder, bwidth)
-        elif format == None:
+        elif format == "mms":
             self.downloadMMS(folder)
+        elif format == None:
+            if self.h264 != None:
+                self.downloadH264(grabber, folder)
+            else:
+                m3 = self.getTabletPlaylist()
+                if m3 != None:
+                    self.downloadTablet(grabber, folder, bwidth)
+                elif self.mms != None:
+                    self.downloadMMS(folder)
 
 
     def downloadTablet(self, grabber, folder, bwidth):
