@@ -6,15 +6,20 @@ import urlgrabber.progress
 # setUserLocation("ESTERO");
 userLocation = "http://mediapolis.rai.it/relinker/relinkerServlet.htm?cont=826819"
 
+# this one is from TF1
+userIP = "http://api.prod.capptain.com/ip-to-country"
+
 def display(grabber, rootFolder):
 
     location = grabber.urlread(userLocation)
+    ip = grabber.urlread(userIP)
 
     width = urlgrabber.progress.terminal_width()
 
     print("=" * width)
 
-    print("Location:   ", location)
     print("Root folder:", rootFolder)
+    print("Location:   ", location)
+    print("IP:         ", ip)
 
     print()

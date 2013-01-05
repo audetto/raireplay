@@ -42,7 +42,7 @@ class Base(object):
         elif format == "ts":
             self.downloadTablet(grabber, folder, bwidth)
         elif format == None:
-            self.downloadMMS(grabber, folder)
+            self.downloadMMS(folder)
 
 
     def downloadTablet(self, grabber, folder, bwidth):
@@ -51,7 +51,7 @@ class Base(object):
 
 
     def downloadH264(self, grabber, folder):
-        Utils.downloadH264(grabber, folder, self.pid, self.values.videoUrlH264, self.filename)
+        Utils.downloadH264(grabber, folder, self.pid, self.h264, self.filename)
 
 
     def downloadMMS(self, folder):

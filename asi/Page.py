@@ -31,6 +31,8 @@ class Elem(Base.Base):
         self.title         = data.findtext("titolo")
         self.description   = data.findtext("descrizione")
         strTime            = data.findtext("datapubblicazione")
+
+        strTime            = strTime.replace("-", "/")
         self.datetime      = time.strptime(strTime, "%d/%m/%Y")
 
         # extra experimental data
