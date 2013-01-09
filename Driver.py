@@ -1,5 +1,6 @@
 from __future__ import print_function
 
+from asi import Utils
 from asi import Info
 from asi import Replay
 from asi import Page
@@ -7,7 +8,7 @@ from asi import Item
 from asi import Demand
 from asi import Config
 from asi import Pluzz
-from asi import Utils
+from asi import TF1
 
 import urlgrabber.grabber
 
@@ -69,8 +70,11 @@ def process(args):
         if args.proxy != None:
             proxy = { "http" : args.proxy }
 
+    # got from the iphone
+    # required for TF1 - www.wat.tv
+    userAgent = "AppleCoreMedia/1.0.0.9B206 (iPod; U; CPU OS 5_1_1 like Mac OS X; en_us)"
 
-    grabber = urlgrabber.grabber.URLGrabber(proxies = proxy, quote = 0)
+    grabber = urlgrabber.grabber.URLGrabber(proxies = proxy, quote = 0, user_agent = userAgent)
 
     if args.info:
         Info.display(grabber, Config.rootFolder)
@@ -104,6 +108,9 @@ def process(args):
 
     if args.pluzz:
         Pluzz.download(db, grabber, args.download)
+
+    if args.tf1:
+        TF1.download(db, grabber, args.download)
 
     if args.pid:
         subset = {}
