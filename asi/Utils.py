@@ -150,12 +150,20 @@ def makeFilename(input):
     return name
 
 
+def getResolution(p):
+    if p.stream_info.resolution == None:
+        return None
+    res = "{0:>4}x{1:>4}".format(p.stream_info.resolution[0], p.stream_info.resolution[1])
+    return res
+
+
 def displayM3U8(m3):
     if m3 != None and m3.is_variant:
         print()
         for playlist in m3.playlists:
             format = "\tProgram: {0:>2}, Bandwidth: {1:>10}, Resolution: {2:>10}, Codecs: {3}"
+
             line = format.format(playlist.stream_info.program_id, playlist.stream_info.bandwidth,
-                                 playlist.stream_info.resolution, playlist.stream_info.codecs)
+                                 getResolution(playlist), playlist.stream_info.codecs)
             print(line)
         print()
