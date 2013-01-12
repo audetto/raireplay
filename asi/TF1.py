@@ -33,63 +33,107 @@ def parseItem(grabber, prog, name):
     desc     = prog["longTitle"]
     date     = prog["publicationDate"]
     duration = prog["duration"]
-    channel  = "tf1"
     name     = name + " - " + prog["shortTitle"]
     wat      = prog["watId"]
+    category = prog["videoCategory"]
 
-    minutes = duration / 60
+    minutes  = duration / 60
+    datetime = time.strptime(date, "%Y-%m-%d %H:%M:%S")
 
-    p = Program(grabber, channel, date, minutes, pid, name, desc, wat)
+    p = Program(grabber, datetime, minutes, pid, name, desc, wat, category)
 
     return p
 
 
-def processId(grabber, f, name, db):
+def processGroup(grabber, f, name, db):
     o = json.load(f)
 
     for prog in o:
         p = parseItem(grabber, prog, name)
-        db[p.pid] = p
+
+        # ignore the countless "extract", "bonus", "short" which last just a few minutes
+        if p.category == "fullvideo":
+            db[p.pid] = p
 
 
-def process(grabber, f, folder, progress, downType, db):
+def processNews(grabber, f, folder, progress, downType, db):
     o = json.load(f)
 
     for prog in o:
         name = prog["programName"]
-        progId = prog["programId"]
+        groupId = prog["programId"]
 
-        url_0 = getDataUrl(progId, 0)
-        localName_0 = os.path.join(folder, str(progId) + ".0.json")
-        f_0 = Utils.download(grabber, progress, url_0, localName_0, downType, "utf-8", True)
-        processId(grabber, f_0, name, db)
+        downloadGroup(grabber, name, groupId, folder, progress, downType, db)
 
-        url_1 = getDataUrl(progId, 1)
-        localName_1 = os.path.join(folder, str(progId) + ".1.json")
-        f_1 = Utils.download(grabber, progress, url_1, localName_1, downType, "utf-8", True)
-        processId(grabber, f_1, name, db)
+        # this group contains the info of the most recent Item
+        # we add an other item with the group name
+        # some info will still be missing
+
+        title = prog["title"]
+        wat = prog["linkAttributes"]["watId"]
+        category = prog["linkAttributes"]["videoCategory"]
+
+        p = Program(grabber, time.localtime(), None, str(groupId), name, title, wat, category)
+        db[p.pid] = p
+
+
+def processPrograms(grabber, f, folder, progress, downType, db):
+    o = json.load(f)
+
+    for prog in o:
+        name = prog["shortTitle"]
+        groupId = prog["id"]
+
+        # here, we do not know the most recent item
+        # we simply have to go through them all
+
+        downloadGroup(grabber, name, groupId, folder, progress, downType, db)
+
+
+def downloadGroup(grabber, name, groupId, folder, progress, downType, db):
+
+    # we set it to True as this is a group
+    # and subject to continuous changes
+    checkTimestamp = True
+
+    url_0 = getDataUrl(groupId, 0)
+    localName_0 = os.path.join(folder, str(groupId) + ".0.json")
+    f_0 = Utils.download(grabber, progress, url_0, localName_0, downType, "utf-8", checkTimestamp)
+    processGroup(grabber, f_0, name, db)
+
+    url_1 = getDataUrl(groupId, 1)
+    localName_1 = os.path.join(folder, str(groupId) + ".1.json")
+    f_1 = Utils.download(grabber, progress, url_1, localName_1, downType, "utf-8", checkTimestamp)
+    processGroup(grabber, f_1, name, db)
 
 
 def download(db, grabber, downType):
     progress_obj = urlgrabber.progress.TextMeter()
 
     folder = Config.tf1Folder
+
     localName = os.path.join(folder, "news.json")
     f = Utils.download(grabber, progress_obj, newsUrl, localName, downType, "utf-8", True)
 
-    process(grabber, f, folder, progress_obj, downType, db)
+    processNews(grabber, f, folder, progress_obj, downType, db)
+
+    localName = os.path.join(folder, "programs.json")
+    f = Utils.download(grabber, progress_obj, programsUrl, localName, downType, "utf-8", True)
+
+    processPrograms(grabber, f, folder, progress_obj, downType, db)
 
 
 class Program(Base.Base):
-    def __init__(self, grabber, channel, date, minutes, pid, title, desc, wat):
+    def __init__(self, grabber, datetime, minutes, pid, title, desc, wat, category):
         super(Program, self).__init__()
 
         self.pid = pid
         self.title = title
         self.description = desc
-        self.channel = channel
+        self.channel = "tf1"
         self.wat = wat
-        self.datetime = time.strptime(date, "%Y-%m-%d %H:%M:%S")
+        self.datetime = datetime
+        self.category = category
 
         self.minutes = minutes
         self.grabber = grabber
@@ -118,6 +162,7 @@ class Program(Base.Base):
         print("Date:", time.strftime("%Y-%m-%d %H:%M", self.datetime))
         print("Length:", self.minutes, "minutes")
         print("Filename:", self.filename)
+        print("Category:", self.category)
         print()
         print("url:", self.ts)
 
