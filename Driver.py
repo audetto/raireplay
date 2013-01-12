@@ -5,6 +5,7 @@ from asi import Info
 from asi import Replay
 from asi import Page
 from asi import Item
+from asi import TG
 from asi import Demand
 from asi import Config
 from asi import Pluzz
@@ -105,6 +106,9 @@ def process(args):
 
     if args.replay:
         Replay.download(db, grabber, args.download)
+
+    if args.tg:
+        TG.download(db, grabber, args.download)
 
     if args.pluzz:
         Pluzz.download(db, grabber, args.download)

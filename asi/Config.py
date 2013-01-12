@@ -1,35 +1,20 @@
 import os.path
 import os
 
-rootFolder    = os.path.expanduser("~/.raireplay")
-dataFolder    = os.path.join(rootFolder, "data")
+def createFolder(name):
+    if not os.path.exists(name):
+        os.makedirs(name)
+    return name
 
-replayFolder  = os.path.join(dataFolder, "replay")
-itemFolder    = os.path.join(dataFolder, "items")
-pageFolder    = os.path.join(dataFolder, "pages")
-demandFolder  = os.path.join(dataFolder, "demand")
-pluzzFolder   = os.path.join(dataFolder, "pluzz")
-tf1Folder     = os.path.join(dataFolder, "tf1")
+rootFolder    = createFolder(os.path.expanduser("~/.raireplay"))
+dataFolder    = createFolder(os.path.join(rootFolder, "data"))
 
-programFolder = os.path.join(rootFolder, "programs")
+replayFolder  = createFolder(os.path.join(dataFolder, "replay"))
+itemFolder    = createFolder(os.path.join(dataFolder, "items"))
+pageFolder    = createFolder(os.path.join(dataFolder, "pages"))
+demandFolder  = createFolder(os.path.join(dataFolder, "demand"))
+tgFolder      = createFolder(os.path.join(dataFolder, "tg"))
+pluzzFolder   = createFolder(os.path.join(dataFolder, "pluzz"))
+tf1Folder     = createFolder(os.path.join(dataFolder, "tf1"))
 
-if not os.path.exists(replayFolder):
-    os.makedirs(replayFolder)
-
-if not os.path.exists(itemFolder):
-    os.makedirs(itemFolder)
-
-if not os.path.exists(pageFolder):
-    os.makedirs(pageFolder)
-
-if not os.path.exists(demandFolder):
-    os.makedirs(demandFolder)
-
-if not os.path.exists(pluzzFolder):
-    os.makedirs(pluzzFolder)
-
-if not os.path.exists(tf1Folder):
-    os.makedirs(tf1Folder)
-
-if not os.path.exists(programFolder):
-    os.makedirs(programFolder)
+programFolder = createFolder(os.path.join(rootFolder, "programs"))

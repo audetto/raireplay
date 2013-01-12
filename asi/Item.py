@@ -84,7 +84,7 @@ class VideoHTMLParser(HTMLParser):
                 self.values.type = val
 
             val = self.extract(attrs, "itemDate")
-            if val != None:
+            if val != None and val:
                 self.values.date = val
 
             val = self.extract(attrs, "idPageProgramma")

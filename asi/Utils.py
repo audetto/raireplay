@@ -143,7 +143,7 @@ def setTorExitNodes(country):
 
 def makeFilename(input):
     translateTo = u"_"
-    charactersToRemove = u" /:^,"
+    charactersToRemove = u" /:^,|"
     translateTable = dict((ord(char), translateTo) for char in charactersToRemove)
     name = input.translate(translateTable)
     name = removeAccents(name)
