@@ -1,6 +1,6 @@
 from __future__ import print_function
 
-import time
+import datetime
 import os.path
 import urlgrabber.progress
 
@@ -34,7 +34,7 @@ class Elem(Base.Base):
         strTime            = data.findtext("datapubblicazione")
 
         strTime            = strTime.replace("-", "/")
-        self.datetime      = time.strptime(strTime, "%d/%m/%Y")
+        self.datetime      = datetime.datetime.strptime(strTime, "%d/%m/%Y")
 
         # extra experimental data
         self.h264          = data.findtext("h264")
@@ -55,7 +55,7 @@ class Elem(Base.Base):
         print("PID:", self.pid)
         print("Title:", self.title)
         print("Description:", self.description)
-        print("Date:", time.strftime("%Y-%m-%d %H:%M", self.datetime))
+        print("Date:", self.datetime.strftime("%Y-%m-%d %H:%M"))
         print("Length:", self.length)
         print("URL:", self.url)
         print("h264:", self.h264)

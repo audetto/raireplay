@@ -1,11 +1,8 @@
 from __future__ import print_function
 
 import os
-import time
+import datetime
 import json
-
-from datetime import date
-from datetime import timedelta
 
 import urlgrabber.progress
 
@@ -31,16 +28,16 @@ def getWatLink(watId):
 def parseItem(grabber, prog, name):
     pid      = str(prog["id"])
     desc     = prog["longTitle"]
-    date     = prog["publicationDate"]
+    pubDate  = prog["publicationDate"]
     duration = prog["duration"]
     name     = name + " - " + prog["shortTitle"]
     wat      = prog["watId"]
     category = prog["videoCategory"]
 
     minutes  = duration / 60
-    datetime = time.strptime(date, "%Y-%m-%d %H:%M:%S")
+    date = datetime.datetime.strptime(pubDate, "%Y-%m-%d %H:%M:%S")
 
-    p = Program(grabber, datetime, minutes, pid, name, desc, wat, category)
+    p = Program(grabber, date, minutes, pid, name, desc, wat, category)
 
     return p
 
@@ -73,7 +70,7 @@ def processNews(grabber, f, folder, progress, downType, db):
         wat = prog["linkAttributes"]["watId"]
         category = prog["linkAttributes"]["videoCategory"]
 
-        p = Program(grabber, time.localtime(), None, str(groupId), name, title, wat, category)
+        p = Program(grabber, datetime.datetime.now(), None, str(groupId), name, title, wat, category)
         db[p.pid] = p
 
 
@@ -151,7 +148,7 @@ class Program(Base.Base):
         print("Channel:", self.channel)
         print("Title:", self.title)
         print("Description:", self.description)
-        print("Date:", time.strftime("%Y-%m-%d %H:%M", self.datetime))
+        print("Date:", self.datetime.strftime("%Y-%m-%d %H:%M"))
         print("Length:", self.minutes, "minutes")
         print("Filename:", self.filename)
         print("Category:", self.category)

@@ -1,6 +1,6 @@
 from __future__ import print_function
 
-import time
+import datetime
 import os
 import libmimms.core
 
@@ -27,7 +27,7 @@ class Base(object):
 
     def short(self, fmt):
         if self.datetime != None:
-            ts = time.strftime("%Y-%m-%d %H:%M", self.datetime)
+            ts = self.datetime.strftime("%Y-%m-%d %H:%M")
         else:
             ts = None
 

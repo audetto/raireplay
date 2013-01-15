@@ -2,11 +2,8 @@ from __future__ import print_function
 
 import os
 import urlparse
-import time
+import datetime
 import json
-
-from datetime import date
-from datetime import timedelta
 
 import urlgrabber.progress
 
@@ -97,12 +94,12 @@ def process(grabber, f, db):
 def download(db, grabber, downType):
     progress_obj = urlgrabber.progress.TextMeter()
 
-    today = date.today()
+    today = datetime.date.today()
 
     folder = Config.replayFolder
 
     for x in range(1, 8):
-        day = today - timedelta(days = x)
+        day = today - datetime.timedelta(days = x)
         strDate = day.strftime("_%Y_%m_%d")
 
         for channel in channels.itervalues():
@@ -126,7 +123,7 @@ class Program(Base.Base):
         self.description = desc
         self.channel = channel
         self.ts = getFullUrl(tablet, smartPhone)
-        self.datetime = time.strptime(date + " " + hour, "%Y-%m-%d %H:%M")
+        self.datetime = datetime.datetime.strptime(date + " " + hour, "%Y-%m-%d %H:%M")
 
         self.grabber = grabber
         self.minutes = minutes
@@ -141,7 +138,7 @@ class Program(Base.Base):
         print("Channel:", self.channel)
         print("Title:", self.title)
         print("Description:", self.description)
-        print("Date:", time.strftime("%Y-%m-%d %H:%M", self.datetime))
+        print("Date:", self.datetime.strftime("%Y-%m-%d %H:%M"))
         print("Length:", self.minutes, "minutes")
         print("Filename:", self.filename)
         print()

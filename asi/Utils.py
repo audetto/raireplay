@@ -7,13 +7,10 @@ import os.path
 import urlparse
 import m3u8
 import codecs
-import time
+import datetime
 import unicodedata
 import telnetlib
 import urlgrabber.progress
-
-from datetime import timedelta
-from datetime import datetime
 
 from asi import Meter
 
@@ -36,8 +33,8 @@ def download(grabber, progress, url, localName, downType, encoding, checkTime = 
 
     if exists and checkTime:
         # if it is more than a day old, we redownload it
-        age = datetime.today() - datetime.fromtimestamp(os.path.getmtime(localName))
-        maximum = timedelta(days = 1)
+        age = datetime.datetime.today() - datetime.datetime.fromtimestamp(os.path.getmtime(localName))
+        maximum = datetime.timedelta(days = 1)
         exists = age < maximum
 
     if downType == "always" or (downType == "update" and not exists):

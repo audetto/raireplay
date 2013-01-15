@@ -1,12 +1,9 @@
 from __future__ import print_function
 
 import os
-import time
+import datetime
 import json
 import zipfile
-
-from datetime import date
-from datetime import timedelta
 
 import urlgrabber.progress
 
@@ -68,7 +65,7 @@ class Program(Base.Base):
         self.title = title
         self.description = desc
         self.channel = channel
-        self.datetime = time.strptime(date + " " + hour, "%Y-%m-%d %H:%M")
+        self.datetime = datetime.datetime.strptime(date + " " + hour, "%Y-%m-%d %H:%M")
         self.ts = url
 
         self.grabber = grabber
@@ -86,7 +83,7 @@ class Program(Base.Base):
         print("Channel:", self.channel)
         print("Title:", self.title)
         print("Description:", self.description)
-        print("Date:", time.strftime("%Y-%m-%d %H:%M", self.datetime))
+        print("Date:", self.datetime.strftime("%Y-%m-%d %H:%M"))
         print("Length:", self.minutes, "minutes")
         print("Filename:", self.filename)
         print()

@@ -3,7 +3,7 @@ from __future__ import print_function
 import os.path
 import urlgrabber.progress
 import urlparse
-import time
+import datetime
 
 import ConfigParser
 
@@ -132,7 +132,7 @@ class Demand(Base.Base):
         self.h264 = self.values.videoUrlH264
 
         if self.values.date != None:
-            self.datetime = time.strptime(self.values.date, "%d/%m/%Y")
+            self.datetime = datetime.datetime.strptime(self.values.date, "%d/%m/%Y")
 
         self.asf = None
         self.mms = None

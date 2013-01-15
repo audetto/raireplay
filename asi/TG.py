@@ -1,11 +1,8 @@
 from __future__ import print_function
 
 import os
-import time
+import datetime
 import json
-
-from datetime import date
-from datetime import timedelta
 
 import urlgrabber.progress
 
@@ -116,7 +113,7 @@ class Program(Base.Base):
         self.description = desc
         self.channel = channel
         strtime = date.replace("-", "/")
-        self.datetime = time.strptime(strtime, "%d/%m/%Y")
+        self.datetime = datetime.datetime.strptime(strtime, "%d/%m/%Y")
         if h264:
             self.h264 = h264
         if m3u8:
@@ -136,7 +133,7 @@ class Program(Base.Base):
         print("Channel:", self.channel)
         print("Title:", self.title)
         print("Description:", self.description)
-        print("Date:", time.strftime("%Y-%m-%d %H:%M", self.datetime))
+        print("Date:", self.datetime.strftime("%Y-%m-%d %H:%M"))
         print("Filename:", self.filename)
         print()
         print("h264:", self.h264)
