@@ -158,7 +158,7 @@ class Demand(Base.Base):
             self.mms = self.values.videoUrl
         else:
             # search for the mms url
-            content = grabber.urlread(self.values.videoUrl)
+            content = grabber.urlread(str(self.values.videoUrl))
 
             if content == invalid:
                 # is this the case of videos only available in Italy?

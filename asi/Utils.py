@@ -38,7 +38,7 @@ def download(grabber, progress, url, localName, downType, encoding, checkTime = 
         exists = age < maximum
 
     if downType == "always" or (downType == "update" and not exists):
-        localName = grabber.urlgrab(url, filename = localName, progress_obj = progress)
+        localName = grabber.urlgrab(str(url), filename = localName, progress_obj = progress)
 
     if encoding == None:
         f = open(localName, "r")
@@ -107,7 +107,7 @@ def downloadH264(grabber, folder, pid, url, filename):
     print()
     print("Saving {0} as {1}".format(pid, localFilename))
 
-    filename = grabber.urlgrab(url, filename = localFilename, progress_obj = progress_obj)
+    filename = grabber.urlgrab(str(url), filename = localFilename, progress_obj = progress_obj)
 
     print()
     print("Saved {0} as {1}".format(pid, filename))
@@ -123,7 +123,7 @@ def removeAccents(input_str):
 # as we want to ensure we use the grabber to download
 # and we still get a good baseuri
 def load_m3u8_from_url(grabber, uri):
-    content = grabber.urlread(uri)
+    content = grabber.urlread(str(uri))
     parsed_url = urlparse.urlparse(uri)
     prefix = parsed_url.scheme + '://' + parsed_url.netloc
     basepath = os.path.normpath(parsed_url.path + '/..')
