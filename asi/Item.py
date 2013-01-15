@@ -116,7 +116,6 @@ class Demand(Base.Base):
         self.grabber = grabber
         self.url = url
         self.pid = pid
-        self.m3 = None
 
         folder = Config.itemFolder
         localFilename = os.path.join(folder, Utils.httpFilename(self.url))
@@ -183,14 +182,6 @@ class Demand(Base.Base):
                     print("Unknown root tag: " + root.tag)
 
 
-    def getTabletPlaylist(self):
-        if self.m3 == None:
-            if self.values.videoUrlM3U8 != None:
-                self.m3 = Utils.load_m3u8_from_url(self.grabber, self.values.videoUrlM3U8)
-
-        return self.m3
-
-
     def display(self):
         width = urlgrabber.progress.terminal_width()
 
@@ -214,5 +205,5 @@ class Demand(Base.Base):
         Utils.displayM3U8(self.m3)
 
 
-    def follow(self, db, grabber, downType):
+    def follow(self, db, downType):
         raise Exception("Follow selection must terminate here.")

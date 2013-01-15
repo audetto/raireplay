@@ -23,13 +23,14 @@ def getDataUrl(page):
 
 
 class Elem(Base.Base):
-    def __init__(self, pid, data):
+    def __init__(self, grabber, pid, data):
 
         super(Elem, self).__init__()
 
         self.pid           = pid
         self.title         = data.findtext("titolo")
         self.description   = data.findtext("descrizione")
+        self.grabber       = grabber
         strTime            = data.findtext("datapubblicazione")
 
         strTime            = strTime.replace("-", "/")
@@ -62,8 +63,8 @@ class Elem(Base.Base):
         print()
 
 
-    def follow(self, db, grabber, downType):
-        p = Item.Demand(grabber, self.url, downType, self.pid)
+    def follow(self, db, downType):
+        p = Item.Demand(self.grabber, self.url, downType, self.pid)
         db[str(self.pid)] = p
 
 
@@ -84,7 +85,7 @@ def download(db, grabber, url, downType):
 
     for child in root:
         if child.tag == "content":
-            it = Elem(pid, child)
+            it = Elem(grabber, pid, child)
             # use str() as a key for consistency with --replay
             db[str(pid)] = it
             pid = pid + 1

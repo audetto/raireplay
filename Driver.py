@@ -14,7 +14,7 @@ from asi import TF1
 import urlgrabber.grabber
 
 
-def displayOrGet(item, grabber, list, get, format, bwidth, html):
+def displayOrGet(item, list, get, format, bwidth, html):
     if list:
         if html:
             fmt = "<tr><td>{0}</td><td>{1}</td><td>{2}</td></tr>"
@@ -26,10 +26,10 @@ def displayOrGet(item, grabber, list, get, format, bwidth, html):
         item.display()
 
     if get:
-        item.download(grabber, Config.programFolder, format, bwidth)
+        item.download(Config.programFolder, format, bwidth)
 
 
-def listDisplayOrGet(items, grabber, list, get, format, bwidth, html):
+def listDisplayOrGet(items, list, get, format, bwidth, html):
     if (list and html):
         print("<!DOCTYPE HTML>")
         print("<html>")
@@ -39,7 +39,7 @@ def listDisplayOrGet(items, grabber, list, get, format, bwidth, html):
         print("<tr><td>PID</td><td>Time</td><td>Title</td></tr>")
 
     for p in sorted(items.itervalues(), key = lambda x: x.datetime):
-        displayOrGet(p, grabber, list, get, format, bwidth, html)
+        displayOrGet(p, list, get, format, bwidth, html)
 
     if (list and html):
         print("</table></body></html>")
@@ -96,7 +96,7 @@ def process(args):
                 # continue follow calculation
                 db = {}
                 p = next(subset.itervalues())
-                p.follow(db, grabber, args.download)
+                p.follow(db, args.download)
                 follows = follows[1:] # continue with one element less
             else:
                 print("Too many/few ({0}) items selected during while processing follow '{1}'".format(len(subset), follows[0]))
@@ -121,14 +121,14 @@ def process(args):
         for pid in args.pid:
             find(db, pid, subset)
 
-        listDisplayOrGet(subset, grabber, args.list, args.get, args.format, args.bwidth, args.html)
+        listDisplayOrGet(subset, args.list, args.get, args.format, args.bwidth, args.html)
 
     elif args.item != None:
         p = Item.Demand(grabber, args.item, args.download)
         displayOrGet(p, grabber, args.list, args.get, args.format, args.bwidth, args.html)
 
     elif args.list:
-        listDisplayOrGet(db, grabber, args.list, args.get, args.format, args.bwidth, args.html)
+        listDisplayOrGet(db, args.list, args.get, args.format, args.bwidth, args.html)
 
     else:
         print()

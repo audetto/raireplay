@@ -124,16 +124,8 @@ class Program(Base.Base):
 
         self.grabber = grabber
 
-        self.m3 = None
         name = Utils.makeFilename(self.title)
         self.filename = self.pid + "-" + name
-
-
-    def getTabletPlaylist(self):
-        if self.m3 == None:
-            self.m3 = Utils.load_m3u8_from_url(self.grabber, self.ts)
-
-        return self.m3
 
 
     def display(self):
@@ -151,11 +143,4 @@ class Program(Base.Base):
         print("m3u8:", self.ts)
 
         m3 = self.getTabletPlaylist()
-
-        if m3 != None and m3.is_variant:
-            print()
-            for playlist in m3.playlists:
-                format = "\tProgram: {0:>2}, Bandwidth: {1:>10}, Codecs: {2}"
-                line = format.format(playlist.stream_info.program_id, playlist.stream_info.bandwidth, playlist.stream_info.codecs)
-                print(line)
-            print()
+        Utils.displayM3U8(self.m3)

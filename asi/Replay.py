@@ -131,7 +131,6 @@ class Program(Base.Base):
         self.grabber = grabber
         self.minutes = minutes
 
-        self.m3 = None
         self.filename = self.getFilename()
 
     def display(self):
@@ -150,16 +149,7 @@ class Program(Base.Base):
         print("ts:  ", self.ts)
 
         m3 = self.getTabletPlaylist()
-
         Utils.displayM3U8(self.m3)
-
-
-    def getTabletPlaylist(self):
-        if self.m3 == None:
-            if self.ts != "":
-                self.m3 = Utils.load_m3u8_from_url(self.grabber, self.ts)
-
-        return self.m3
 
 
     # use RAI m3u8 url to get a "nice" filename

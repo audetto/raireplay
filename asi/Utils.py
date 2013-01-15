@@ -73,7 +73,7 @@ def findPlaylist(m3, bandwidth):
 
 
 def downloadM3U8(grabber, m3, bwidth, folder, pid, filename):
-    if m3.is_variant:
+    if m3 != None and m3.is_variant:
         playlist = findPlaylist(m3, bwidth)
 
         print("Downloading:")
