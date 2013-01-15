@@ -110,7 +110,7 @@ class VideoHTMLParser(HTMLParser):
 
 
 class Demand(Base.Base):
-    def __init__(self, grabber, url, downType, pid = 0):
+    def __init__(self, grabber, url, downType, pid):
         super(Demand, self).__init__()
 
         self.grabber = grabber
@@ -127,6 +127,7 @@ class Demand(Base.Base):
 
         self.values = parser.values
 
+        self.title = self.values.title
         self.ts = self.values.videoUrlM3U8
         self.h264 = self.values.videoUrlH264
 

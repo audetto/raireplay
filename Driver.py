@@ -14,35 +14,25 @@ from asi import TF1
 import urlgrabber.grabber
 
 
-def displayOrGet(item, list, get, format, bwidth, html):
-    if list:
-        if html:
-            fmt = "<tr><td>{0}</td><td>{1}</td><td>{2}</td></tr>"
-        else:
-            fmt = "{0:>9}: {1} {2}"
-        print(item.short(unicode(fmt)))
-
-    else:
+def displayOrGet(item, nolist, info, get, format, bwidth):
+    if info:
         item.display()
+    elif not nolist:
+        # this is list
+        fmt = "{0:>9}: {1} {2}"
+        print(item.short(unicode(fmt)))
 
     if get:
         item.download(Config.programFolder, format, bwidth)
 
 
-def listDisplayOrGet(items, list, get, format, bwidth, html):
-    if (list and html):
-        print("<!DOCTYPE HTML>")
-        print("<html>")
-        print('<head><meta charset="utf-8"></head>')
-        print("<body>")
-        print('<table border="1">')
-        print("<tr><td>PID</td><td>Time</td><td>Title</td></tr>")
+def listDisplayOrGet(items, nolist, info, get, format, bwidth):
+    if nolist:
+        print()
+        print("INFO: {0} programmes found".format(len(items)))
 
     for p in sorted(items.itervalues(), key = lambda x: x.datetime):
-        displayOrGet(p, list, get, format, bwidth, html)
-
-    if (list and html):
-        print("</table></body></html>")
+        displayOrGet(p, nolist, info, get, format, bwidth)
 
 
 def find(db, pid, subset):
@@ -77,7 +67,7 @@ def process(args):
 
     grabber = urlgrabber.grabber.URLGrabber(proxies = proxy, quote = 0, user_agent = userAgent)
 
-    if args.info:
+    if args.ip:
         Info.display(grabber, Config.rootFolder)
         return
 
@@ -116,20 +106,15 @@ def process(args):
     if args.tf1:
         TF1.download(db, grabber, args.download)
 
+    if args.item != None:
+        p = Item.Demand(grabber, args.item, args.download, len(db))
+        db[p.pid] = p
+
     if args.pid:
         subset = {}
         for pid in args.pid:
             find(db, pid, subset)
-
-        listDisplayOrGet(subset, args.list, args.get, args.format, args.bwidth, args.html)
-
-    elif args.item != None:
-        p = Item.Demand(grabber, args.item, args.download)
-        displayOrGet(p, grabber, args.list, args.get, args.format, args.bwidth, args.html)
-
-    elif args.list:
-        listDisplayOrGet(db, args.list, args.get, args.format, args.bwidth, args.html)
-
     else:
-        print()
-        print("INFO: {0} programmes found".format(len(db)))
+        subset = db
+
+    listDisplayOrGet(subset, args.nolist, args.info, args.get, args.format, args.bwidth)

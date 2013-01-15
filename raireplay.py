@@ -16,7 +16,7 @@ def main():
                         help = "Default is update")
     parser.add_argument("--format", action = "store", choices = ["h264", "ts", "mms"])
     parser.add_argument("--bwidth", action = "store")
-    parser.add_argument("--info", action = "store_true", default = False)
+    parser.add_argument("--ip", action = "store_true", default = False)
     parser.add_argument("--tor", action = "store")
     parser.add_argument("--proxy", action = "store")
 
@@ -29,11 +29,10 @@ def main():
 
     parser.add_argument("--follow", action = "append")
 
-    parser.add_argument("--list", action = "store_true", default = False)
+    parser.add_argument("--nolist", action = "store_true", default = False)
     parser.add_argument("--get", action = "store_true", default = False)
+    parser.add_argument("--info", action = "store_true", default = False)
     parser.add_argument("pid", nargs = "*")
-
-    parser.add_argument("--html", action = "store_true", default = False)
 
     parser.add_argument("--item", action = "store", help = "RAI On Demand Item")
 
