@@ -31,7 +31,7 @@ def listDisplayOrGet(items, nolist, info, get, format, bwidth):
         print()
         print("INFO: {0} programmes found".format(len(items)))
 
-    for p in sorted(items.itervalues(), key = lambda x: x.datetime):
+    for p in sorted(items.itervalues(), key = lambda x: (x.datetime, x.title)):
         displayOrGet(p, nolist, info, get, format, bwidth)
 
 
@@ -77,6 +77,9 @@ def process(args):
     if args.ondemand:
         Demand.download(db, grabber, args.download)
 
+    if args.tg:
+        TG.download(db, grabber, args.download)
+
     if args.follow != None:
         follows = args.follow
         while follows:
@@ -96,9 +99,6 @@ def process(args):
 
     if args.replay:
         Replay.download(db, grabber, args.download)
-
-    if args.tg:
-        TG.download(db, grabber, args.download)
 
     if args.pluzz:
         Pluzz.download(db, grabber, args.download)
