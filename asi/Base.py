@@ -42,43 +42,49 @@ class Base(object):
         return self.m3
 
 
-    def download(self, folder, format, bwidth):
+    def download(self, folder, format, bwidth, overwrite):
         if not os.path.exists(folder):
             os.makedirs(folder)
 
         if format == "h264":
-            self.downloadH264(folder)
+            self.downloadH264(folder, overwrite)
         elif format == "ts":
-            self.downloadTablet(folder, bwidth)
+            self.downloadTablet(folder, bwidth, overwrite)
         elif format == "mms":
-            self.downloadMMS(folder)
+            self.downloadMMS(folder, overwrite)
         elif format == None:
             if self.h264 != None:
-                self.downloadH264(folder)
+                self.downloadH264(folder, overwrite)
             else:
                 m3 = self.getTabletPlaylist()
                 if m3 != None:
-                    self.downloadTablet(folder, bwidth)
+                    self.downloadTablet(folder, bwidth, overwrite)
                 elif self.mms != None:
-                    self.downloadMMS(folder)
+                    self.downloadMMS(folder, overwrite)
 
 
-    def downloadTablet(self, folder, bwidth):
+    def downloadTablet(self, folder, bwidth, overwrite):
         m3 = self.getTabletPlaylist()
-        Utils.downloadM3U8(self.grabber, m3, bwidth, folder, self.pid, self.filename)
+        Utils.downloadM3U8(self.grabber, folder, m3, bwidth, overwrite, self.pid, self.filename)
 
 
-    def downloadH264(self, folder):
-        Utils.downloadH264(self.grabber, folder, self.pid, self.h264, self.filename)
+    def downloadH264(self, folder, overwrite):
+        Utils.downloadH264(self.grabber, folder, self.h264, overwrite, self.pid, self.filename)
 
 
     def downloadMMS(self, folder):
+        localFilename = os.path.join(folder, self.filename + ".wmv")
+
+        if (not overwrite) and os.path.exists(localFilename):
+            print("{0} already there as {1}".format(self.pid, localFilename))
+            return
+
         options = Utils.Obj()
         options.quiet        = False
         options.url          = self.mms
         options.resume       = False
         options.bandwidth    = 1e6
-        options.filename     = os.path.join(folder, self.filename + ".wmv")
+        options.filename     = localFilename
         options.clobber      = True
         options.time         = 0
 

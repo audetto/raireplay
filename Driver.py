@@ -14,7 +14,7 @@ from asi import TF1
 import urlgrabber.grabber
 
 
-def displayOrGet(item, nolist, info, get, format, bwidth):
+def displayOrGet(item, nolist, info, get, format, bwidth, overwrite):
     if info:
         item.display()
     elif not nolist:
@@ -23,16 +23,16 @@ def displayOrGet(item, nolist, info, get, format, bwidth):
         print(item.short(unicode(fmt)))
 
     if get:
-        item.download(Config.programFolder, format, bwidth)
+        item.download(Config.programFolder, format, bwidth, overwrite)
 
 
-def listDisplayOrGet(items, nolist, info, get, format, bwidth):
+def listDisplayOrGet(items, nolist, info, get, format, bwidth, overwrite):
     if nolist:
         print()
         print("INFO: {0} programmes found".format(len(items)))
 
     for p in sorted(items.itervalues(), key = lambda x: (x.datetime, x.title)):
-        displayOrGet(p, nolist, info, get, format, bwidth)
+        displayOrGet(p, nolist, info, get, format, bwidth, overwrite)
 
 
 def find(db, pid, subset):
@@ -117,4 +117,4 @@ def process(args):
     else:
         subset = db
 
-    listDisplayOrGet(subset, args.nolist, args.info, args.get, args.format, args.bwidth)
+    listDisplayOrGet(subset, args.nolist, args.info, args.get, args.format, args.bwidth, args.overwrite)

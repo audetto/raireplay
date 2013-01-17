@@ -19,6 +19,7 @@ def main():
     parser.add_argument("--ip", action = "store_true", default = False)
     parser.add_argument("--tor", action = "store")
     parser.add_argument("--proxy", action = "store")
+    parser.add_argument("--overwrite", action = "store_true", default = False)
 
     parser.add_argument("--page",   action = "store", help = "RAI On Demand Page")
     parser.add_argument("--replay", action = "store_true", default = False, help = "RAI Replay")
