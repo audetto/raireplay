@@ -75,7 +75,9 @@ def downloadM3U8(grabber, folder, m3, bwidth, overwrite, pid, filename):
         localFilename = os.path.join(folder, filename + ".ts")
 
         if (not overwrite) and os.path.exists(localFilename):
+            print()
             print("{0} already there as {1}".format(pid, localFilename))
+            print()
             return
 
         playlist = findPlaylist(m3, bwidth)
@@ -104,13 +106,16 @@ def downloadM3U8(grabber, folder, m3, bwidth, overwrite, pid, filename):
 
         print()
         print("Saved {0} as {1}".format(pid, localFilename))
+        print()
 
 
 def downloadH264(grabber, folder, url, overwrite, pid, filename):
     localFilename = os.path.join(folder, filename + ".mp4")
 
     if (not overwrite) and os.path.exists(localFilename):
+        print()
         print("{0} already there as {1}".format(pid, localFilename))
+        print()
         return
 
     progress_obj = urlgrabber.progress.TextMeter()
@@ -122,6 +127,7 @@ def downloadH264(grabber, folder, url, overwrite, pid, filename):
 
     print()
     print("Saved {0} as {1}".format(pid, filename))
+    print()
 
 
 def removeAccents(input_str):

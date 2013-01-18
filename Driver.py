@@ -53,6 +53,9 @@ def process(args):
 
     proxy = None
 
+    if args.location:
+        Config.programFolder = Config.createFolder(args.location)
+
     if args.tor != None:
         # we use privoxy to access tor
         Utils.setTorExitNodes(args.tor)
@@ -68,7 +71,7 @@ def process(args):
     grabber = urlgrabber.grabber.URLGrabber(proxies = proxy, quote = 0, user_agent = userAgent)
 
     if args.ip:
-        Info.display(grabber, Config.rootFolder)
+        Info.display(grabber)
         return
 
     if args.page != None:
