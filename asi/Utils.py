@@ -70,7 +70,7 @@ def findPlaylist(m3, bandwidth):
     return opt
 
 
-def downloadM3U8(grabber, folder, m3, bwidth, overwrite, pid, filename):
+def downloadM3U8(grabber, folder, m3, bwidth, overwrite, quiet, pid, filename):
     if m3 != None and m3.is_variant:
         localFilename = os.path.join(folder, filename + ".ts")
 
@@ -91,25 +91,32 @@ def downloadM3U8(grabber, folder, m3, bwidth, overwrite, pid, filename):
             print("m3u8 @ {0} is not a playlist".format(uri))
             return
 
-        out = open(localFilename, "wb")
-
         print()
         print("Saving {0} as {1}".format(pid, localFilename))
 
-        numberOfFiles = len(item.segments)
-        progress = Meter.Meter(numberOfFiles, filename + ".ts")
+        try:
+            numberOfFiles = len(item.segments)
+            progress = None
+            if not quiet:
+                progress = Meter.Meter(numberOfFiles, filename + ".ts")
 
-        for seg in item.segments:
-            uri = seg.absolute_uri
-            s = grabber.urlread(uri, progress_obj = progress)
-            out.write(s)
+            out = open(localFilename, "wb")
+            for seg in item.segments:
+                uri = seg.absolute_uri
+                s = grabber.urlread(uri, progress_obj = progress)
+                out.write(s)
 
-        print()
-        print("Saved {0} as {1}".format(pid, localFilename))
-        print()
+            print()
+            print("Saved {0} as {1}".format(pid, localFilename))
+            print()
+
+        except:
+            print("Exception: removing {0}".format(localFilename))
+            if os.path.exists(localFilename):
+                os.remove(localFilename)
 
 
-def downloadH264(grabber, folder, url, overwrite, pid, filename):
+def downloadH264(grabber, folder, url, overwrite, quiet, pid, filename):
     localFilename = os.path.join(folder, filename + ".mp4")
 
     if (not overwrite) and os.path.exists(localFilename):
@@ -118,17 +125,25 @@ def downloadH264(grabber, folder, url, overwrite, pid, filename):
         print()
         return
 
-    progress_obj = urlgrabber.progress.TextMeter()
+    progress_obj = None
+    if not quiet:
+        progress_obj = urlgrabber.progress.TextMeter()
 
     print()
     print("Saving {0} as {1}".format(pid, localFilename))
 
-    filename = grabber.urlgrab(str(url), filename = localFilename, progress_obj = progress_obj)
+    try:
+        filename = grabber.urlgrab(str(url), filename = localFilename, progress_obj = progress_obj)
 
-    print()
-    print("Saved {0} as {1}".format(pid, filename))
-    print()
+        print()
+        print("Saved {0} as {1}".format(pid, filename))
+        print()
 
+    except:
+        print("Exception: removing {0}".format(localFilename))
+        if os.path.exists(localFilename):
+            os.remove(localFilename)
+        raise
 
 def removeAccents(input_str):
     nkfd_form = unicodedata.normalize('NFKD', unicode(input_str))

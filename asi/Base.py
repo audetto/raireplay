@@ -42,34 +42,34 @@ class Base(object):
         return self.m3
 
 
-    def download(self, folder, format, bwidth, overwrite):
+    def download(self, folder, format, bwidth, overwrite, quiet):
         if not os.path.exists(folder):
             os.makedirs(folder)
 
         if format == "h264":
-            self.downloadH264(folder, overwrite)
+            self.downloadH264(folder, overwrite, quiet)
         elif format == "ts":
-            self.downloadTablet(folder, bwidth, overwrite)
+            self.downloadTablet(folder, bwidth, overwrite, quiet)
         elif format == "mms":
             self.downloadMMS(folder, overwrite)
         elif format == None:
             if self.h264 != None:
-                self.downloadH264(folder, overwrite)
+                self.downloadH264(folder, overwrite, quiet)
             else:
                 m3 = self.getTabletPlaylist()
                 if m3 != None:
-                    self.downloadTablet(folder, bwidth, overwrite)
+                    self.downloadTablet(folder, bwidth, overwrite, quiet)
                 elif self.mms != None:
                     self.downloadMMS(folder, overwrite)
 
 
-    def downloadTablet(self, folder, bwidth, overwrite):
+    def downloadTablet(self, folder, bwidth, overwrite, quiet):
         m3 = self.getTabletPlaylist()
-        Utils.downloadM3U8(self.grabber, folder, m3, bwidth, overwrite, self.pid, self.filename)
+        Utils.downloadM3U8(self.grabber, folder, m3, bwidth, overwrite, quiet, self.pid, self.filename)
 
 
     def downloadH264(self, folder, overwrite):
-        Utils.downloadH264(self.grabber, folder, self.h264, overwrite, self.pid, self.filename)
+        Utils.downloadH264(self.grabber, folder, self.h264, overwrite, quiet, self.pid, self.filename)
 
 
     def downloadMMS(self, folder):
