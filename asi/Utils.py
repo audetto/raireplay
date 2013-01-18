@@ -70,17 +70,17 @@ def findPlaylist(m3, bandwidth):
     return opt
 
 
-def downloadM3U8(grabber, folder, m3, bwidth, overwrite, quiet, pid, filename):
+def downloadM3U8(grabber, folder, m3, options, pid, filename):
     if m3 != None and m3.is_variant:
         localFilename = os.path.join(folder, filename + ".ts")
 
-        if (not overwrite) and os.path.exists(localFilename):
+        if (not options.overwrite) and os.path.exists(localFilename):
             print()
             print("{0} already there as {1}".format(pid, localFilename))
             print()
             return
 
-        playlist = findPlaylist(m3, bwidth)
+        playlist = findPlaylist(m3, options.bwidth)
 
         print("Downloading:")
         print(playlist)
@@ -97,7 +97,7 @@ def downloadM3U8(grabber, folder, m3, bwidth, overwrite, quiet, pid, filename):
         try:
             numberOfFiles = len(item.segments)
             progress = None
-            if not quiet:
+            if not options.quiet:
                 progress = Meter.Meter(numberOfFiles, filename + ".ts")
 
             out = open(localFilename, "wb")
@@ -116,17 +116,17 @@ def downloadM3U8(grabber, folder, m3, bwidth, overwrite, quiet, pid, filename):
                 os.remove(localFilename)
 
 
-def downloadH264(grabber, folder, url, overwrite, quiet, pid, filename):
+def downloadH264(grabber, folder, url, options, pid, filename):
     localFilename = os.path.join(folder, filename + ".mp4")
 
-    if (not overwrite) and os.path.exists(localFilename):
+    if (not options.overwrite) and os.path.exists(localFilename):
         print()
         print("{0} already there as {1}".format(pid, localFilename))
         print()
         return
 
     progress_obj = None
-    if not quiet:
+    if not options.quiet:
         progress_obj = urlgrabber.progress.TextMeter()
 
     print()
@@ -144,6 +144,7 @@ def downloadH264(grabber, folder, url, overwrite, quiet, pid, filename):
         if os.path.exists(localFilename):
             os.remove(localFilename)
         raise
+
 
 def removeAccents(input_str):
     nkfd_form = unicodedata.normalize('NFKD', unicode(input_str))

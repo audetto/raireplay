@@ -42,50 +42,50 @@ class Base(object):
         return self.m3
 
 
-    def download(self, folder, format, bwidth, overwrite, quiet):
+    def download(self, folder, options):
         if not os.path.exists(folder):
             os.makedirs(folder)
 
-        if format == "h264":
-            self.downloadH264(folder, overwrite, quiet)
-        elif format == "ts":
-            self.downloadTablet(folder, bwidth, overwrite, quiet)
-        elif format == "mms":
-            self.downloadMMS(folder, overwrite)
-        elif format == None:
+        if options.format == "h264":
+            self.downloadH264(folder, options)
+        elif options.format == "ts":
+            self.downloadTablet(folder, options)
+        elif options.format == "mms":
+            self.downloadMMS(folder, options)
+        elif options.format == None:
             if self.h264 != None:
-                self.downloadH264(folder, overwrite, quiet)
+                self.downloadH264(folder, options)
             else:
                 m3 = self.getTabletPlaylist()
                 if m3 != None:
-                    self.downloadTablet(folder, bwidth, overwrite, quiet)
+                    self.downloadTablet(folder, options)
                 elif self.mms != None:
-                    self.downloadMMS(folder, overwrite)
+                    self.downloadMMS(folder, options)
 
 
-    def downloadTablet(self, folder, bwidth, overwrite, quiet):
+    def downloadTablet(self, folder, options):
         m3 = self.getTabletPlaylist()
-        Utils.downloadM3U8(self.grabber, folder, m3, bwidth, overwrite, quiet, self.pid, self.filename)
+        Utils.downloadM3U8(self.grabber, folder, m3, options, self.pid, self.filename)
 
 
-    def downloadH264(self, folder, overwrite, quiet):
-        Utils.downloadH264(self.grabber, folder, self.h264, overwrite, quiet, self.pid, self.filename)
+    def downloadH264(self, folder, options):
+        Utils.downloadH264(self.grabber, folder, self.h264, options, self.pid, self.filename)
 
 
-    def downloadMMS(self, folder):
+    def downloadMMS(self, folder, options):
         localFilename = os.path.join(folder, self.filename + ".wmv")
 
-        if (not overwrite) and os.path.exists(localFilename):
+        if (not options.overwrite) and os.path.exists(localFilename):
             print("{0} already there as {1}".format(self.pid, localFilename))
             return
 
-        options = Utils.Obj()
-        options.quiet        = False
-        options.url          = self.mms
-        options.resume       = False
-        options.bandwidth    = 1e6
-        options.filename     = localFilename
-        options.clobber      = True
-        options.time         = 0
+        opt = Utils.Obj()
+        opt.quiet        = False
+        opt.url          = self.mms
+        opt.resume       = False
+        opt.bandwidth    = 1e6
+        opt.filename     = localFilename
+        opt.clobber      = True
+        opt.time         = 0
 
-        libmimms.core.download(options)
+        libmimms.core.download(opt)
