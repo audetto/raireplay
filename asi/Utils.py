@@ -96,9 +96,7 @@ def downloadM3U8(grabber, folder, m3, options, pid, filename):
 
         try:
             numberOfFiles = len(item.segments)
-            progress = None
-            if not options.quiet:
-                progress = Meter.Meter(numberOfFiles, filename + ".ts")
+            progress = getProgress(numberOfFiles, filename + ".ts")
 
             out = open(localFilename, "wb")
             for seg in item.segments:
@@ -125,15 +123,12 @@ def downloadH264(grabber, folder, url, options, pid, filename):
         print()
         return
 
-    progress_obj = None
-    if not options.quiet:
-        progress_obj = urlgrabber.progress.TextMeter()
-
     print()
     print("Saving {0} as {1}".format(pid, localFilename))
 
     try:
-        filename = grabber.urlgrab(str(url), filename = localFilename, progress_obj = progress_obj)
+        progress = getProgress()
+        filename = grabber.urlgrab(str(url), filename = localFilename, progress_obj = progress)
 
         print()
         print("Saved {0} as {1}".format(pid, filename))
@@ -197,3 +192,14 @@ def displayM3U8(m3):
                                  getResolution(playlist), playlist.stream_info.codecs)
             print(line)
         print()
+
+
+def getProgress(numberOfFiles = 1, filename = None):
+    # only use a progress meter if we are not redirected
+    if sys.stdout.isatty():
+        if numberOfFiles == 1:
+            return urlgrabber.progress.TextMeter()
+        else:
+            return Meter.Meter(numberOfFiles, filename)
+    else:
+        return None

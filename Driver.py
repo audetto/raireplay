@@ -28,7 +28,6 @@ def displayOrGet(item, nolist, info, get, options):
         except Exception as e:
             print("Exception: {0}".format(e))
             print()
-            raise
 
 
 def listDisplayOrGet(items, nolist, info, get, options):
