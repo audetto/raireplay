@@ -68,7 +68,7 @@ class Base(object):
         Utils.downloadM3U8(self.grabber, folder, m3, bwidth, overwrite, quiet, self.pid, self.filename)
 
 
-    def downloadH264(self, folder, overwrite):
+    def downloadH264(self, folder, overwrite, quiet):
         Utils.downloadH264(self.grabber, folder, self.h264, overwrite, quiet, self.pid, self.filename)
 
 
