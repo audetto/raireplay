@@ -5,8 +5,6 @@ import urlparse
 import datetime
 import json
 
-import urlgrabber.progress
-
 from asi import Utils
 from asi import Config
 from asi import Base
@@ -85,14 +83,12 @@ def process(grabber, f, db):
                 if p != None:
                     if p.pid in db:
                         print("WARNING: duplicate pid {0}".format(p.pid))
-                        #                        db[pid].display()
-                        #                        p.display()
 
                     db[p.pid] = p
 
 
 def download(db, grabber, downType):
-    progress_obj = urlgrabber.progress.TextMeter()
+    progress = Utils.getProgress()
 
     today = datetime.date.today()
 
@@ -107,7 +103,7 @@ def download(db, grabber, downType):
             url = baseUrl + "/" + filename
             localName = os.path.join(folder, filename)
 
-            f = Utils.download(grabber, progress_obj, url, localName, downType, "utf-8")
+            f = Utils.download(grabber, progress, url, localName, downType, "utf-8")
             process(grabber, f, db)
 
     print()
@@ -130,9 +126,7 @@ class Program(Base.Base):
 
         self.filename = self.getFilename()
 
-    def display(self):
-        width = urlgrabber.progress.terminal_width()
-
+    def display(self, width):
         print("=" * width)
         print("PID:", self.pid)
         print("Channel:", self.channel)

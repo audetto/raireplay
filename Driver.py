@@ -12,11 +12,13 @@ from asi import Pluzz
 from asi import TF1
 
 import urlgrabber.grabber
+import urlgrabber.progress
 
 
 def displayOrGet(item, nolist, info, get, options):
     if info:
-        item.display()
+        width = urlgrabber.progress.terminal_width()
+        item.display(width)
     elif not nolist:
         # this is list
         fmt = "{0:>9}: {1} {2}"

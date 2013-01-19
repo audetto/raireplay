@@ -4,8 +4,6 @@ import os
 import datetime
 import json
 
-import urlgrabber.progress
-
 from asi import Item
 from asi import Utils
 from asi import Config
@@ -21,11 +19,12 @@ def isThereADate(oldDate, description):
         if delGiorno.find("del ") != 0:
             return oldDate
         possibleDate = delGiorno[4:].replace("-", "/")
-        newDate = datetime.datetime.strptime( possibleDate, "%d/%m/%Y")
+        newDate = datetime.datetime.strptime(possibleDate, "%d/%m/%Y")
         strDate = newDate.strftime("%d/%m/%Y")
         return strDate
     except ValueError:
         return oldDate
+
 
 def processSet(grabber, title, time, f, db):
     o = json.load(f)
@@ -69,17 +68,17 @@ def processSet(grabber, title, time, f, db):
                 db[p.pid] = p
 
 
-def processItem(grabber, progress_obj, downType, title, time, url, db):
+def processItem(grabber, progress, downType, title, time, url, db):
     folder = Config.tgFolder
 
     name = Utils.httpFilename(url)
     localName = os.path.join(folder, name)
 
-    f = Utils.download(grabber, progress_obj, url, localName, downType, "utf-8", True)
+    f = Utils.download(grabber, progress, url, localName, downType, "utf-8", True)
     processSet(grabber, title, time, f, db)
 
 
-def processGroup(grabber, progress_obj, downType, prog, db):
+def processGroup(grabber, progress, downType, prog, db):
     name = prog["title"]
 
     edizioni = prog.get("edizioni")
@@ -87,29 +86,29 @@ def processGroup(grabber, progress_obj, downType, prog, db):
     if edizioni != None:
         for time, url in edizioni.iteritems():
             title = name + " " + time
-            processItem(grabber, progress_obj, downType, title, time, url, db)
+            processItem(grabber, progress, downType, title, time, url, db)
     elif dettaglio.find("ContentSet") >= 0:
-        processItem(grabber, progress_obj, downType, name, None, dettaglio, db)
+        processItem(grabber, progress, downType, name, None, dettaglio, db)
 
 
-def process(grabber, progress_obj, downType, f, db):
+def process(grabber, progress, downType, f, db):
     o = json.load(f)
 
     programmes = o["list"]
 
     for prog in programmes:
-        processGroup(grabber, progress_obj, downType, prog, db)
+        processGroup(grabber, progress, downType, prog, db)
 
 
 def download(db, grabber, downType):
-    progress_obj = urlgrabber.progress.TextMeter()
+    progress = Utils.getProgress()
     name = Utils.httpFilename(infoUrl)
 
     folder = Config.tgFolder
     localName = os.path.join(folder, name)
 
-    f = Utils.download(grabber, progress_obj, infoUrl, localName, downType, "utf-8", True)
-    process(grabber, progress_obj, downType, f, db)
+    f = Utils.download(grabber, progress, infoUrl, localName, downType, "utf-8", True)
+    process(grabber, progress, downType, f, db)
 
 
 class Program(Base.Base):
@@ -134,9 +133,7 @@ class Program(Base.Base):
         self.filename = name + "-" + self.datetime.strftime("%Y-%m-%d")
 
 
-    def display(self):
-        width = urlgrabber.progress.terminal_width()
-
+    def display(self, width):
         print("=" * width)
         print("PID:", self.pid)
         print("Channel:", self.channel)

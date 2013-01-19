@@ -1,7 +1,6 @@
 from __future__ import print_function
 
 import os.path
-import urlgrabber.progress
 import urlparse
 import datetime
 
@@ -183,9 +182,7 @@ class Demand(Base.Base):
                     print("Unknown root tag: " + root.tag)
 
 
-    def display(self):
-        width = urlgrabber.progress.terminal_width()
-
+    def display(self, width):
         print("=" * width)
         print("PID:        ", self.pid)
         print("Title:      ", self.values.title)

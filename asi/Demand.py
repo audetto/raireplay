@@ -3,8 +3,6 @@ from __future__ import print_function
 import json
 import os.path
 
-import urlgrabber.progress
-
 from asi import Utils
 from asi import Config
 from asi import Page
@@ -30,9 +28,9 @@ def download(db, grabber, downType):
     folder = Config.demandFolder
     localFilename = os.path.join(folder, page)
 
-    progress_obj = urlgrabber.progress.TextMeter()
+    progress = Utils.getProgress()
 
-    f = Utils.download(grabber, progress_obj, url, localFilename, downType, "raw-unicode-escape", True)
+    f = Utils.download(grabber, progress, url, localFilename, downType, "raw-unicode-escape", True)
 
     process(grabber, f, db)
 
@@ -50,9 +48,7 @@ class Group(Base.Base):
         self.url = baseUrl + link
 
 
-    def display(self):
-        width = urlgrabber.progress.terminal_width()
-
+    def display(self, width):
         print("=" * width)
         print("PID:", self.pid)
         print("Title:", self.title)

@@ -5,8 +5,6 @@ import datetime
 import json
 import zipfile
 
-import urlgrabber.progress
-
 from asi import Meter
 from asi import Utils
 from asi import Config
@@ -42,13 +40,13 @@ def process(grabber, f, db):
 
 
 def download(db, grabber, downType):
-    progress_obj = urlgrabber.progress.TextMeter()
+    progress = Utils.getProgress()
     name = Utils.httpFilename(infoUrl)
 
     folder = Config.pluzzFolder
     localName = os.path.join(folder, name)
 
-    Utils.download(grabber, progress_obj, infoUrl, localName, downType, "utf-8", True)
+    Utils.download(grabber, progress, infoUrl, localName, downType, "utf-8", True)
 
     z = zipfile.ZipFile(localName, "r")
 
@@ -75,9 +73,7 @@ class Program(Base.Base):
         self.filename = self.pid + "-" + name
 
 
-    def display(self):
-        width = urlgrabber.progress.terminal_width()
-
+    def display(self, width):
         print("=" * width)
         print("PID:", self.pid)
         print("Channel:", self.channel)

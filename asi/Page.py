@@ -2,7 +2,6 @@ from __future__ import print_function
 
 import datetime
 import os.path
-import urlgrabber.progress
 
 from xml.etree import ElementTree
 
@@ -48,9 +47,7 @@ class Elem(Base.Base):
         self.url           = Utils.baseUrl + web
 
 
-    def display(self):
-        width = urlgrabber.progress.terminal_width()
-
+    def display(self, width):
         print("=" * width)
         print("PID:", self.pid)
         print("Title:", self.title)

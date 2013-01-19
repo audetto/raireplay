@@ -1,7 +1,5 @@
 from __future__ import print_function
 
-import urlgrabber.progress
-
 from asi import Config
 
 # this returns some JavaScript like
@@ -11,12 +9,10 @@ userLocation = "http://mediapolis.rai.it/relinker/relinkerServlet.htm?cont=82681
 # this one is from TF1
 userIP = "http://api.prod.capptain.com/ip-to-country"
 
-def display(grabber):
+def display(grabber, width):
 
     rai = grabber.urlread(userLocation)
     ip = grabber.urlread(userIP)
-
-    width = urlgrabber.progress.terminal_width()
 
     print("=" * width)
 

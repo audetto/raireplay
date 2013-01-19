@@ -4,8 +4,6 @@ import os
 import datetime
 import json
 
-import urlgrabber.progress
-
 from asi import Meter
 from asi import Utils
 from asi import Config
@@ -105,19 +103,19 @@ def downloadGroup(grabber, name, groupId, folder, progress, downType, db):
 
 
 def download(db, grabber, downType):
-    progress_obj = urlgrabber.progress.TextMeter()
+    progress = Utils.getProgress()
 
     folder = Config.tf1Folder
 
     localName = os.path.join(folder, "news.json")
-    f = Utils.download(grabber, progress_obj, newsUrl, localName, downType, "utf-8", True)
+    f = Utils.download(grabber, progress, newsUrl, localName, downType, "utf-8", True)
 
-    processNews(grabber, f, folder, progress_obj, downType, db)
+    processNews(grabber, f, folder, progress, downType, db)
 
     localName = os.path.join(folder, "programs.json")
-    f = Utils.download(grabber, progress_obj, programsUrl, localName, downType, "utf-8", True)
+    f = Utils.download(grabber, progress, programsUrl, localName, downType, "utf-8", True)
 
-    processPrograms(grabber, f, folder, progress_obj, downType, db)
+    processPrograms(grabber, f, folder, progress, downType, db)
 
 
 class Program(Base.Base):
@@ -140,9 +138,7 @@ class Program(Base.Base):
         self.filename = self.pid + "-" + name
 
 
-    def display(self):
-        width = urlgrabber.progress.terminal_width()
-
+    def display(self, width):
         print("=" * width)
         print("PID:", self.pid)
         print("Channel:", self.channel)
