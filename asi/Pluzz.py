@@ -36,7 +36,7 @@ def process(grabber, f, db):
 
     for prog in programmes:
         p = parseItem(grabber, prog)
-        db[p.pid] = p
+        Utils.addToDB(db, p)
 
 
 def download(db, grabber, downType):

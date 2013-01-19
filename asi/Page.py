@@ -62,7 +62,7 @@ class Elem(Base.Base):
 
     def follow(self, db, downType):
         p = Item.Demand(self.grabber, self.url, downType, self.pid)
-        db[str(self.pid)] = p
+        Utils.addToDB(db, p)
 
 
 def download(db, grabber, url, downType):
@@ -78,11 +78,7 @@ def download(db, grabber, url, downType):
     # ElementTree does not like unicode, it prefers byte strings
     root = ElementTree.fromstring(f.read().strip().encode("utf-8"))
 
-    pid = 0
-
     for child in root:
         if child.tag == "content":
-            it = Elem(grabber, pid, child)
-            # use str() as a key for consistency with --replay
-            db[str(pid)] = it
-            pid = pid + 1
+            it = Elem(grabber, None, child)
+            Utils.addToDB(db, it)

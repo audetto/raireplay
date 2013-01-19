@@ -48,7 +48,7 @@ def processGroup(grabber, f, name, db):
 
         # ignore the countless "extract", "bonus", "short" which last just a few minutes
         if p.category == "fullvideo":
-            db[p.pid] = p
+            Utils.addToDB(db, p)
 
 
 def processNews(grabber, f, folder, progress, downType, db):

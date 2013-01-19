@@ -203,3 +203,20 @@ def getProgress(numberOfFiles = 1, filename = None):
             return Meter.Meter(numberOfFiles, filename)
     else:
         return None
+
+
+def addToDB(db, prog):
+    if prog == None:
+        return
+
+    pid = prog.pid
+    if pid == None:
+        pid = len(db)
+
+    pid = str(pid)
+    prog.pid = pid
+
+    if pid in db:
+        print("WARNING: duplicate pid {0}".format(prog.pid))
+
+    db[pid] = prog

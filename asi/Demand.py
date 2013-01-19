@@ -14,12 +14,9 @@ baseUrl = "http://www.rai.tv"
 def process(grabber, f, db):
     o = json.load(f)
 
-    pid = 0
-
     for v in o:
-        p = Group(grabber, pid, v["title"], v["linkDemand"], v["date"], v["editore"])
-        db[str(pid)] = p
-        pid = pid + 1
+        p = Group(grabber, None, v["title"], v["linkDemand"], v["date"], v["editore"])
+        Utils.addToDB(db, p)
 
 
 def download(db, grabber, downType):

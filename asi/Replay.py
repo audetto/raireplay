@@ -80,11 +80,7 @@ def process(grabber, f, db):
             for time, value in v2.iteritems():
                 p = parseItem(grabber, channel, date, time, value)
 
-                if p != None:
-                    if p.pid in db:
-                        print("WARNING: duplicate pid {0}".format(p.pid))
-
-                    db[p.pid] = p
+                Utils.addToDB(db, p)
 
 
 def download(db, grabber, downType):
