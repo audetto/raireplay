@@ -46,6 +46,7 @@ class Elem(Base.Base):
             web = Utils.getWebFromID(self.id)
         self.url           = Utils.baseUrl + web
 
+        self.filename      =  Utils.makeFilename(self.title)
 
     def display(self, width):
         print("=" * width)
@@ -54,6 +55,8 @@ class Elem(Base.Base):
         print("Description:", self.description)
         print("Date:", self.datetime.strftime("%Y-%m-%d %H:%M"))
         print("Length:", self.length)
+        print("Filename:", self.filename)
+        print()
         print("URL:", self.url)
         print("h264:", self.h264)
         print("m3u8:", self.ts)

@@ -15,6 +15,8 @@ from asi import Meter
 class Obj:
     pass
 
+invalidMP4 = "http://creativemedia3.rai.it/video_no_available.mp4"
+
 baseUrl = "http://www.rai.tv"
 
 def httpFilename(url):
@@ -130,6 +132,9 @@ def downloadH264(grabber, folder, url, options, pid, filename):
         progress = getProgress()
         filename = grabber.urlgrab(str(url), filename = localFilename, progress_obj = progress)
 
+        if os.path.getsize(localFilename) == len(invalidMP4):
+            raise Exception("{0} only available in Italy".format(url))
+
         print()
         print("Saved {0} as {1}".format(pid, filename))
         print()
@@ -170,7 +175,7 @@ def makeFilename(input):
     translateTo = u"_"
     charactersToRemove = u" /:^,|"
     translateTable = dict((ord(char), translateTo) for char in charactersToRemove)
-    name = input.translate(translateTable)
+    name = unicode(input).translate(translateTable)
     name = removeAccents(name)
     return name
 
