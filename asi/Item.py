@@ -27,8 +27,6 @@ from asi import Base
 # here we can get away with videoUrl
 # http://www.rai.tv/dl/RaiTV/programmi/media/ContentItem-b9812490-7243-4545-a5fc-843bf46ec3c9.html
 
-invalid = "http://creativemedia3.rai.it/video_no_available.mp4"
-
 # create a subclass and override the handler methods
 class VideoHTMLParser(HTMLParser):
     def __init__(self):
@@ -159,10 +157,10 @@ class Demand(Base.Base):
             # search for the mms url
             content = grabber.urlread(str(self.values.videoUrl))
 
-            if content == invalid:
+            if content == Utils.invalidMP4:
                 # is this the case of videos only available in Italy?
-                self.asf = invalid
-                self.mms = invalid
+                self.asf = content
+                self.mms = content
             else:
                 root = ElementTree.fromstring(content)
                 if root.tag == "ASX":
