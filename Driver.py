@@ -11,6 +11,8 @@ from asi import Config
 from asi import Pluzz
 from asi import TF1
 
+import datetime
+
 import urlgrabber.grabber
 import urlgrabber.progress
 
@@ -39,6 +41,20 @@ def listDisplayOrGet(items, nolist, info, get, options):
 
     for p in sorted(items.itervalues(), key = lambda x: (x.datetime, x.title)):
         displayOrGet(p, nolist, info, get, options)
+
+
+def checkDate(prog, date):
+    prog_date = prog.datetime
+    if prog_date >= date and prog_date < date + datetime.timedelta(days = 1):
+        return True
+    else:
+        return False
+
+
+def filterByDate(db, date):
+    date = datetime.datetime.strptime(date, "%Y-%m-%d")
+    res = dict((k, v) for k, v in db.items() if checkDate(v, date))
+    return res
 
 
 def find(db, pid, subset):
@@ -125,6 +141,9 @@ def process(args):
             find(db, pid, subset)
     else:
         subset = db
+
+    if args.date:
+        subset = filterByDate(subset, args.date)
 
     # we should only copy over
     # format, bwidth, overwrite, quiet

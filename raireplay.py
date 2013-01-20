@@ -28,15 +28,18 @@ def main():
     parser.add_argument("--tg", action = "store_true", default = False, help = "Telegiornali RAI")
     parser.add_argument("--pluzz", action = "store_true", default = False, help = "Pluzz France Television")
     parser.add_argument("--tf1", action = "store_true", default = False, help = "MY TF1")
+    parser.add_argument("--item", action = "store", help = "RAI On Demand Item")
 
+    parser.add_argument("--date", action = "store", help = "Filter by date YYYY-MM-DD")
     parser.add_argument("--follow", action = "append")
 
     parser.add_argument("--nolist", action = "store_true", default = False)
     parser.add_argument("--get", action = "store_true", default = False)
     parser.add_argument("--info", action = "store_true", default = False)
+
     parser.add_argument("pid", nargs = "*")
 
-    parser.add_argument("--item", action = "store", help = "RAI On Demand Item")
+
 
     args = parser.parse_args()
 
