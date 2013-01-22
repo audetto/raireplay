@@ -12,7 +12,7 @@ def main():
 
     parser = argparse.ArgumentParser(description = "Rai Replay")
 
-    parser.add_argument("--download", action = "store", default = "update", choices = ["always", "update", "never"],
+    parser.add_argument("--download", action = "store", default = "update", choices = ["always", "update", "never", "shm"],
                         help = "Default is update")
     parser.add_argument("--format", action = "store", choices = ["h264", "ts", "mms"])
     parser.add_argument("--bwidth", action = "store")

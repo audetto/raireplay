@@ -25,25 +25,34 @@ def httpFilename(url):
 
 
 def download(grabber, progress, url, localName, downType, encoding, checkTime = False):
-    exists = os.path.exists(localName)
-    exists = exists and os.path.getsize(localName) > 0
+    tmpFileName = "/dev/shm/raireplay.tmp"
 
-    if downType == "never" and not exists:
-        raise Exception("Will not download missing file: {0} -> {1}".format(url, localName))
+    if downType == "shm":
+        localName = grabber.urlgrab(str(url), filename = tmpFileName, progress_obj = progress)
+    else:
 
-    if exists and checkTime:
-        # if it is more than a day old, we redownload it
-        age = datetime.datetime.today() - datetime.datetime.fromtimestamp(os.path.getmtime(localName))
-        maximum = datetime.timedelta(days = 1)
-        exists = age < maximum
+        exists = os.path.exists(localName)
+        exists = exists and os.path.getsize(localName) > 0
 
-    if downType == "always" or (downType == "update" and not exists):
-        localName = grabber.urlgrab(str(url), filename = localName, progress_obj = progress)
+        if downType == "never" and not exists:
+            raise Exception("Will not download missing file: {0} -> {1}".format(url, localName))
+
+        if exists and checkTime:
+            # if it is more than a day old, we redownload it
+            age = datetime.datetime.today() - datetime.datetime.fromtimestamp(os.path.getmtime(localName))
+            maximum = datetime.timedelta(days = 1)
+            exists = age < maximum
+
+            if downType == "always" or (downType == "update" and not exists):
+                localName = grabber.urlgrab(str(url), filename = localName, progress_obj = progress)
 
     if encoding == None:
         f = open(localName, "r")
     else:
         f = codecs.open(localName, "r", encoding = encoding)
+
+    if downType == "shm":
+        os.remove(tmpFileName)
 
     return f
 
