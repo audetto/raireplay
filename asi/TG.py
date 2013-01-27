@@ -150,4 +150,4 @@ class Program(Base.Base):
 
     def follow(self, db, downType):
         p = Item.Demand(self.grabber, self.link, downType, self.pid)
-        db[str(self.pid)] = p
+        Utils.addToDB(db, p)

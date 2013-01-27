@@ -69,7 +69,7 @@ def processNews(grabber, f, folder, progress, downType, db):
         category = prog["linkAttributes"]["videoCategory"]
 
         p = Program(grabber, datetime.datetime.now(), None, str(groupId), name, title, wat, category)
-        db[p.pid] = p
+        Utils.addToDB(db, p)
 
 
 def processPrograms(grabber, f, folder, progress, downType, db):
