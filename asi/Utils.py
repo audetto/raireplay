@@ -9,6 +9,7 @@ import datetime
 import unicodedata
 import telnetlib
 import urlgrabber.progress
+import subprocess
 
 from asi import Meter
 
@@ -81,9 +82,24 @@ def findPlaylist(m3, bandwidth):
     return opt
 
 
-def downloadM3U8(grabber, folder, m3, options, pid, filename):
+def remuxToMP4(inFile, outFile):
+    # -absf aac_adtstoasc
+    # seems to be needed by ffmpeg (Fedora), not by avconv (Pi)
+    cmdLine = ["ffmpeg", "-i", inFile, "-vcodec", "copy", "-acodec", "copy", "-absf", "aac_adtstoasc", "-y", outFile]
+    code = subprocess.call(cmdLine)
+    if code != 0:
+        raise Exception("ffmpeg filed: exit code {0}".format(code))
+
+
+def downloadM3U8(grabber, folder, m3, options, pid, filename, remux):
     if m3 != None and m3.is_variant:
-        localFilename = os.path.join(folder, filename + ".ts")
+        if remux:
+            ext = ".mp4"
+        else:
+            ext = ".ts"
+
+        localFilename   = os.path.join(folder, filename + ext)
+        localFilenameTS = os.path.join(folder, filename + ".ts")
 
         if (not options.overwrite) and os.path.exists(localFilename):
             print()
@@ -109,11 +125,16 @@ def downloadM3U8(grabber, folder, m3, options, pid, filename):
             numberOfFiles = len(item.segments)
             progress = getProgress(numberOfFiles, filename + ".ts")
 
-            out = open(localFilename, "wb")
+            out = open(localFilenameTS, "wb")
             for seg in item.segments:
                 uri = seg.absolute_uri
                 s = grabber.urlread(uri, progress_obj = progress)
                 out.write(s)
+
+            if remux:
+                remuxToMP4(localFilenameTS, localFilename)
+                os.remove(localFilenameTS)
+
 
             print()
             print("Saved {0} as {1}".format(pid, localFilename))
@@ -123,6 +144,9 @@ def downloadM3U8(grabber, folder, m3, options, pid, filename):
             print("Exception: removing {0}".format(localFilename))
             if os.path.exists(localFilename):
                 os.remove(localFilename)
+            if remux and os.path.exists(localFilenameTS):
+                os.remove(localFilenameTS)
+            raise
 
 
 def downloadH264(grabber, folder, url, options, pid, filename):

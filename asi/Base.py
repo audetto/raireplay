@@ -49,7 +49,9 @@ class Base(object):
         if options.format == "h264":
             self.downloadH264(folder, options)
         elif options.format == "ts":
-            self.downloadTablet(folder, options)
+            self.downloadTablet(folder, options, False)
+        elif options.format == "tsmp4":
+            self.downloadTablet(folder, options, True)
         elif options.format == "mms":
             self.downloadMMS(folder, options)
         elif options.format == None:
@@ -58,14 +60,14 @@ class Base(object):
             else:
                 m3 = self.getTabletPlaylist()
                 if m3 != None:
-                    self.downloadTablet(folder, options)
+                    self.downloadTablet(folder, options, True)
                 elif self.mms != None:
                     self.downloadMMS(folder, options)
 
 
-    def downloadTablet(self, folder, options):
+    def downloadTablet(self, folder, options, remux):
         m3 = self.getTabletPlaylist()
-        Utils.downloadM3U8(self.grabber, folder, m3, options, self.pid, self.filename)
+        Utils.downloadM3U8(self.grabber, folder, m3, options, self.pid, self.filename, remux)
 
 
     def downloadH264(self, folder, options):
