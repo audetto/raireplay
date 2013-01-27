@@ -43,8 +43,8 @@ def download(grabber, progress, url, localName, downType, encoding, checkTime = 
             maximum = datetime.timedelta(days = 1)
             exists = age < maximum
 
-            if downType == "always" or (downType == "update" and not exists):
-                localName = grabber.urlgrab(str(url), filename = localName, progress_obj = progress)
+        if downType == "always" or (downType == "update" and not exists):
+            localName = grabber.urlgrab(str(url), filename = localName, progress_obj = progress)
 
     if encoding == None:
         f = open(localName, "r")
