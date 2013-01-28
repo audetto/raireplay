@@ -93,7 +93,8 @@ def process(args):
     grabber = urlgrabber.grabber.URLGrabber(proxies = proxy, quote = 0, user_agent = userAgent)
 
     if args.ip:
-        Info.display(grabber)
+        width = urlgrabber.progress.terminal_width()
+        Info.display(grabber, width)
         return
 
     if args.page != None:
