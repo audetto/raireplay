@@ -46,9 +46,9 @@ def download(db, grabber, downType):
     folder = Config.pluzzFolder
     localName = os.path.join(folder, name)
 
-    Utils.download(grabber, progress, infoUrl, localName, downType, "utf-8", True)
+    f = Utils.download(grabber, progress, infoUrl, localName, downType, None, True)
 
-    z = zipfile.ZipFile(localName, "r")
+    z = zipfile.ZipFile(f, "r")
 
     for a in z.namelist():
         if a.find("catch_up_") == 0:
