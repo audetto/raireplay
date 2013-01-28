@@ -11,6 +11,7 @@ from asi import Config
 from asi import Pluzz
 from asi import TF1
 
+import re
 import datetime
 
 import urlgrabber.grabber
@@ -51,23 +52,37 @@ def checkDate(prog, date):
         return False
 
 
-def filterByDate(db, date):
-    date = datetime.datetime.strptime(date, "%Y-%m-%d")
+def filterByDate(db, value):
+    # this nonsense is because today() returns the same as now()
+    # and date.today() is not compatible with datetime... all pythonic!
+
+    if value.lower() == "today":
+        date = datetime.datetime.today().replace(hour = 0, minute = 0, second = 0, microsecond = 0)
+    elif value.lower() == "yesterday":
+        date = datetime.datetime.today().replace(hour = 0, minute = 0, second = 0, microsecond = 0) - datetime.timedelta(days = 1)
+    else:
+        date = datetime.datetime.strptime(value, "%Y-%m-%d")
+
     res = dict((k, v) for k, v in db.items() if checkDate(v, date))
     return res
 
 
-def find(db, pid, subset):
+def find(db, pid, isre, subset):
     if pid in db:
         subset[pid] = db[pid]
     else:
         fmt = unicode("{2}")
         match = pid.lower()
-        for pid, p in db.iteritems():
-            s = p.short(fmt).lower()
-            s = Utils.removeAccents(s)
-            if s.find(match) != -1:
-                subset[pid] = p
+        for ppid, p in db.iteritems():
+            title = p.short(fmt)
+            if isre:
+                if re.match(pid, title):
+                    subset[ppid] = p
+            else:
+                s = title.lower()
+                s = Utils.removeAccents(s)
+                if s.find(match) != -1:
+                    subset[ppid] = p
 
 
 def process(args):
@@ -139,7 +154,7 @@ def process(args):
     if args.pid:
         subset = {}
         for pid in args.pid:
-            find(db, pid, subset)
+            find(db, pid, args.re, subset)
     else:
         subset = db
 

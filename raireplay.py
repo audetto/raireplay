@@ -36,6 +36,7 @@ def main():
     parser.add_argument("--nolist", action = "store_true", default = False)
     parser.add_argument("--get", action = "store_true", default = False)
     parser.add_argument("--info", action = "store_true", default = False)
+    parser.add_argument("--re", action = "store_true", default = False)
 
     parser.add_argument("pid", nargs = "*")
 
