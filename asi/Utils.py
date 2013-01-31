@@ -128,7 +128,7 @@ def downloadM3U8(grabber, folder, m3, options, pid, filename, remux):
             out = open(localFilenameTS, "wb")
             for seg in item.segments:
                 uri = seg.absolute_uri
-                s = grabber.urlread(uri, progress_obj = progress)
+                s = grabber.urlread(str(uri), progress_obj = progress)
                 out.write(s)
 
             if remux:
