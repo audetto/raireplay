@@ -10,7 +10,7 @@ import Driver
 
 def main():
 
-    parser = argparse.ArgumentParser(description = "Rai Replay")
+    parser = argparse.ArgumentParser(description = "Rai Replay", fromfile_prefix_chars = "@")
 
     parser.add_argument("--download", action = "store", default = "update", choices = ["always", "update", "never", "shm"],
                         help = "Default is update")
@@ -18,6 +18,7 @@ def main():
     parser.add_argument("--bwidth", action = "store")
     parser.add_argument("--ip", action = "store_true", default = False)
     parser.add_argument("--tor", action = "store")
+    parser.add_argument("--tor-pass", action = "store")
     parser.add_argument("--proxy", action = "store")
     parser.add_argument("--overwrite", action = "store_true", default = False)
     parser.add_argument("--location", action = "store", help = "path where to download programs")

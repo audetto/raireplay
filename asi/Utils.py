@@ -197,9 +197,10 @@ def load_m3u8_from_url(grabber, uri):
     return m3u8.model.M3U8(content, baseuri=baseuri)
 
 
-def setTorExitNodes(country):
+def setTorExitNodes(country, password):
     tn = telnetlib.Telnet("127.0.0.1", 9051)
-    tn.write('AUTHENTICATE "portachiusa"\n')
+    if password != None:
+        tn.write('AUTHENTICATE "{0}"\n'.format(password))
     tn.write("SETCONF ExitNodes={{{0}}}\n".format(country))
     tn.write("QUIT\n")
 

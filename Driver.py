@@ -95,7 +95,7 @@ def process(args):
 
     if args.tor != None:
         # we use privoxy to access tor
-        Utils.setTorExitNodes(args.tor)
+        Utils.setTorExitNodes(args.tor, args.tor_pass)
         proxy = { "http" : "http://127.0.0.1:8118" }
     else:
         if args.proxy != None:
