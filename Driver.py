@@ -125,7 +125,7 @@ def process(args):
         follows = args.follow
         while follows:
             subset = {}
-            p = find(db, follows[0], subset)
+            p = find(db, follows[0], args.re, subset)
             if len(subset) == 1:
                 # continue follow calculation
                 db = {}
