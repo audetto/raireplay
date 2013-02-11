@@ -5,7 +5,6 @@ import datetime
 import json
 import zipfile
 
-from asi import Meter
 from asi import Utils
 from asi import Config
 from asi import Base

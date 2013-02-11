@@ -4,7 +4,6 @@ import os
 import datetime
 import json
 
-from asi import Meter
 from asi import Utils
 from asi import Config
 from asi import Base
