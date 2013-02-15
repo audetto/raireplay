@@ -1,7 +1,7 @@
-from __future__ import print_function
+
 
 import os
-import urlparse
+import urllib.parse
 import datetime
 import json
 
@@ -68,7 +68,7 @@ def parseItem(grabber, channel, date, time, value):
 def process(grabber, f, db):
     o = json.load(f)
 
-    for k1, v1 in o.iteritems():
+    for k1, v1 in o.items():
         if k1 == "now":
             continue
         if k1 == "defaultBannerVars":
@@ -76,8 +76,8 @@ def process(grabber, f, db):
 
         channel = k1
 
-        for date, v2 in v1.iteritems():
-            for time, value in v2.iteritems():
+        for date, v2 in v1.items():
+            for time, value in v2.items():
                 p = parseItem(grabber, channel, date, time, value)
 
                 Utils.addToDB(db, p)
@@ -94,7 +94,7 @@ def download(db, grabber, downType):
         day = today - datetime.timedelta(days = x)
         strDate = day.strftime("_%Y_%m_%d")
 
-        for channel in channels.itervalues():
+        for channel in channels.values():
             filename = channel + strDate + ".html"
             url = baseUrl + "/" + filename
             localName = os.path.join(folder, filename)
@@ -145,7 +145,7 @@ class Program(Base.Base):
         if self.ts == "":
             return self.pid
 
-        fullName = os.path.split(os.path.split(urlparse.urlsplit(self.ts).path)[0])[1]
+        fullName = os.path.split(os.path.split(urllib.parse.urlsplit(self.ts).path)[0])[1]
         tmp = fullName.split(",")[0]
         posOfDash = tmp.rfind("-")
         nice = tmp[0 : posOfDash]

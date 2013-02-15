@@ -1,15 +1,19 @@
-from __future__ import print_function
+
 
 import sys
 import os.path
-import urlparse
+import urllib.parse
 import m3u8
 import codecs
 import datetime
 import unicodedata
 import telnetlib
-import urlgrabber.progress
+import fcntl
+import struct
+import termios
 import subprocess
+import shutil
+import io
 
 from asi import Meter
 
@@ -18,20 +22,51 @@ class Obj:
 
 invalidMP4 = "http://creativemedia3.rai.it/video_no_available.mp4"
 
+# got from the iphone
+# required for TF1 - www.wat.tv
+userAgent = "AppleCoreMedia/1.0.0.9B206 (iPod; U; CPU OS 5_1_1 like Mac OS X; en_us)"
+httpHeaders = {"User-Agent" : userAgent }
+
 baseUrl = "http://www.rai.tv"
 
 def httpFilename(url):
-    name = os.path.split(urlparse.urlsplit(url).path)[1]
+    name = os.path.basename(urllib.parse.urlsplit(url).path)
     return name
 
 
+# simply download a file and saves it to localName
+#def downloadFile(grabber, progress, url, localName):
+#    print("Get {0} to {1}".format(url, localName))
+#    request = urllib.request.Request(url, headers = httpHeaders)
+#    with grabber.open(request) as response, open(localName, "wb") as f:
+#        shutil.copyfileobj(response, f)
+
+
+def downloadFile(grabber, progress, url, localName):
+    if progress:
+        progress.setName(localName)
+    request = urllib.request.Request(url, headers = httpHeaders)
+
+    urllib.request.urlretrieve(url, filename = localName, reporthook = progress)
+    if progress:
+        progress.done()
+
+
+# download a file and returns a file object
+# with optional encoding, checking if it exists already...
 def download(grabber, progress, url, localName, downType, encoding, checkTime = False):
-    tmpFileName = "/dev/shm/raireplay.tmp"
+    request = urllib.request.Request(url, headers = httpHeaders)
 
     if downType == "shm":
-        localName = grabber.urlgrab(str(url), filename = tmpFileName, progress_obj = progress)
+        f = grabber.open(request)
+        if encoding != None:
+            decoder = codecs.getreader(encoding)
+            f = decoder(f)
+        else:
+            # make it seekable
+            f = io.BytesIO(f.read())
     else:
-
+        # here we need to download (maybe), copy local and open
         exists = os.path.exists(localName)
         exists = exists and os.path.getsize(localName) > 0
 
@@ -45,15 +80,13 @@ def download(grabber, progress, url, localName, downType, encoding, checkTime = 
             exists = age < maximum
 
         if downType == "always" or (downType == "update" and not exists):
-            localName = grabber.urlgrab(str(url), filename = localName, progress_obj = progress)
+            downloadFile(grabber, progress, url, localName)
 
-    if encoding == None:
-        f = open(localName, "r")
-    else:
-        f = codecs.open(localName, "r", encoding = encoding)
-
-    if downType == "shm":
-        os.remove(tmpFileName)
+        # now the file exists on the local filesystem
+        if encoding == None:
+            f = open(localName, "rb")
+        else:
+            f = codecs.open(localName, "r", encoding = encoding)
 
     return f
 
@@ -70,7 +103,7 @@ def findPlaylist(m3, bandwidth):
     b1 = int(bandwidth)
 
     opt = None
-    dist = sys.maxint
+    dist = sys.maxsize
 
     for p in m3.playlists:
         b2 = int(p.stream_info.bandwidth)
@@ -128,8 +161,17 @@ def downloadM3U8(grabber, folder, m3, options, pid, filename, remux):
             out = open(localFilenameTS, "wb")
             for seg in item.segments:
                 uri = seg.absolute_uri
-                s = grabber.urlread(str(uri), progress_obj = progress)
-                out.write(s)
+                s = grabber.open(uri)
+                b = s.read()
+                size = len(b)
+                if progress:
+                    progress(0, size, size)
+                out.write(b)
+                if progress:
+                    progress(1, size, size)
+
+            if progress:
+                progress.done()
 
             if remux:
                 remuxToMP4(localFilenameTS, localFilename)
@@ -163,7 +205,7 @@ def downloadH264(grabber, folder, url, options, pid, filename):
 
     try:
         progress = getProgress()
-        filename = grabber.urlgrab(str(url), filename = localFilename, progress_obj = progress)
+        downloadFile(grabber, progress, url, localFilename)
 
         if os.path.getsize(localFilename) == len(invalidMP4):
             raise Exception("{0} only available in Italy".format(url))
@@ -180,21 +222,15 @@ def downloadH264(grabber, folder, url, options, pid, filename):
 
 
 def removeAccents(input_str):
-    nkfd_form = unicodedata.normalize('NFKD', unicode(input_str))
-    result = u"".join([c for c in nkfd_form if not unicodedata.combining(c)])
+    nkfd_form = unicodedata.normalize('NFKD', input_str)
+    result = "".join([c for c in nkfd_form if not unicodedata.combining(c)])
     return result
 
 
-# this is copied from M3U8 package
-# as we want to ensure we use the grabber to download
-# and we still get a good baseuri
 def load_m3u8_from_url(grabber, uri):
-    content = grabber.urlread(str(uri))
-    parsed_url = urlparse.urlparse(uri)
-    prefix = parsed_url.scheme + '://' + parsed_url.netloc
-    basepath = os.path.normpath(parsed_url.path + '/..')
-    baseuri = urlparse.urljoin(prefix, basepath)
-    return m3u8.model.M3U8(content, baseuri=baseuri)
+    # here we need the global opener to be installed
+    # as it is used internally by m3u8
+    return m3u8.load(uri)
 
 
 def setTorExitNodes(country, password):
@@ -206,10 +242,10 @@ def setTorExitNodes(country, password):
 
 
 def makeFilename(input):
-    translateTo = u"_"
-    charactersToRemove = u" /:^,|"
+    translateTo = "_"
+    charactersToRemove = " /:^,|"
     translateTable = dict((ord(char), translateTo) for char in charactersToRemove)
-    name = unicode(input).translate(translateTable)
+    name = input.translate(translateTable)
     name = removeAccents(name)
     return name
 
@@ -236,10 +272,10 @@ def displayM3U8(m3):
 def getProgress(numberOfFiles = 1, filename = None):
     # only use a progress meter if we are not redirected
     if sys.stdout.isatty():
-        if numberOfFiles == 1:
-            return urlgrabber.progress.TextMeter()
-        else:
-            return Meter.Meter(numberOfFiles, filename)
+        p = Meter.ReportHook(numberOfFiles)
+        if filename:
+            p.setName(filename)
+        return p
     else:
         return None
 
@@ -259,3 +295,18 @@ def addToDB(db, prog):
         print("WARNING: duplicate pid {0}".format(prog.pid))
 
     db[pid] = prog
+
+
+# Code from http://mail.python.org/pipermail/python-list/2000-May/033365.html
+def terminal_width(fd=1):
+    """ Get the real terminal width """
+    try:
+        buf = 'abcdefgh'
+        buf = fcntl.ioctl(fd, termios.TIOCGWINSZ, buf)
+        ret = struct.unpack('hhhh', buf)[1]
+        if ret == 0:
+            return 80
+        # Add minimum too?
+        return ret
+    except: # IOError
+        return 80

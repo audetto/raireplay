@@ -1,4 +1,4 @@
-from __future__ import print_function
+
 
 import os
 import datetime
@@ -82,7 +82,7 @@ def processGroup(grabber, progress, downType, prog, db):
     edizioni = prog.get("edizioni")
     dettaglio = prog.get("dettaglio")
     if edizioni != None:
-        for time, url in edizioni.iteritems():
+        for time, url in edizioni.items():
             title = name + " " + time
             processItem(grabber, progress, downType, title, time, url, db)
     elif dettaglio.find("ContentSet") >= 0:

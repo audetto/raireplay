@@ -1,12 +1,12 @@
-from __future__ import print_function
+
 
 import os.path
-import urlparse
+import urllib.parse
 import datetime
 
-import ConfigParser
+import configparser
 
-from HTMLParser import HTMLParser
+from html.parser import HTMLParser
 from xml.etree import ElementTree
 
 from asi import Utils
@@ -149,13 +149,13 @@ class Demand(Base.Base):
         #make a nice filename
         self.filename = Utils.makeFilename(self.values.title)
 
-        urlScheme = urlparse.urlsplit(self.values.videoUrl).scheme
+        urlScheme = urllib.parse.urlsplit(self.values.videoUrl).scheme
         if urlScheme == "mms":
             # if it is already mms, don't look further
             self.mms = self.values.videoUrl
         else:
             # search for the mms url
-            content = grabber.urlread(str(self.values.videoUrl))
+            content = grabber.open(self.values.videoUrl).read().decode("ascii")
 
             if content == Utils.invalidMP4:
                 # is this the case of videos only available in Italy?
@@ -169,7 +169,7 @@ class Demand(Base.Base):
                     if self.asf != None:
                         # use urlgrab to make it work with ConfigParser
                         content = grabber.urlgrab(self.asf)
-                        config = ConfigParser.ConfigParser()
+                        config = configparser.ConfigParser()
                         config.read(content)
                         self.mms = config.get("Reference", "ref1")
                         self.mms = self.mms.replace("http://", "mms://")

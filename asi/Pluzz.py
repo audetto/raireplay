@@ -1,9 +1,10 @@
-from __future__ import print_function
+
 
 import os
 import datetime
 import json
 import zipfile
+import codecs
 
 from asi import Utils
 from asi import Config
@@ -49,9 +50,11 @@ def download(db, grabber, downType):
 
     z = zipfile.ZipFile(f, "r")
 
+    decoder = codecs.getreader("ascii")
+
     for a in z.namelist():
         if a.find("catch_up_") == 0:
-            f = z.open(a)
+            f = decoder(z.open(a))
             process(grabber, f, db)
 
 class Program(Base.Base):

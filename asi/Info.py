@@ -1,4 +1,4 @@
-from __future__ import print_function
+
 
 from asi import Config
 
@@ -11,8 +11,8 @@ userIP = "http://api.prod.capptain.com/ip-to-country"
 
 def display(grabber, width):
 
-    rai = grabber.urlread(userLocation)
-    ip = grabber.urlread(userIP)
+    rai = grabber.open(userLocation).read().decode("ascii")
+    ip = grabber.open(userIP).read().decode("ascii")
 
     print("=" * width)
 

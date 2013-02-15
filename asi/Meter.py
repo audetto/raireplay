@@ -1,60 +1,128 @@
-from __future__ import print_function
-
 import time
+import os
+import fcntl
+import struct
+import termios
 
-import urlgrabber.progress
+# Code from http://mail.python.org/pipermail/python-list/2000-May/033365.html
+def terminal_width(fd=1):
+    """ Get the real terminal width """
+    try:
+        buf = 'abcdefgh'
+        buf = fcntl.ioctl(fd, termios.TIOCGWINSZ, buf)
+        ret = struct.unpack('hhhh', buf)[1]
+        if ret == 0:
+            return 80
+        # Add minimum too?
+        return ret
+    except:
+        return 80
 
-# progress class for URLgrabber
-# that "concatenates" many files.
-# we want to have a global progress constrained by:
-# we know the number of files
-# we do not know the total size
-# we estimate the size based on the previous files
-# assuming they are about the same lenght
-
-class Meter(urlgrabber.progress.TextMeter):
-    def __init__(self, numberOfFiles, name):
-        urlgrabber.progress.TextMeter.__init__(self)
-        self.numberOfFiles = numberOfFiles
-        self.name = name
-
-        self.bytesSoFar = 0
-        self.filesSoFar = 0
-        self.now = None
-
-    def addFile(self, size, now):
-        self.baseRead   = self.bytesSoFar
-        self.bytesSoFar = self.bytesSoFar + size
-        self.filesSoFar = self.filesSoFar + 1
-
-        # assume following files have same average length as past
-        estimatedTotal = self.bytesSoFar / self.filesSoFar * self.numberOfFiles
-
-        if self.now == None:
-            self.now == now
-
-        if self.now == None:
-            self.now == time.time()
-
-        return estimatedTotal
-
-    def start(self, filename = None, url = None, basename = None, size = None, now = None, text = None):
-        estimatedTotal = self.addFile(size, now)
-        if self.filesSoFar == 1:
-            urlgrabber.progress.TextMeter.start(self, filename, url, basename, estimatedTotal, self.now, self.name)
+def format_time(seconds, use_hours=0):
+    if seconds is None or seconds < 0:
+        if use_hours: return '--:--:--'
+        else:         return '--:--'
+    elif seconds == float('inf'):
+        return 'Infinite'
+    else:
+        seconds = int(seconds)
+        minutes = seconds / 60
+        seconds = seconds % 60
+        if use_hours:
+            hours = minutes / 60
+            minutes = minutes % 60
+            return '%02i:%02i:%02i' % (hours, minutes, seconds)
         else:
-            # update total
-            # a bit of a hack. Copied from URLGrabber source code
-            self.size = estimatedTotal
-            self.fsize = urlgrabber.progress.format_number(estimatedTotal) + 'B'
-            self.re.total = estimatedTotal
+            return '%02i:%02i' % (minutes, seconds)
 
-    def end(self, amount_read, now = None):
-        # otherwise we get a new line after each file
-        if self.filesSoFar == self.numberOfFiles:
-            totalRead = self.baseRead + amount_read
-            urlgrabber.progress.TextMeter.end(self, totalRead, now)
 
-    def update(self, amount_read, now = None):
-        totalRead = self.baseRead + amount_read
-        urlgrabber.progress.TextMeter.update(self, totalRead, now)
+def format_number(number, SI=0, space=' '):
+    """Turn numbers into human-readable metric-like numbers"""
+    symbols = ['',  # (none)
+               'k', # kilo
+               'M', # mega
+               'G', # giga
+               'T', # tera
+               'P', # peta
+               'E', # exa
+               'Z', # zetta
+               'Y'] # yotta
+
+    if SI: step = 1000.0
+    else: step = 1024.0
+
+    thresh = 999
+    depth = 0
+    max_depth = len(symbols) - 1
+
+    # we want numbers between 0 and thresh, but don't exceed the length
+    # of our list.  In that event, the formatting will be screwed up,
+    # but it'll still show the right number.
+    while number > thresh and depth < max_depth:
+        depth  = depth + 1
+        number = number / step
+
+    if isinstance(number, int):
+        # it's an int or a long, which means it didn't get divided,
+        # which means it's already short enough
+        format = '%i%s%s'
+    elif number < 9.95:
+        # must use 9.95 for proper sizing.  For example, 9.99 will be
+        # rounded to 10.0 with the .1f format string (which is too long)
+        format = '%.1f%s%s'
+    else:
+        format = '%.0f%s%s'
+
+    return(format % (float(number or 0), space, symbols[depth]))
+
+
+class ReportHook():
+
+    def __init__(self, numberOfFiles = 1):
+        self.name = None
+        self.numberOfFiles = numberOfFiles
+        self.reset()
+
+
+    def reset(self):
+        self.startTime = None
+        self.filesRead = 0
+        self.totalSizeSoFar = 0
+        self.readSoFar = 0
+        self.estimatedSize = None
+
+
+    def setName(self, name):
+        self.name = os.path.basename(name)
+        self.reset()
+
+
+    def __call__(self, blockCount, blockSize, totalSize):
+        if blockCount == 0:
+            if not self.startTime:
+                self.startTime = time.time()
+            self.totalSizeSoFar = self.totalSizeSoFar + totalSize
+            self.filesRead      = self.filesRead + 1
+            self.estimatedSize  = self.totalSizeSoFar / self.filesRead * self.numberOfFiles
+            return
+
+        currentTime = time.time()
+        elapsedTime = currentTime - self.startTime
+
+        self.readSoFar = self.readSoFar + blockSize
+
+        terminalWidth = terminal_width()
+
+        nameWidth = terminalWidth - 28
+
+        print("\r{0:{nameWidth}}: {1:>6} {2:>6} ".format(self.name[:nameWidth], format_number(self.readSoFar), format_time(elapsedTime), nameWidth = nameWidth), end = "")
+
+        if self.estimatedSize > 0:
+            self.readSoFar = min(self.estimatedSize, self.readSoFar)
+            pct = self.readSoFar / self.estimatedSize
+            timeToGo = elapsedTime * (1 - pct) / pct
+            print("{0:4.0%} {1:>6}".format(pct, format_time(timeToGo)), end = "")
+
+
+    def done(self):
+        print()

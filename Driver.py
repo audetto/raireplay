@@ -1,4 +1,3 @@
-from __future__ import print_function
 
 from asi import Utils
 from asi import Info
@@ -13,19 +12,17 @@ from asi import TF1
 
 import re
 import datetime
-
-import urlgrabber.grabber
-import urlgrabber.progress
+import urllib
 
 
 def displayOrGet(item, nolist, info, get, options):
     if info:
-        width = urlgrabber.progress.terminal_width()
+        width = Utils.terminal_width()
         item.display(width)
     elif not nolist:
         # this is list
         fmt = "{0:>9}: {1} {2}"
-        print(item.short(unicode(fmt)))
+        print(item.short(fmt))
 
     if get:
         try:
@@ -40,7 +37,7 @@ def listDisplayOrGet(items, nolist, info, get, options):
         print()
         print("INFO: {0} programmes found".format(len(items)))
 
-    for p in sorted(items.itervalues(), key = lambda x: (x.datetime, x.title)):
+    for p in sorted(items.values(), key = lambda x: (x.datetime, x.title)):
         displayOrGet(p, nolist, info, get, options)
 
 
@@ -71,9 +68,9 @@ def find(db, pid, isre, subset):
     if pid in db:
         subset[pid] = db[pid]
     else:
-        fmt = unicode("{2}")
+        fmt = "{2}"
         match = pid.lower()
-        for ppid, p in db.iteritems():
+        for ppid, p in db.items():
             title = p.short(fmt)
             if isre:
                 if re.match(pid, title):
@@ -101,14 +98,15 @@ def process(args):
         if args.proxy != None:
             proxy = { "http" : args.proxy }
 
-    # got from the iphone
-    # required for TF1 - www.wat.tv
-    userAgent = "AppleCoreMedia/1.0.0.9B206 (iPod; U; CPU OS 5_1_1 like Mac OS X; en_us)"
+    proxyHandler = urllib.request.ProxyHandler(proxy)
 
-    grabber = urlgrabber.grabber.URLGrabber(proxies = proxy, quote = 0, user_agent = userAgent)
+    grabber = urllib.request.build_opener(proxyHandler)
+    # we still need to install the global one, as sometimes we cannot pass in a new one
+    # (m3u8 and urlretrieve)
+    urllib.request.install_opener(grabber)
 
     if args.ip:
-        width = urlgrabber.progress.terminal_width()
+        width = Utils.terminal_width()
         Info.display(grabber, width)
         return
 
@@ -129,7 +127,7 @@ def process(args):
             if len(subset) == 1:
                 # continue follow calculation
                 db = {}
-                p = next(subset.itervalues())
+                p = next(iter(subset.values()))
                 p.follow(db, args.download)
                 follows = follows[1:] # continue with one element less
             else:
