@@ -50,7 +50,10 @@ def processSet(grabber, title, time, f, db):
         Utils.addToDB(db, p)
     else:
         # get the list
-        lst = o["list"]
+        lst = o.get("list")
+
+        if lst == None:
+            return
 
         for prg in lst:
             tp = prg["type"]
