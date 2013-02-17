@@ -115,13 +115,17 @@ class ReportHook():
 
         nameWidth = terminalWidth - 28
 
-        print("\r{0:{nameWidth}}: {1:>6} {2:>6} ".format(self.name[:nameWidth], format_number(self.readSoFar), format_time(elapsedTime), nameWidth = nameWidth), end = "")
+        output = "\r{0:{nameWidth}}: {1:>6} {2:>6}".format(self.name[:nameWidth], format_number(self.readSoFar), format_time(elapsedTime), nameWidth = nameWidth)
+        print(output, end = "")
 
         if self.estimatedSize > 0:
             self.readSoFar = min(self.estimatedSize, self.readSoFar)
             pct = self.readSoFar / self.estimatedSize
             timeToGo = elapsedTime * (1 - pct) / pct
-            print("{0:4.0%} {1:>6}".format(pct, format_time(timeToGo)), end = "")
+            output = " {0:4.0%} {1:>6}".format(pct, format_time(timeToGo))
+            print(output, end = "")
+
+        print("\r", end = "")
 
 
     def done(self):

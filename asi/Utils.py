@@ -236,9 +236,9 @@ def load_m3u8_from_url(grabber, uri):
 def setTorExitNodes(country, password):
     tn = telnetlib.Telnet("127.0.0.1", 9051)
     if password != None:
-        tn.write('AUTHENTICATE "{0}"\n'.format(password))
-    tn.write("SETCONF ExitNodes={{{0}}}\n".format(country))
-    tn.write("QUIT\n")
+        tn.write('AUTHENTICATE "{0}"\n'.format(password).encode("ascii"))
+    tn.write("SETCONF ExitNodes={{{0}}}\n".format(country).encode("ascii"))
+    tn.write("QUIT\n".encode("ascii"))
 
 
 def makeFilename(input):

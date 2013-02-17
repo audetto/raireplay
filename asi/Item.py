@@ -168,9 +168,9 @@ class Demand(Base.Base):
 
                     if self.asf != None:
                         # use urlgrab to make it work with ConfigParser
-                        content = grabber.urlgrab(self.asf)
+                        content = grabber.open(self.asf)
                         config = configparser.ConfigParser()
-                        config.read(content)
+                        config.read_string(content.read().decode("ascii"))
                         self.mms = config.get("Reference", "ref1")
                         self.mms = self.mms.replace("http://", "mms://")
                 elif root.tag == "playList":
