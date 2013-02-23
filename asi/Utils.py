@@ -35,21 +35,48 @@ def httpFilename(url):
 
 
 # simply download a file and saves it to localName
-#def downloadFile(grabber, progress, url, localName):
-#    print("Get {0} to {1}".format(url, localName))
-#    request = urllib.request.Request(url, headers = httpHeaders)
-#    with grabber.open(request) as response, open(localName, "wb") as f:
-#        shutil.copyfileobj(response, f)
-
-
 def downloadFile(grabber, progress, url, localName):
     if progress:
         progress.setName(localName)
-    request = urllib.request.Request(url, headers = httpHeaders)
 
-    urllib.request.urlretrieve(url, filename = localName, reporthook = progress)
-    if progress:
-        progress.done()
+    request = urllib.request.Request(url, headers = httpHeaders)
+    with grabber.open(request) as response, open(localName, "wb") as f:
+        # same length as shutil.copyfileobj
+
+        # the rest is the same logic as urllib.request.urlretrieve
+        # which unfortunately does not work with proxies
+        blockSize = 1024 * 16
+        size = -1
+
+        headers = response.info()
+        if "content-length" in headers:
+            size = int(headers["Content-Length"])
+
+        blockNum = 0
+        if progress:
+            progress(blockNum, blockSize, size)
+
+        while 1:
+            buf = response.read(blockSize)
+            if not buf:
+                break
+            f.write(buf)
+            blockNum = blockNum + 1
+            if progress:
+                progress(blockNum, blockSize, size)
+
+        if progress:
+            progress.done()
+
+
+#def downloadFile(grabber, progress, url, localName):
+#    if progress:
+#        progress.setName(localName)
+#    request = urllib.request.Request(url, headers = httpHeaders)
+#
+#    urllib.request.urlretrieve(url, filename = localName, reporthook = progress)
+#    if progress:
+#        progress.done()
 
 
 # download a file and returns a file object
