@@ -155,7 +155,7 @@ class Demand(Base.Base):
             self.mms = self.values.videoUrl
         else:
             # search for the mms url
-            content = grabber.open(self.values.videoUrl).read().decode("ascii")
+            content = Utils.getStringFromUrl(grabber, self.values.videoUrl)
 
             if content == Utils.invalidMP4:
                 # is this the case of videos only available in Italy?
@@ -168,9 +168,9 @@ class Demand(Base.Base):
 
                     if self.asf != None:
                         # use urlgrab to make it work with ConfigParser
-                        content = grabber.open(self.asf)
+                        content = Utils.getStringFromUrl(grabber, self.asf)
                         config = configparser.ConfigParser()
-                        config.read_string(content.read().decode("ascii"))
+                        config.read_string(content)
                         self.mms = config.get("Reference", "ref1")
                         self.mms = self.mms.replace("http://", "mms://")
                 elif root.tag == "playList":

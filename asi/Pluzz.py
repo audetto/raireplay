@@ -54,8 +54,8 @@ def download(db, grabber, downType):
 
     for a in z.namelist():
         if a.find("catch_up_") == 0:
-            f = decoder(z.open(a))
-            process(grabber, f, db)
+            with z.open(a) as f:
+                process(grabber, decoder(f), db)
 
 class Program(Base.Base):
     def __init__(self, grabber, channel, date, hour, pid, minutes, title, desc, url):

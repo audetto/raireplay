@@ -185,17 +185,17 @@ def downloadM3U8(grabber, folder, m3, options, pid, filename, remux):
             numberOfFiles = len(item.segments)
             progress = getProgress(numberOfFiles, filename + ".ts")
 
-            out = open(localFilenameTS, "wb")
-            for seg in item.segments:
-                uri = seg.absolute_uri
-                s = grabber.open(uri)
-                b = s.read()
-                size = len(b)
-                if progress:
-                    progress(0, size, size)
-                out.write(b)
-                if progress:
-                    progress(1, size, size)
+            with open(localFilenameTS, "wb") as out:
+                for seg in item.segments:
+                    uri = seg.absolute_uri
+                    with grabber.open(uri) as s:
+                        b = s.read()
+                        size = len(b)
+                        if progress:
+                            progress(0, size, size)
+                        out.write(b)
+                        if progress:
+                            progress(1, size, size)
 
             if progress:
                 progress.done()
@@ -337,3 +337,9 @@ def terminal_width(fd=1):
         return ret
     except: # IOError
         return 80
+
+
+def getStringFromUrl(grabber, url):
+    with grabber.open(url) as f:
+        content = f.read().decode("ascii")
+        return content

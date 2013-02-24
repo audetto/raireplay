@@ -1,5 +1,5 @@
 
-
+from asi import Utils
 from asi import Config
 
 # this returns some JavaScript like
@@ -11,8 +11,8 @@ userIP = "http://api.prod.capptain.com/ip-to-country"
 
 def display(grabber, width):
 
-    rai = grabber.open(userLocation).read().decode("ascii")
-    ip = grabber.open(userIP).read().decode("ascii")
+    rai = Utils.getStringFromUrl(grabber, userLocation)
+    ip = Utils.getStringFromUrl(grabber, userIP)
 
     print("=" * width)
 
