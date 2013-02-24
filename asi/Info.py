@@ -13,10 +13,12 @@ def display(grabber, width):
 
     rai = Utils.getStringFromUrl(grabber, userLocation)
     ip = Utils.getStringFromUrl(grabber, userIP)
+    tor = Utils.getTorExitNodes(None)
 
     print("=" * width)
 
     print("Root folder:", Config.rootFolder)
+    print("ExitNodes:  ", tor)
     print("Location:   ", Config.programFolder)
     print("RAI:        ", rai)
     print("IP:         ", ip)
