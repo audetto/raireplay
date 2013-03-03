@@ -111,11 +111,13 @@ class ReportHook():
 
         self.readSoFar = self.readSoFar + blockSize
 
+        speed = self.readSoFar / elapsedTime
+
         terminalWidth = terminal_width()
 
-        nameWidth = terminalWidth - 28
+        nameWidth = terminalWidth - 32
 
-        output = "\r{0:{nameWidth}}: {1:>6} {2:>6}".format(self.name[:nameWidth], format_number(self.readSoFar), format_time(elapsedTime), nameWidth = nameWidth)
+        output = "\r{0:{nameWidth}}: {1:>6}B {2:>6}B/s".format(self.name[:nameWidth], format_number(self.readSoFar), format_number(speed), nameWidth = nameWidth)
         print(output, end = "")
 
         if self.estimatedSize > 0:
