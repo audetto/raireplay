@@ -12,6 +12,7 @@ from xml.etree import ElementTree
 from asi import Utils
 from asi import Config
 from asi import Base
+from asi import RAIUrls
 
 # <meta name="videourl" content="....." />
 
@@ -86,7 +87,7 @@ class VideoHTMLParser(HTMLParser):
 
             val = self.extract(attrs, "idPageProgramma")
             if val != None:
-                self.values.page = Utils.baseUrl + Utils.getWebFromID(val)
+                self.values.page = RAIUrls.base + RAIUrls.getWebFromID(val)
 
         elif tag == "param":
             if len(attrs) > 0:
@@ -111,6 +112,11 @@ class Demand(Base.Base):
         super(Demand, self).__init__()
 
         self.grabber = grabber
+
+        parts = urllib.parse.urlparse(url)
+        if not parts.scheme:
+            url = RAIUrls.getItemUrl(url)
+
         self.url = url
         self.pid = pid
 
@@ -157,7 +163,7 @@ class Demand(Base.Base):
             # search for the mms url
             content = Utils.getStringFromUrl(grabber, self.values.videoUrl)
 
-            if content == Utils.invalidMP4:
+            if content == RAIUrls.invalidMP4:
                 # is this the case of videos only available in Italy?
                 self.asf = content
                 self.mms = content

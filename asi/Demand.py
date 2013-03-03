@@ -7,9 +7,8 @@ from asi import Utils
 from asi import Config
 from asi import Page
 from asi import Base
+from asi import RAIUrls
 
-url = "http://www.rai.tv/dl/RaiTV/programmi/ricerca/ContentSet-6445de64-d321-476c-a890-ae4ed32c729e-darivedere.html"
-baseUrl = "http://www.rai.tv"
 
 def process(grabber, f, db):
     o = json.load(f)
@@ -20,14 +19,14 @@ def process(grabber, f, db):
 
 
 def download(db, grabber, downType):
-    page = Utils.httpFilename(url)
+    page = Utils.httpFilename(RAIUrls.onDemand)
 
     folder = Config.demandFolder
     localFilename = os.path.join(folder, page)
 
     progress = Utils.getProgress()
 
-    f = Utils.download(grabber, progress, url, localFilename, downType, "raw-unicode-escape", True)
+    f = Utils.download(grabber, progress, RAIUrls.onDemand, localFilename, downType, "raw-unicode-escape", True)
 
     process(grabber, f, db)
 
@@ -42,7 +41,7 @@ class Group(Base.Base):
         self.somedate = float(date)
         self.channel = channel
 
-        self.url = baseUrl + link
+        self.url = RAIUrls.base + link
 
 
     def display(self, width):

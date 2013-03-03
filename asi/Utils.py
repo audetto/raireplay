@@ -19,14 +19,12 @@ from asi import Meter
 class Obj:
     pass
 
-invalidMP4 = "http://creativemedia3.rai.it/video_no_available.mp4"
 
 # got from the iphone
 # required for TF1 - www.wat.tv
 userAgent = "AppleCoreMedia/1.0.0.9B206 (iPod; U; CPU OS 5_1_1 like Mac OS X; en_us)"
 httpHeaders = {"User-Agent" : userAgent }
 
-baseUrl = "http://www.rai.tv"
 
 def httpFilename(url):
     name = os.path.basename(urllib.parse.urlsplit(url).path)
@@ -115,11 +113,6 @@ def download(grabber, progress, url, localName, downType, encoding, checkTime = 
             f = codecs.open(localName, "r", encoding = encoding)
 
     return f
-
-
-def getWebFromID(id):
-    web = "/dl/RaiTV/programmi/media/{0}.html".format(id)
-    return web
 
 
 def findPlaylist(m3, bandwidth):

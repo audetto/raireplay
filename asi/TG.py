@@ -8,8 +8,7 @@ from asi import Item
 from asi import Utils
 from asi import Config
 from asi import Base
-
-infoUrl = "http://www.rai.tv/dl/RaiTV/iphone/assets/tg_json.js?NS=0-1-4c61b46e9a4ab09b25da2246ae52d31edb528475-5.1.1"
+from asi import RAIUrls
 
 # try to guess a date from a description like
 # "TG2 ore 23:30 del 14/01/2013"
@@ -103,12 +102,12 @@ def process(grabber, progress, downType, f, db):
 
 def download(db, grabber, downType):
     progress = Utils.getProgress()
-    name = Utils.httpFilename(infoUrl)
+    name = Utils.httpFilename(RAIUrls.info)
 
     folder = Config.tgFolder
     localName = os.path.join(folder, name)
 
-    f = Utils.download(grabber, progress, infoUrl, localName, downType, "utf-8", True)
+    f = Utils.download(grabber, progress, RAIUrls.info, localName, downType, "utf-8", True)
     process(grabber, progress, downType, f, db)
 
 

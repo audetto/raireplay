@@ -9,16 +9,11 @@ from asi import Utils
 from asi import Config
 from asi import Item
 from asi import Base
+from asi import RAIUrls
 
 # example: without xls we get a nice XML,
 # numContent is compulsory, but it seems a big number is accepted and gives the whole list
 # http://www.rai.tv/StatisticheProxy/proxyPost.jsp?action=getLastContentByTag&numContents=12&tags=PageOB:Page-054bcd53-df7e-42c3-805b-dbe6e90bc817&domain=RaiTv&xsl=rai_tv-statisticheN&_=1351111295981
-
-# returns the url that requests the list of ContentItems behind a Page-xxx page
-def getDataUrl(page):
-    n = 1000 # just get them all
-    url = "http://www.rai.tv/StatisticheProxy/proxyPost.jsp?action=getLastContentByTag&numContents={0}&tags=PageOB:{1}&domain=RaiTv".format(n, page)
-    return url
 
 
 class Elem(Base.Base):
@@ -43,10 +38,10 @@ class Elem(Base.Base):
         self.length        = data.findtext("durata")
         web =  data.findtext("web")
         if web == None:
-            web = Utils.getWebFromID(self.id)
-        self.url           = Utils.baseUrl + web
+            web = RAIUrls.getWebFromID(self.id)
+        self.url           = RAIUrls.base + web
 
-        self.filename      =  Utils.makeFilename(self.title)
+        self.filename      = Utils.makeFilename(self.title)
 
     def display(self, width):
         print("=" * width)
@@ -72,7 +67,7 @@ def download(db, grabber, url, downType):
     page = Utils.httpFilename(url)
     page = os.path.splitext(page)[0]
 
-    dataUrl = getDataUrl(page)
+    dataUrl = RAIUrls.getPageDataUrl(page)
 
     folder = Config.pageFolder
     localFilename = os.path.join(folder, page + ".xml")

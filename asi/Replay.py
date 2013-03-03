@@ -8,8 +8,8 @@ import json
 from asi import Utils
 from asi import Config
 from asi import Base
+from asi import RAIUrls
 
-baseUrl = "http://www.rai.it/dl/portale/html/palinsesti/replaytv/static"
 channels = {"1": "RaiUno", "2": "RaiDue", "3": "RaiTre", "31": "RaiCinque"}
 
 # tablet and phone url contain an overlapping set of bitrates
@@ -96,7 +96,7 @@ def download(db, grabber, downType):
 
         for channel in channels.values():
             filename = channel + strDate + ".html"
-            url = baseUrl + "/" + filename
+            url = RAIUrls.replay + "/" + filename
             localName = os.path.join(folder, filename)
 
             f = Utils.download(grabber, progress, url, localName, downType, "utf-8")
