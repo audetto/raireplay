@@ -4,10 +4,7 @@ import os.path
 import urllib.parse
 import datetime
 
-import configparser
-
 from html.parser import HTMLParser
-from xml.etree import ElementTree
 
 from asi import Utils
 from asi import Config
@@ -137,7 +134,6 @@ class Demand(Base.Base):
         if self.values.date != None:
             self.datetime = datetime.datetime.strptime(self.values.date, "%d/%m/%Y")
 
-        self.asf = None
         self.mms = None
 
         if self.values.type != None and self.values.type != "Video":
@@ -160,30 +156,7 @@ class Demand(Base.Base):
             # if it is already mms, don't look further
             self.mms = self.values.videoUrl
         else:
-            # search for the mms url
-            content = Utils.getStringFromUrl(grabber, self.values.videoUrl)
-
-            if content == RAIUrls.invalidMP4:
-                # is this the case of videos only available in Italy?
-                self.asf = content
-                self.mms = content
-            else:
-                root = ElementTree.fromstring(content)
-                if root.tag == "ASX":
-                    self.asf = root.find("ENTRY").find("REF").attrib.get("HREF")
-
-                    if self.asf != None:
-                        # use urlgrab to make it work with ConfigParser
-                        content = Utils.getStringFromUrl(grabber, self.asf)
-                        config = configparser.ConfigParser()
-                        config.read_string(content)
-                        self.mms = config.get("Reference", "ref1")
-                        self.mms = self.mms.replace("http://", "mms://")
-                elif root.tag == "playList":
-                    # adaptive streaming - unsupported
-                    pass
-                else:
-                    print("Unknown root tag: " + root.tag)
+            self.mms = getMMSUrl(grabber, self.values.videoUrl)
 
 
     def display(self, width):
@@ -200,7 +173,6 @@ class Demand(Base.Base):
         print("videourl:   ", self.values.videoUrl)
         print("h264:       ", self.values.videoUrlH264)
         print("m3u8:       ", self.values.videoUrlM3U8)
-        print("asf:        ", self.asf)
         print("mms:        ", self.mms)
 
         m3 = self.getTabletPlaylist()

@@ -13,8 +13,12 @@ import subprocess
 import shutil
 import io
 import time
+import configparser
+
+from xml.etree import ElementTree
 
 from asi import Meter
+from asi import RAIUrls
 
 class Obj:
     pass
@@ -349,3 +353,32 @@ def getStringFromUrl(grabber, url):
     with grabber.open(url) as f:
         content = f.read().decode("ascii")
         return content
+
+
+def getMMSUrl(grabber, url):
+    # search for the mms url
+    content = getStringFromUrl(grabber, url)
+
+    mms = None
+    if content == RAIUrls.invalidMP4:
+        # is this the case of videos only available in Italy?
+        mms = content
+    else:
+        root = ElementTree.fromstring(content)
+        if root.tag == "ASX":
+            asf = root.find("ENTRY").find("REF").attrib.get("HREF")
+
+            if asf != None:
+                # use urlgrab to make it work with ConfigParser
+                content = getStringFromUrl(grabber, asf)
+                config = configparser.ConfigParser()
+                config.read_string(content)
+                mms = config.get("Reference", "ref1")
+                mms = mms.replace("http://", "mms://")
+            elif root.tag == "playList":
+                # adaptive streaming - unsupported
+                pass
+            else:
+                print("Unknown root tag: " + root.tag)
+
+    return mms

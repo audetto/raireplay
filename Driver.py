@@ -5,6 +5,7 @@ from asi import Replay
 from asi import Page
 from asi import Item
 from asi import TG
+from asi import Junior
 from asi import Demand
 from asi import Config
 from asi import Pluzz
@@ -118,6 +119,9 @@ def process(args):
 
     if args.tg:
         TG.download(db, grabber, args.download)
+
+    if args.junior:
+        Junior.download(db, grabber, args.download)
 
     if args.follow != None:
         follows = args.follow

@@ -76,7 +76,6 @@ def download(db, grabber, url, downType):
     # ElementTree does not like unicode, it prefers byte strings
     root = ElementTree.fromstring(f.read().strip().encode("utf-8"))
 
-    for child in root:
-        if child.tag == "content":
-            it = Elem(grabber, None, child)
-            Utils.addToDB(db, it)
+    for child in root.findall("content"):
+        it = Elem(grabber, None, child)
+        Utils.addToDB(db, it)
