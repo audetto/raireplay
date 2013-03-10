@@ -44,7 +44,7 @@ def getFullUrl(tablet, phone):
     return fullUrl
 
 
-def parseItem(grabber, channel, date, time, value):
+def parseItem(grabber, channel, date, time, value, db):
     name = value["t"]
     desc = value["d"]
     secs = value["l"]
@@ -59,10 +59,9 @@ def parseItem(grabber, channel, date, time, value):
     pid = value["i"]
 
     if h264 != "" or tablet != "" or smartPhone != "" :
+        pid = Utils.getNewPID(db, pid)
         p = Program(grabber, channels[channel], date, time, pid, minutes, name, desc, h264, tablet, smartPhone)
-        return p
-
-    return None
+        Utils.addToDB(db, p)
 
 
 def process(grabber, f, db):
@@ -78,9 +77,7 @@ def process(grabber, f, db):
 
         for date, v2 in v1.items():
             for time, value in v2.items():
-                p = parseItem(grabber, channel, date, time, value)
-
-                Utils.addToDB(db, p)
+                p = parseItem(grabber, channel, date, time, value, db)
 
 
 def download(db, grabber, downType):

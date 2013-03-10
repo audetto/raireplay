@@ -47,7 +47,8 @@ def processEpisode(grabber, e, db):
         elif key == "h264":
             h264 = value
 
-    item = Episode(grabber, title, description, date, minutes, url, h264, ts, mms)
+    pid = Utils.getNewPID(db, None)
+    item = Episode(pid, grabber, title, description, date, minutes, url, h264, ts, mms)
     Utils.addToDB(db, item)
 
 
@@ -76,7 +77,9 @@ def processBlock(grabber, progress, folder, f, db, downType):
             name = e.find("label").text
             name = h.unescape(name)
             path = video.text
-            item = Item(grabber, path, downType, group, name)
+
+            pid = Utils.getNewPID(db, None)
+            item = Item(pid, grabber, path, downType, group, name)
             Utils.addToDB(db, item)
 
 
@@ -124,9 +127,10 @@ def download(db, grabber, downType):
 
 
 class Item(Base.Base):
-    def __init__(self, grabber, url, downType, group, title):
+    def __init__(self, pid, grabber, url, downType, group, title):
         super(Item, self).__init__()
 
+        self.pid = pid
         self.grabber = grabber
 
         self.url = url
@@ -170,9 +174,10 @@ class Item(Base.Base):
 
 
 class Episode(Base.Base):
-    def __init__(self, grabber, title, description, date, minutes, url, h264, ts, mms):
+    def __init__(self, pid, grabber, title, description, date, minutes, url, h264, ts, mms):
         super(Episode, self).__init__()
 
+        self.pid = pid
         self.grabber = grabber
 
         self.title = title

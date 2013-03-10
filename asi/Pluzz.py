@@ -14,7 +14,7 @@ infoUrl = "http://webservices.francetelevisions.fr/catchup/flux/flux_main.zip"
 baseUrl = "http://medias2.francetv.fr/catchup-mobile"
 
 
-def parseItem(grabber, prog):
+def parseItem(grabber, prog, db):
     pid     = prog["id_diffusion"]
     date    = prog["date"]
     hour    = prog["heure"]
@@ -24,9 +24,9 @@ def parseItem(grabber, prog):
     name    = prog["titre"]
     minutes = prog["duree"]
 
+    pid = Utils.getNewPID(db, pid)
     p = Program(grabber, channel, date, hour, pid, minutes, name, desc, url)
-
-    return p
+    Utils.addToDB(db, p)
 
 
 def process(grabber, f, db):
@@ -35,8 +35,7 @@ def process(grabber, f, db):
     programmes = o["programmes"]
 
     for prog in programmes:
-        p = parseItem(grabber, prog)
-        Utils.addToDB(db, p)
+        parseItem(grabber, prog, db)
 
 
 def download(db, grabber, downType):

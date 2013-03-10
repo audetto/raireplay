@@ -317,16 +317,25 @@ def getProgress(numberOfFiles = 1, filename = None):
         return None
 
 
+def getNewPID(db, pid):
+    if pid == None:
+        pid = len(db)
+
+        # we only enforce uniqueness
+        # if there is no real PID
+        while str(pid) in db:
+            pid = pid + 1
+
+    pid = str(pid)
+
+    return pid
+
+
 def addToDB(db, prog):
     if prog == None:
         return
 
     pid = prog.pid
-    if pid == None:
-        pid = len(db)
-
-    pid = str(pid)
-    prog.pid = pid
 
     if pid in db:
         print("WARNING: duplicate pid {0}".format(prog.pid))

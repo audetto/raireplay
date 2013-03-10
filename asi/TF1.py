@@ -22,7 +22,7 @@ def getWatLink(watId):
     return url
 
 
-def parseItem(grabber, prog, name):
+def parseItem(grabber, prog, name, db):
     pid      = str(prog["id"])
     desc     = prog["longTitle"]
     pubDate  = prog["publicationDate"]
@@ -34,20 +34,18 @@ def parseItem(grabber, prog, name):
     minutes  = duration / 60
     date = datetime.datetime.strptime(pubDate, "%Y-%m-%d %H:%M:%S")
 
-    p = Program(grabber, date, minutes, pid, name, desc, wat, category)
-
-    return p
+    # ignore the countless "extract", "bonus", "short" which last just a few minutes
+    if category == "fullvideo":
+        pid = Utils.getNewPID(db, pid)
+        p = Program(grabber, date, minutes, pid, name, desc, wat, category)
+        Utils.addToDB(db, p)
 
 
 def processGroup(grabber, f, name, db):
     o = json.load(f)
 
     for prog in o:
-        p = parseItem(grabber, prog, name)
-
-        # ignore the countless "extract", "bonus", "short" which last just a few minutes
-        if p.category == "fullvideo":
-            Utils.addToDB(db, p)
+        p = parseItem(grabber, prog, name, db)
 
 
 def processNews(grabber, f, folder, progress, downType, db):
@@ -67,7 +65,8 @@ def processNews(grabber, f, folder, progress, downType, db):
         wat = prog["linkAttributes"]["watId"]
         category = prog["linkAttributes"]["videoCategory"]
 
-        p = Program(grabber, datetime.datetime.now(), None, str(groupId), name, title, wat, category)
+        pid = Utils.getNewPID(db, groupId)
+        p = Program(grabber, datetime.datetime.now(), None, pid, name, title, wat, category)
         Utils.addToDB(db, p)
 
 

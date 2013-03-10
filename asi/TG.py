@@ -45,7 +45,8 @@ def processSet(grabber, title, time, f, db):
         date          = isThereADate(date, description)
         datetime      = date + " " + time
 
-        p = Program(grabber, link, title, datetime, None, title, description, h264, m3u8)
+        pid = Utils.getNewPID(db, None)
+        p = Program(grabber, link, title, datetime, pid, title, description, h264, m3u8)
         Utils.addToDB(db, p)
     else:
         # get the list
@@ -64,7 +65,8 @@ def processSet(grabber, title, time, f, db):
                 aTitle        = title + "-" + prg["name"]
                 description   = prg["desc"]
 
-                p = Program(grabber, link, title, dt, None, aTitle, description, h264, m3u8)
+                pid = Utils.getNewPID(db, None)
+                p = Program(grabber, link, title, dt, pid, aTitle, description, h264, m3u8)
                 Utils.addToDB(db, p)
 
 

@@ -14,7 +14,8 @@ def process(grabber, f, db):
     o = json.load(f)
 
     for v in o:
-        p = Group(grabber, None, v["title"], v["linkDemand"], v["date"], v["editore"])
+        pid = Utils.getNewPID(db, None)
+        p = Group(grabber, pid, v["title"], v["linkDemand"], v["date"], v["editore"])
         Utils.addToDB(db, p)
 
 

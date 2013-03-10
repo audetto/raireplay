@@ -17,7 +17,7 @@ from asi import RAIUrls
 
 
 class Elem(Base.Base):
-    def __init__(self, grabber, pid, data):
+    def __init__(self, pid, grabber, data):
 
         super(Elem, self).__init__()
 
@@ -77,5 +77,6 @@ def download(db, grabber, url, downType):
     root = ElementTree.fromstring(f.read().strip().encode("utf-8"))
 
     for child in root.findall("content"):
-        it = Elem(grabber, None, child)
+        pid = Utils.getNewPID(db, None)
+        it = Elem(pid, grabber, child)
         Utils.addToDB(db, it)
