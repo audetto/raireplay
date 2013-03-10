@@ -75,6 +75,8 @@ class Base(object):
 
 
     def downloadMMS(self, folder, options):
+        mms = Utils.getMMSUrl(self.grabber, self.mms)
+
         localFilename = os.path.join(folder, self.filename + ".wmv")
 
         if (not options.overwrite) and os.path.exists(localFilename):
@@ -83,7 +85,7 @@ class Base(object):
 
         opt = Utils.Obj()
         opt.quiet        = False
-        opt.url          = self.mms
+        opt.url          = mms
         opt.resume       = False
         opt.bandwidth    = 1e6
         opt.filename     = localFilename

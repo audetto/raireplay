@@ -356,25 +356,31 @@ def getStringFromUrl(grabber, url):
 
 
 def getMMSUrl(grabber, url):
-    # search for the mms url
-    content = getStringFromUrl(grabber, url)
-
     mms = None
-    if content == RAIUrls.invalidMP4:
-        # is this the case of videos only available in Italy?
-        mms = content
-    else:
-        root = ElementTree.fromstring(content)
-        if root.tag == "ASX":
-            asf = root.find("ENTRY").find("REF").attrib.get("HREF")
 
-            if asf != None:
-                # use urlgrab to make it work with ConfigParser
-                content = getStringFromUrl(grabber, asf)
-                config = configparser.ConfigParser()
-                config.read_string(content)
-                mms = config.get("Reference", "ref1")
-                mms = mms.replace("http://", "mms://")
+    urlScheme = urllib.parse.urlsplit(url).scheme
+    if urlScheme == "mms":
+        # if it is already mms, don't look further
+        mms = self.values.videoUrl
+    else:
+        # search for the mms url
+        content = getStringFromUrl(grabber, url)
+
+        if content == RAIUrls.invalidMP4:
+            # is this the case of videos only available in Italy?
+            mms = content
+        else:
+            root = ElementTree.fromstring(content)
+            if root.tag == "ASX":
+                asf = root.find("ENTRY").find("REF").attrib.get("HREF")
+
+                if asf != None:
+                    # use urlgrab to make it work with ConfigParser
+                    content = getStringFromUrl(grabber, asf)
+                    config = configparser.ConfigParser()
+                    config.read_string(content)
+                    mms = config.get("Reference", "ref1")
+                    mms = mms.replace("http://", "mms://")
             elif root.tag == "playList":
                 # adaptive streaming - unsupported
                 pass

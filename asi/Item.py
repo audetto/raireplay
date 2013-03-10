@@ -151,12 +151,7 @@ class Demand(Base.Base):
         #make a nice filename
         self.filename = Utils.makeFilename(self.values.title)
 
-        urlScheme = urllib.parse.urlsplit(self.values.videoUrl).scheme
-        if urlScheme == "mms":
-            # if it is already mms, don't look further
-            self.mms = self.values.videoUrl
-        else:
-            self.mms = getMMSUrl(grabber, self.values.videoUrl)
+        self.mms = self.values.videoUrl
 
 
     def display(self, width):

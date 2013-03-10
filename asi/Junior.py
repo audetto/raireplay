@@ -1,5 +1,6 @@
 import os.path
 import datetime
+import html.parser
 
 from asi import Utils
 from asi import Config
@@ -10,6 +11,8 @@ from xml.etree import ElementTree
 
 
 def processEpisode(grabber, e, db):
+    h = html.parser.HTMLParser()
+
     title = e.attrib.get("name")
     date  = e.attrib.get("createDate")
     url   = e.attrib.get("uniquename")
@@ -23,8 +26,14 @@ def processEpisode(grabber, e, db):
             minutes = u.find("text").text
         elif typ == "Testo breve":
             description = u.find("text").text
+            if description:
+                description = h.unescape(description)
 
     video = units.find("videoUnit")
+    if video == None:
+        # no video, skip this episode
+        return
+
     mms = video.find("url").text
     h264 = None
     ts = None
@@ -44,19 +53,28 @@ def processEpisode(grabber, e, db):
 
 def processSet(grabber, progress, folder, f, db, downType):
     root = ElementTree.parse(f).getroot()
+
+    index = int(root.attrib.get("pageIndex"))
+    total = int(root.attrib.get("pages"))
+
     items = root.find("items")
     for e in items.findall("item"):
         processEpisode(grabber, e, db)
 
+    return (index, total)
 
 def processBlock(grabber, progress, folder, f, db, downType):
+    h = html.parser.HTMLParser()
+
     root =  ElementTree.parse(f).getroot()
     group = root.find("label").text
+    group = h.unescape(group)
     categoria = root.findall('categoria')
     for e in categoria:
         video = e.find("video")
         if video != None:
             name = e.find("label").text
+            name = h.unescape(name)
             path = video.text
             item = Item(grabber, path, downType, group, name)
             Utils.addToDB(db, item)
@@ -130,11 +148,25 @@ class Item(Base.Base):
         folder = Config.juniorFolder
         progress = Utils.getProgress()
 
-        name = Utils.httpFilename(self.url)
-        localFilename = os.path.join(folder, name)
+        again = True
+        url = self.url
 
-        f = Utils.download(self.grabber, progress, self.url, localFilename, downType, None, True)
-        processSet(self.grabber, progress, folder, f, db, downType)
+        while again:
+            name = Utils.httpFilename(url)
+            localFilename = os.path.join(folder, name)
+
+            f = Utils.download(self.grabber, progress, url, localFilename, downType, None, True)
+            (index, total) = processSet(self.grabber, progress, folder, f, db, downType)
+            if index + 1 == total:
+                again = False
+            else:
+                # replace -V-0.xml -> -V-1.xml and so on
+                pos = url.rfind("-V-")
+                if pos == -1:
+                    again = False
+                else:
+                    base = url[:pos]
+                    url = "{0}-V-{1}.xml".format(base, index + 1)
 
 
 class Episode(Base.Base):
@@ -151,7 +183,7 @@ class Episode(Base.Base):
 
         self.h264 = h264
         self.ts = ts
-        self.mms = Utils.getMMSUrl(grabber, mms)
+        self.mms = mms
 
         self.filename = Utils.makeFilename(self.title)
 
