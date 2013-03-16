@@ -3,6 +3,7 @@
 import datetime
 import os
 import libmimms.core
+import urllib.request
 
 from asi import Utils
 
@@ -36,8 +37,11 @@ class Base(object):
 
 
     def getTabletPlaylist(self):
-        if self.m3 == None and self.ts:
-            self.m3 = Utils.load_m3u8_from_url(self.grabber, self.ts)
+        try:
+            if self.m3 == None and self.ts:
+                self.m3 = Utils.load_m3u8_from_url(self.grabber, self.ts)
+        except urllib.error.HTTPError:
+            pass
 
         return self.m3
 
