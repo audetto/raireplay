@@ -50,18 +50,17 @@ def downloadFile(grabber, progress, url, localName):
         if "content-length" in headers:
             size = int(headers["Content-Length"])
 
-        blockNum = 0
         if progress:
-            progress(blockNum, blockSize, size)
+            progress.start(size)
 
         while 1:
             buf = response.read(blockSize)
             if not buf:
                 break
+            amountRead = len(buf)
             f.write(buf)
-            blockNum = blockNum + 1
             if progress:
-                progress(blockNum, blockSize, size)
+                progress.update(amountRead)
 
         if progress:
             progress.done()
@@ -185,10 +184,10 @@ def downloadM3U8(grabber, folder, m3, options, pid, filename, remux):
                         b = s.read()
                         size = len(b)
                         if progress:
-                            progress(0, size, size)
+                            progress.start(size)
                         out.write(b)
                         if progress:
-                            progress(1, size, size)
+                            progress.update(size)
 
             if progress:
                 progress.done()

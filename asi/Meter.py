@@ -82,19 +82,20 @@ class ReportHook():
         self.reset()
 
 
-    def __call__(self, blockCount, blockSize, totalSize):
-        if blockCount == 0:
-            if not self.startTime:
-                self.startTime = time.time()
-            self.totalSizeSoFar = self.totalSizeSoFar + totalSize
-            self.filesRead      = self.filesRead + 1
-            self.estimatedSize  = self.totalSizeSoFar / self.filesRead * self.numberOfFiles
-            return
+    def start(self, totalSize):
+        if not self.startTime:
+            self.startTime = time.time()
+        self.totalSizeSoFar = self.totalSizeSoFar + totalSize
+        self.filesRead      = self.filesRead + 1
+        self.estimatedSize  = self.totalSizeSoFar / self.filesRead * self.numberOfFiles
+        return
 
+
+    def update(self, amountRead):
         currentTime = time.time()
         elapsedTime = currentTime - self.startTime
 
-        self.readSoFar = self.readSoFar + blockSize
+        self.readSoFar = self.readSoFar + amountRead
 
         speed = self.readSoFar / elapsedTime
 
@@ -102,17 +103,16 @@ class ReportHook():
 
         nameWidth = terminalWidth - 32
 
-        output = "\r{0:{nameWidth}}: {1:>6}B {2:>6}B/s".format(self.name[:nameWidth], format_number(self.readSoFar), format_number(speed), nameWidth = nameWidth)
-        print(output, end = "")
+        status = "{0:{nameWidth}}: {1:>6}B {2:>6}B/s".format(self.name[:nameWidth], format_number(self.readSoFar), format_number(speed), nameWidth = nameWidth)
 
         if self.estimatedSize > 0:
             self.readSoFar = min(self.estimatedSize, self.readSoFar)
             pct = self.readSoFar / self.estimatedSize
             timeToGo = elapsedTime * (1 - pct) / pct
             output = " {0:4.0%} {1:>6}".format(pct, format_time(timeToGo))
-            print(output, end = "")
+            status = status + output
 
-        print("\r", end = "")
+        print("\r", status, end = "")
 
 
     def done(self):
