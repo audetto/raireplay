@@ -59,7 +59,8 @@ class Elem(Base.Base):
 
 
     def follow(self, db, downType):
-        p = Item.Demand(self.grabber, self.url, downType, self.pid)
+        pid = Utils.getNewPID(db, self.pid)
+        p = Item.Demand(self.grabber, self.url, downType, pid)
         Utils.addToDB(db, p)
 
 

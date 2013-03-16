@@ -153,5 +153,6 @@ class Program(Base.Base):
 
 
     def follow(self, db, downType):
+        pid = Utils.getNewPID(db, self.pid)
         p = Item.Demand(self.grabber, self.link, downType, self.pid)
         Utils.addToDB(db, p)
