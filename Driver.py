@@ -128,18 +128,13 @@ def process(args):
         follows = args.follow
         while follows:
             subset = {}
-            p = find(db, follows[0], args.re, subset)
-            if len(subset) == 1:
-                # continue follow calculation
-                db = {}
-                p = next(iter(subset.values()))
+            find(db, follows[0], args.re, subset)
+            # continue follow calculation
+            db = {}
+            for p in subset.values():
                 p.follow(db, args.download)
-                follows = follows[1:] # continue with one element less
-            else:
-                print("Too many/few ({0}) items selected during while processing follow '{1}'".format(len(subset), follows[0]))
-                # replace the db with the subset and display it
-                db = subset
-                break
+            follows = follows[1:] # continue with one element less
+
 
     if args.replay:
         Replay.download(db, grabber, args.download)
