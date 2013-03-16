@@ -31,13 +31,13 @@ def parseItem(grabber, prog, name, db):
     wat      = prog["watId"]
     category = prog["videoCategory"]
 
-    minutes  = duration / 60
+    length = datetime.timedelta(seconds = duration)
     date = datetime.datetime.strptime(pubDate, "%Y-%m-%d %H:%M:%S")
 
     # ignore the countless "extract", "bonus", "short" which last just a few minutes
     if category == "fullvideo":
         pid = Utils.getNewPID(db, pid)
-        p = Program(grabber, date, minutes, pid, name, desc, wat, category)
+        p = Program(grabber, date, length, pid, name, desc, wat, category)
         Utils.addToDB(db, p)
 
 
@@ -117,7 +117,7 @@ def download(db, grabber, downType):
 
 
 class Program(Base.Base):
-    def __init__(self, grabber, datetime, minutes, pid, title, desc, wat, category):
+    def __init__(self, grabber, datetime, length, pid, title, desc, wat, category):
         super(Program, self).__init__()
 
         self.pid = pid
@@ -128,7 +128,7 @@ class Program(Base.Base):
         self.datetime = datetime
         self.category = category
 
-        self.minutes = minutes
+        self.length = length
         self.grabber = grabber
         self.ts = getWatLink(self.wat)
 
@@ -143,7 +143,7 @@ class Program(Base.Base):
         print("Title:", self.title)
         print("Description:", self.description)
         print("Date:", self.datetime.strftime("%Y-%m-%d %H:%M"))
-        print("Length:", self.minutes, "minutes")
+        print("Length:", self.length)
         print("Filename:", self.filename)
         print("Category:", self.category)
         print()

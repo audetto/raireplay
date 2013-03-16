@@ -24,8 +24,10 @@ def parseItem(grabber, prog, db):
     name    = prog["titre"]
     minutes = prog["duree"]
 
+    length = datetime.timedelta(minutes = int(minutes))
+
     pid = Utils.getNewPID(db, pid)
-    p = Program(grabber, channel, date, hour, pid, minutes, name, desc, url)
+    p = Program(grabber, channel, date, hour, pid, length, name, desc, url)
     Utils.addToDB(db, p)
 
 
@@ -57,7 +59,7 @@ def download(db, grabber, downType):
                 process(grabber, decoder(f), db)
 
 class Program(Base.Base):
-    def __init__(self, grabber, channel, date, hour, pid, minutes, title, desc, url):
+    def __init__(self, grabber, channel, date, hour, pid, length, title, desc, url):
         super(Program, self).__init__()
 
         self.pid = pid
@@ -68,7 +70,7 @@ class Program(Base.Base):
         self.ts = url
 
         self.grabber = grabber
-        self.minutes = minutes
+        self.length = length
 
         name = Utils.makeFilename(self.title)
         self.filename = self.pid + "-" + name
@@ -81,7 +83,7 @@ class Program(Base.Base):
         print("Title:", self.title)
         print("Description:", self.description)
         print("Date:", self.datetime.strftime("%Y-%m-%d %H:%M"))
-        print("Length:", self.minutes, "minutes")
+        print("Length:", self.length)
         print("Filename:", self.filename)
         print()
         print("url:", self.ts)

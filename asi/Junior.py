@@ -17,13 +17,13 @@ def processEpisode(grabber, e, db):
     date  = e.attrib.get("createDate")
     url   = e.attrib.get("uniquename")
     units = e.find("units")
-    minutes = None
+    length = None
     description = None
 
     for u in units.findall("textUnit"):
         typ = u.attrib.get("type")
         if typ == "Durata":
-            minutes = u.find("text").text
+            length = u.find("text").text
         elif typ == "Testo breve":
             description = u.find("text").text
             if description:
@@ -48,7 +48,7 @@ def processEpisode(grabber, e, db):
             h264 = value
 
     pid = Utils.getNewPID(db, None)
-    item = Episode(pid, grabber, title, description, date, minutes, url, h264, ts, mms)
+    item = Episode(pid, grabber, title, description, date, length, url, h264, ts, mms)
     Utils.addToDB(db, item)
 
 
@@ -174,7 +174,7 @@ class Item(Base.Base):
 
 
 class Episode(Base.Base):
-    def __init__(self, pid, grabber, title, description, date, minutes, url, h264, ts, mms):
+    def __init__(self, pid, grabber, title, description, date, length, url, h264, ts, mms):
         super(Episode, self).__init__()
 
         self.pid = pid
@@ -184,7 +184,7 @@ class Episode(Base.Base):
         self.description = description
         self.url = url
         self.datetime = datetime.datetime.strptime(date, "%d-%m-%Y")
-        self.minutes = minutes
+        self.length = length
 
         self.h264 = h264
         self.ts = ts
@@ -200,7 +200,7 @@ class Episode(Base.Base):
         print("Description:", self.description)
         print("Filename:", self.filename)
         print("Date:", self.datetime.strftime("%Y-%m-%d %H:%M"))
-        print("Length:", self.minutes, "minutes")
+        print("Length:", self.length)
         print()
         print("URL:", self.url)
         print("h264:", self.h264)

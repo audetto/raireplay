@@ -49,9 +49,10 @@ def parseItem(grabber, channel, date, time, value, db):
     desc = value["d"]
     secs = value["l"]
 
-    minutes = 0
+    length = None
+
     if secs != "":
-        minutes = int(secs) / 60
+        length = datetime.timedelta(seconds = int(secs))
 
     h264 = value["h264"]
     tablet = value["urlTablet"]
@@ -60,7 +61,7 @@ def parseItem(grabber, channel, date, time, value, db):
 
     if h264 != "" or tablet != "" or smartPhone != "" :
         pid = Utils.getNewPID(db, pid)
-        p = Program(grabber, channels[channel], date, time, pid, minutes, name, desc, h264, tablet, smartPhone)
+        p = Program(grabber, channels[channel], date, time, pid, length, name, desc, h264, tablet, smartPhone)
         Utils.addToDB(db, p)
 
 
@@ -103,7 +104,7 @@ def download(db, grabber, downType):
 
 
 class Program(Base.Base):
-    def __init__(self, grabber, channel, date, hour, pid, minutes, title, desc, h264, tablet, smartPhone):
+    def __init__(self, grabber, channel, date, hour, pid, length, title, desc, h264, tablet, smartPhone):
         super(Program, self).__init__()
 
         self.pid = pid
@@ -115,7 +116,7 @@ class Program(Base.Base):
         self.datetime = datetime.datetime.strptime(date + " " + hour, "%Y-%m-%d %H:%M")
 
         self.grabber = grabber
-        self.minutes = minutes
+        self.length = length
 
         self.filename = self.getFilename()
 
@@ -126,7 +127,7 @@ class Program(Base.Base):
         print("Title:", self.title)
         print("Description:", self.description)
         print("Date:", self.datetime.strftime("%Y-%m-%d %H:%M"))
-        print("Length:", self.minutes, "minutes")
+        print("Length:", self.length)
         print("Filename:", self.filename)
         print()
         print("h264:", self.h264)
