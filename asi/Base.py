@@ -28,12 +28,12 @@ class Base(object):
 
     def short(self, fmt):
         if self.datetime != None:
-            ts = self.datetime.strftime("%Y-%m-%d %H:%M")
+            ts = Utils.strDate(self.datetime)
         else:
             ts = None
 
-        str = fmt.format(self.pid, ts, self.title)
-        return str
+        str1 = fmt.format(self.pid, ts, self.title)
+        return str1
 
 
     def getTabletPlaylist(self):

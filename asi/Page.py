@@ -48,7 +48,7 @@ class Elem(Base.Base):
         print("PID:", self.pid)
         print("Title:", self.title)
         print("Description:", self.description)
-        print("Date:", self.datetime.strftime("%Y-%m-%d %H:%M"))
+        print("Date:", Utils.strDate(self.datetime))
         print("Length:", self.length)
         print("Filename:", self.filename)
         print()

@@ -141,7 +141,7 @@ class Program(Base.Base):
         print("Channel:", self.channel)
         print("Title:", self.title)
         print("Description:", self.description)
-        print("Date:", self.datetime.strftime("%Y-%m-%d %H:%M"))
+        print("Date:", Utils.strDate(self.datetime))
         print("Filename:", self.filename)
         print("Link:", self.link)
         print()

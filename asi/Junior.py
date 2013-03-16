@@ -199,7 +199,7 @@ class Episode(Base.Base):
         print("Title:", self.title)
         print("Description:", self.description)
         print("Filename:", self.filename)
-        print("Date:", self.datetime.strftime("%Y-%m-%d %H:%M"))
+        print("Date:", Utils.strDate(self.datetime))
         print("Length:", self.length)
         print()
         print("URL:", self.url)

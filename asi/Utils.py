@@ -364,6 +364,11 @@ def getStringFromUrl(grabber, url):
         return content
 
 
+def strDate(date):
+    s = date.strftime("%Y-%m-%d %H:%M")
+    return s
+
+
 def getMMSUrl(grabber, url):
     mms = None
 
