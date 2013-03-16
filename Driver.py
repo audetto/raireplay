@@ -10,6 +10,7 @@ from asi import Demand
 from asi import Config
 from asi import Pluzz
 from asi import TF1
+from asi import Console
 
 import re
 import datetime
@@ -18,7 +19,7 @@ import urllib
 
 def displayOrGet(item, nolist, info, get, options):
     if info:
-        width = Utils.terminal_width()
+        width = Console.terminal_width()
         item.display(width)
     elif not nolist:
         # this is list
@@ -107,7 +108,7 @@ def process(args):
     urllib.request.install_opener(grabber)
 
     if args.ip:
-        width = Utils.terminal_width()
+        width = Console.terminal_width()
         Info.display(grabber, width)
         return
 
