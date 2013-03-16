@@ -230,7 +230,7 @@ def downloadH264(grabber, folder, url, options, pid, filename):
         progress = getProgress()
         downloadFile(grabber, progress, url, localFilename)
 
-        if os.path.getsize(localFilename) == len(invalidMP4):
+        if os.path.getsize(localFilename) == len(RAIUrls.invalidMP4):
             raise Exception("{0} only available in Italy".format(url))
 
         print()
