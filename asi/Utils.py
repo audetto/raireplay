@@ -11,6 +11,7 @@ import shutil
 import io
 import time
 import configparser
+import socket
 
 from xml.etree import ElementTree
 
@@ -262,16 +263,19 @@ def setTorExitNodes(country, password):
     tn.close()
 
 def getTorExitNodes(password):
-    tn = telnetlib.Telnet("127.0.0.1", 9051)
-    if not password:
-        password = ""
-    tn.write('AUTHENTICATE "{0}"\n'.format(password).encode("ascii"))
-    tn.read_until(b'\n')
-    tn.write("GETCONF ExitNodes\n".encode("ascii"))
-    res = tn.read_until(b'\n')
-    tn.write("QUIT\n".encode("ascii"))
-    tn.close()
-    return res
+    try:
+        tn = telnetlib.Telnet("127.0.0.1", 9051)
+        if not password:
+            password = ""
+        tn.write('AUTHENTICATE "{0}"\n'.format(password).encode("ascii"))
+        tn.read_until(b'\n')
+        tn.write("GETCONF ExitNodes\n".encode("ascii"))
+        res = tn.read_until(b'\n')
+        tn.write("QUIT\n".encode("ascii"))
+        tn.close()
+        return res
+    except socket.error:
+        return None
 
 
 def makeFilename(input):

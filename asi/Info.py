@@ -9,11 +9,11 @@ userLocation = "http://mediapolis.rai.it/relinker/relinkerServlet.htm?cont=82681
 # this one is from TF1
 userIP = "http://api.prod.capptain.com/ip-to-country"
 
-def display(grabber, width):
+def display(grabber, width, password):
 
     rai = Utils.getStringFromUrl(grabber, userLocation)
     ip = Utils.getStringFromUrl(grabber, userIP)
-    tor = Utils.getTorExitNodes(None)
+    tor = Utils.getTorExitNodes(password)
 
     print("=" * width)
 

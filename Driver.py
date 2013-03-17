@@ -109,7 +109,7 @@ def process(args):
 
     if args.ip:
         width = Console.terminal_width()
-        Info.display(grabber, width)
+        Info.display(grabber, width, args.tor)
         return
 
     if args.page:
