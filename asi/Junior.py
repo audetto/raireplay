@@ -73,7 +73,7 @@ def processBlock(grabber, progress, folder, f, db, downType):
     categoria = root.findall('categoria')
     for e in categoria:
         video = e.find("video")
-        if video != None:
+        if video is not None:
             name = e.find("label").text
             name = h.unescape(name)
             path = video.text

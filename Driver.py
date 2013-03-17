@@ -92,12 +92,12 @@ def process(args):
     if args.location:
         Config.programFolder = Config.createFolder(args.location)
 
-    if args.tor != None:
+    if args.tor:
         # we use privoxy to access tor
         Utils.setTorExitNodes(args.tor, args.tor_pass)
         proxy = { "http" : "http://127.0.0.1:8118" }
     else:
-        if args.proxy != None:
+        if args.proxy:
             proxy = { "http" : args.proxy }
 
     proxyHandler = urllib.request.ProxyHandler(proxy)
@@ -112,7 +112,7 @@ def process(args):
         Info.display(grabber, width)
         return
 
-    if args.page != None:
+    if args.page:
         Page.download(db, grabber, args.page, args.download)
 
     if args.ondemand:
@@ -124,7 +124,7 @@ def process(args):
     if args.junior:
         Junior.download(db, grabber, args.download)
 
-    if args.follow != None:
+    if args.follow:
         follows = args.follow
         while follows:
             subset = {}
@@ -145,7 +145,7 @@ def process(args):
     if args.tf1:
         TF1.download(db, grabber, args.download)
 
-    if args.item != None:
+    if args.item:
         p = Item.Demand(grabber, args.item, args.download, len(db))
         db[p.pid] = p
 

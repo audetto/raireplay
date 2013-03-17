@@ -47,43 +47,43 @@ class VideoHTMLParser(HTMLParser):
     def handle_starttag(self, tag, attrs):
         if tag == "meta":
             val = self.extract(attrs, "videourl")
-            if val != None:
+            if val:
                 self.values.videoUrl = val
 
             val = self.extract(attrs, "videourl_mp4")
-            if val != None:
+            if val:
                 self.values.videoUrlMP4 = val
 
             val = self.extract(attrs, "videourl_h264")
-            if val != None:
+            if val:
                 self.values.videoUrlH264 = val
 
             val = self.extract(attrs, "videourl_m3u8")
-            if val != None:
+            if val:
                 self.values.videoUrlM3U8 = val
 
             val = self.extract(attrs, "title")
-            if val != None:
+            if val:
                 self.values.title = val
 
             val = self.extract(attrs, "programmaTV")
-            if val != None:
+            if val:
                 self.values.program = val
 
             val = self.extract(attrs, "description")
-            if val != None:
+            if val:
                 self.values.description = val
 
             val = self.extract(attrs, "tipo")
-            if val != None:
+            if val:
                 self.values.type = val
 
             val = self.extract(attrs, "itemDate")
-            if val != None and val:
+            if val:
                 self.values.date = val
 
             val = self.extract(attrs, "idPageProgramma")
-            if val != None:
+            if val:
                 self.values.page = RAIUrls.base + RAIUrls.getWebFromID(val)
 
         elif tag == "param":
@@ -131,18 +131,18 @@ class Demand(Base.Base):
         self.ts = self.values.videoUrlM3U8
         self.h264 = self.values.videoUrlH264
 
-        if self.values.date != None:
+        if self.values.date:
             self.datetime = datetime.datetime.strptime(self.values.date, "%d/%m/%Y")
 
         self.mms = None
 
-        if self.values.type != None and self.values.type != "Video":
+        if self.values.type and self.values.type != "Video":
             # this is a case of a Photogallery
             self.url = None
             self.filename = None
             return
 
-        if self.values.videoUrl == None:
+        if not self.values.videoUrl:
             self.values.videoUrl = self.values.videoPath
 
         #sometimes we get .mp4 which does not work

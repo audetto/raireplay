@@ -29,7 +29,7 @@ def processSet(grabber, title, time, f, db):
     o = json.load(f)
 
     prog = o.get("integrale")
-    if prog != None:
+    if prog:
         link          = prog["weblink"]
         h264          = prog["h264"]
         m3u8          = prog["m3u8"]
@@ -52,7 +52,7 @@ def processSet(grabber, title, time, f, db):
         # get the list
         lst = o.get("list")
 
-        if lst == None:
+        if not lst:
             return
 
         for prg in lst:
@@ -85,7 +85,7 @@ def processGroup(grabber, progress, downType, prog, db):
 
     edizioni = prog.get("edizioni")
     dettaglio = prog.get("dettaglio")
-    if edizioni != None:
+    if edizioni:
         for time, url in edizioni.items():
             title = name + " " + time
             processItem(grabber, progress, downType, title, time, url, db)

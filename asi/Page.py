@@ -37,7 +37,7 @@ class Elem(Base.Base):
         self.id            = data.findtext("localid")
         self.length        = data.findtext("durata")
         web =  data.findtext("web")
-        if web == None:
+        if not web:
             web = RAIUrls.getWebFromID(self.id)
         self.url           = RAIUrls.base + web
 

@@ -27,7 +27,7 @@ class Base(object):
 
 
     def short(self, fmt):
-        if self.datetime != None:
+        if self.datetime:
             ts = Utils.strDate(self.datetime)
         else:
             ts = None
@@ -38,7 +38,7 @@ class Base(object):
 
     def getTabletPlaylist(self):
         try:
-            if self.m3 == None and self.ts:
+            if (not self.m3) and self.ts:
                 self.m3 = Utils.load_m3u8_from_url(self.grabber, self.ts)
         except urllib.error.HTTPError:
             pass
@@ -58,14 +58,14 @@ class Base(object):
             self.downloadTablet(folder, options, True)
         elif options.format == "mms":
             self.downloadMMS(folder, options)
-        elif options.format == None:
-            if self.h264 != None:
+        elif not options.format:
+            if self.h264:
                 self.downloadH264(folder, options)
             else:
                 m3 = self.getTabletPlaylist()
-                if m3 != None:
+                if m3:
                     self.downloadTablet(folder, options, True)
-                elif self.mms != None:
+                elif self.mms:
                     self.downloadMMS(folder, options)
 
 

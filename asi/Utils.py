@@ -83,7 +83,7 @@ def download(grabber, progress, url, localName, downType, encoding, checkTime = 
 
     if downType == "shm":
         f = grabber.open(request)
-        if encoding != None:
+        if encoding:
             decoder = codecs.getreader(encoding)
             f = decoder(f)
         else:
@@ -107,7 +107,7 @@ def download(grabber, progress, url, localName, downType, encoding, checkTime = 
             downloadFile(grabber, progress, url, localName)
 
         # now the file exists on the local filesystem
-        if encoding == None:
+        if not encoding:
             f = open(localName, "rb")
         else:
             f = codecs.open(localName, "r", encoding = encoding)
@@ -144,7 +144,7 @@ def remuxToMP4(inFile, outFile):
 
 
 def downloadM3U8(grabber, folder, m3, options, pid, filename, remux):
-    if m3 != None and m3.is_variant:
+    if m3 and m3.is_variant:
         if remux:
             ext = ".mp4"
         else:
@@ -254,7 +254,7 @@ def load_m3u8_from_url(grabber, uri):
 
 def setTorExitNodes(country, password):
     tn = telnetlib.Telnet("127.0.0.1", 9051)
-    if password == None:
+    if not password:
         password = ""
     tn.write('AUTHENTICATE "{0}"\n'.format(password).encode("ascii"))
     tn.write("SETCONF ExitNodes={{{0}}}\n".format(country).encode("ascii"))
@@ -263,7 +263,7 @@ def setTorExitNodes(country, password):
 
 def getTorExitNodes(password):
     tn = telnetlib.Telnet("127.0.0.1", 9051)
-    if password == None:
+    if not password:
         password = ""
     tn.write('AUTHENTICATE "{0}"\n'.format(password).encode("ascii"))
     tn.read_until(b'\n')
@@ -284,14 +284,14 @@ def makeFilename(input):
 
 
 def getResolution(p):
-    if p.stream_info.resolution == None:
+    if not p.stream_info.resolution:
         return None
     res = "{0:>4}x{1:>4}".format(p.stream_info.resolution[0], p.stream_info.resolution[1])
     return res
 
 
 def displayM3U8(m3):
-    if m3 != None and m3.is_variant:
+    if m3 and m3.is_variant:
         print()
         for playlist in m3.playlists:
             format = "\tProgram: {0:>2}, Bandwidth: {1:>10}, Resolution: {2:>10}, Codecs: {3}"
@@ -314,8 +314,9 @@ def getProgress(numberOfFiles = 1, filename = None):
 
 
 def getNewPID(db, pid):
-    if pid == None:
-        pid = len(db)
+    # 0 is not a valid pid
+    if not pid:
+        pid = len(db) + 1
 
         # we only enforce uniqueness
         # if there is no real PID
@@ -328,7 +329,7 @@ def getNewPID(db, pid):
 
 
 def addToDB(db, prog):
-    if prog == None:
+    if not prog:
         return
 
     pid = prog.pid
@@ -369,7 +370,7 @@ def getMMSUrl(grabber, url):
             if root.tag == "ASX":
                 asf = root.find("ENTRY").find("REF").attrib.get("HREF")
 
-                if asf != None:
+                if asf:
                     # use urlgrab to make it work with ConfigParser
                     content = getStringFromUrl(grabber, asf)
                     config = configparser.ConfigParser()
