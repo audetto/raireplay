@@ -101,7 +101,7 @@ class ReportHook():
 
         terminalWidth = Console.terminal_width()
 
-        nameWidth = terminalWidth - 32
+        nameWidth = terminalWidth - 33
 
         status = "{0:{nameWidth}}: {1:>6}B {2:>6}B/s".format(self.name[:nameWidth], format_number(self.readSoFar), format_number(speed), nameWidth = nameWidth)
 
