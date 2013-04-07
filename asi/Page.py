@@ -75,7 +75,9 @@ def download(db, grabber, url, downType):
     f = Utils.download(grabber, None, dataUrl, localFilename, downType, "utf-8")
 
     # ElementTree does not like unicode, it prefers byte strings
-    root = ElementTree.fromstring(f.read().strip().encode("utf-8"))
+    s = f.read().strip()
+    s = Utils.removeInvalidXMLCharacters(s)
+    root = ElementTree.fromstring(s)
 
     for child in root.findall("content"):
         pid = Utils.getNewPID(db, None)

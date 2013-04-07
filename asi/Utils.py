@@ -12,6 +12,7 @@ import io
 import time
 import configparser
 import socket
+import re
 
 from xml.etree import ElementTree
 
@@ -241,6 +242,15 @@ def downloadH264(grabber, folder, url, options, pid, filename):
         raise
 
 
+# sometimes RAI sends invalid XML
+# we get "reference to invalid character number"
+def removeInvalidXMLCharacters(s):
+    s = s.replace("&#0", "xx")
+    s = s.replace("&#1", "xx")
+    s = s.replace("&#22", "xx")
+    return s
+
+
 def removeAccents(input_str):
     nkfd_form = unicodedata.normalize('NFKD', input_str)
     result = "".join([c for c in nkfd_form if not unicodedata.combining(c)])
@@ -280,10 +290,11 @@ def getTorExitNodes(password):
 
 def makeFilename(input):
     translateTo = "_"
-    charactersToRemove = " /:^,|"
+    charactersToRemove = " /:^,|'"
     translateTable = dict((ord(char), translateTo) for char in charactersToRemove)
     name = input.translate(translateTable)
     name = removeAccents(name)
+    name = re.sub("_+", "_", name)
     return name
 
 
