@@ -28,6 +28,7 @@ def main():
     parser.add_argument("--ondemand", action = "store_true", default = False, help = "RAI On Demand List")
     parser.add_argument("--tg", action = "store_true", default = False, help = "Telegiornali RAI")
     parser.add_argument("--junior", action = "store_true", default = False, help = "RAI Junior")
+    parser.add_argument("--search", action = "store", help = "Search RAI TV")
 
     parser.add_argument("--pluzz", action = "store_true", default = False, help = "Pluzz France Television")
     parser.add_argument("--tf1", action = "store_true", default = False, help = "MY TF1")

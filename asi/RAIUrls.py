@@ -1,3 +1,5 @@
+import urllib.parse
+
 onDemand     = "http://www.rai.tv/dl/RaiTV/programmi/ricerca/ContentSet-6445de64-d321-476c-a890-ae4ed32c729e-darivedere.html"
 replay       = "http://www.rai.it/dl/portale/html/palinsesti/replaytv/static"
 info         = "http://www.rai.tv/dl/RaiTV/iphone/assets/tg_json.js?NS=0-1-4c61b46e9a4ab09b25da2246ae52d31edb528475-5.1.1"
@@ -30,4 +32,16 @@ def getJuniorPage(pid):
 
 def getJuniorBlock(pid):
     http = "http://www.junior.rai.it{0}".format(pid)
+    return http
+
+
+def getSearchUrl(name, num = 10):
+    # at the end omitted here
+    # &NS=0-1-4c61b46e9a4ab09b25da2246ae52d31edb528475-5.1.1
+    # alternative from firefox:
+    # http://www.rai.tv/ricerca/search?q=crozza&sort=date:D:L:d1&filter=0&getfields=*&site=raitv&start=0
+
+    quoted = urllib.parse.quote(name)
+
+    http = "http://www.ricerca.rai.it/search?site=raitv&output=xml_no_dtd&proxystylesheet=json&client=json&sort=date:D:S:d1&filter=0&getfields=*&partialfields=videourl_mp4:http&num={1}&q={0}".format(quoted, num)
     return http
