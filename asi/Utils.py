@@ -121,10 +121,15 @@ def findPlaylist(m3, bandwidth):
     if len(m3.playlists) == 1:
         return m3.playlists[0]
 
-    b1 = int(bandwidth)
+    if bandwidth == "high":
+        b1 = sys.maxsize
+    elif bandwidth == "low":
+        b1 = 0
+    else:
+        b1 = int(bandwidth)
 
     opt = None
-    dist = sys.maxsize
+    dist = float('inf')
 
     for p in m3.playlists:
         b2 = int(p.stream_info.bandwidth)
