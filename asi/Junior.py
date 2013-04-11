@@ -103,15 +103,17 @@ def process(grabber, progress, folder, f, db, downType):
     for e in root:
         if e.tag == "elemento":
             titolo     = e.find("titolo").text
-            uniqueName = e.find("uniqueName").text
-            if uniqueName:
-                url = RAIUrls.getJuniorPage(uniqueName)
-                name = Utils.httpFilename(url)
+            uniqueNameNode = e.find("uniqueName")
+            if uniqueNameNode is not None:
+                uniqueName = uniqueNameNode.text
+                if uniqueName:
+                    url = RAIUrls.getJuniorPage(uniqueName)
+                    name = Utils.httpFilename(url)
 
-                localFilename = os.path.join(folder, name)
+                    localFilename = os.path.join(folder, name)
 
-                g = Utils.download(grabber, progress, url, localFilename, downType, None, True)
-                processPage(grabber, progress, folder, g, db, downType)
+                    g = Utils.download(grabber, progress, url, localFilename, downType, None, True)
+                    processPage(grabber, progress, folder, g, db, downType)
 
 
 def download(db, grabber, downType):
