@@ -6,7 +6,9 @@ def createFolder(name):
         os.makedirs(name)
     return name
 
-rootFolder    = createFolder(os.path.expanduser("~/.raireplay"))
+homeFolder    = os.path.expanduser("~")
+
+rootFolder    = createFolder(os.path.join(homeFolder, ".raireplay"))
 dataFolder    = createFolder(os.path.join(rootFolder, "data"))
 
 replayFolder  = createFolder(os.path.join(dataFolder, "replay"))
