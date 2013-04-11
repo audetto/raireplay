@@ -97,7 +97,10 @@ class ReportHook():
 
         self.readSoFar = self.readSoFar + amountRead
 
-        speed = self.readSoFar / elapsedTime
+        if elapsedTime > 0:
+            speed = self.readSoFar / elapsedTime
+        else:
+            speed = float("inf")
 
         terminalWidth = Console.terminal_width()
 
