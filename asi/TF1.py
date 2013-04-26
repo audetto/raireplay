@@ -18,7 +18,7 @@ def getDataUrl(progId, item):
 
 
 def getWatLink(watId):
-    url = "http://www.wat.tv//get/iphone/{0}.m3u8?bwmin=100000&bwmax=490000".format(watId)
+    url = "http://www.wat.tv/get/iphone/{0}.m3u8?bwmin=100000&bwmax=490000".format(watId)
     return url
 
 
