@@ -265,7 +265,10 @@ def removeAccents(input_str):
 def load_m3u8_from_url(grabber, uri):
     # here we need the global opener to be installed
     # as it is used internally by m3u8
-    return m3u8.load(uri)
+    request = urllib.request.Request(uri, headers = httpHeaders)
+    stream = grabber.open(request)
+
+    return m3u8.load(uri, stream)
 
 
 def setTorExitNodes(country, password):
