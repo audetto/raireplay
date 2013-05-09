@@ -58,7 +58,7 @@ def main():
 # and it seems that redirecting the output (e.g. "| less") requires am explicit encoding
 # done here
 if not sys.stdout.encoding:
-    sys.stdout = codecs.getwriter("utf-8")(sys.stdout, "ignore")
+    sys.stdout = codecs.getwriter("utf-8")(sys.stdout.detach(), "ignore")
 
 if __name__ == '__main__':
     main()
