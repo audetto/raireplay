@@ -2,7 +2,6 @@
 
 import datetime
 import os
-import libmimms.core
 import urllib.request
 
 from asi import Utils
@@ -79,6 +78,8 @@ class Base(object):
 
 
     def downloadMMS(self, folder, options):
+        import libmimms.core
+
         mms = Utils.getMMSUrl(self.grabber, self.mms)
 
         localFilename = os.path.join(folder, self.filename + ".wmv")
