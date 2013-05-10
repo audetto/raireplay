@@ -1,8 +1,7 @@
 #! /usr/bin/python
 
-
-
 import sys
+import platform
 import codecs
 import argparse
 
@@ -52,13 +51,19 @@ def main():
 
     print()
 
-# is this required??? seems a bit of pythonic nonsense
-# all RAI html is encoded in "utf-8" (decoded as we read)
-#
-# and it seems that redirecting the output (e.g. "| less") requires am explicit encoding
-# done here
-if not sys.stdout.encoding:
-    sys.stdout = codecs.getwriter("utf-8")(sys.stdout.detach(), "ignore")
+if platform.system() == "Windows":
+    # in windows there are issues when printing utf-8 to the console
+    # it does not work out of the box
+    # no clear solution comes out of google
+    # this "choice" seems to work
+    sys.stdout = codecs.getwriter("cp850")(sys.stdout.buffer, "ignore")
+elif not sys.stdout.encoding:
+    # is this required??? seems a bit of pythonic nonsense
+    # all RAI html is encoded in "utf-8" (decoded as we read)
+    #
+    # and it seems that redirecting the output (e.g. "| less") requires am explicit encoding
+    # done here
+    sys.stdout = codecs.getwriter("utf-8")(sys.stdout.buffer, "ignore")
 
 if __name__ == '__main__':
     main()
