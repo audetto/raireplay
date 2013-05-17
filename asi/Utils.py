@@ -7,9 +7,7 @@ import datetime
 import unicodedata
 import telnetlib
 import subprocess
-import shutil
 import io
-import time
 import configparser
 import socket
 import re
@@ -296,11 +294,11 @@ def getTorExitNodes(password):
         return None
 
 
-def makeFilename(input):
+def makeFilename(value):
     translateTo = "_"
     charactersToRemove = " /:^,|'"
     translateTable = dict((ord(char), translateTo) for char in charactersToRemove)
-    name = input.translate(translateTable)
+    name = value.translate(translateTable)
     name = removeAccents(name)
     name = re.sub("_+", "_", name)
     return name
@@ -317,9 +315,9 @@ def displayM3U8(m3):
     if m3 and m3.is_variant:
         print()
         for playlist in m3.playlists:
-            format = "\tProgram: {0:>2}, Bandwidth: {1:>10}, Resolution: {2:>10}, Codecs: {3}"
+            fmt = "\tProgram: {0:>2}, Bandwidth: {1:>10}, Resolution: {2:>10}, Codecs: {3}"
 
-            line = format.format(playlist.stream_info.program_id, playlist.stream_info.bandwidth,
+            line = fmt.format(playlist.stream_info.program_id, playlist.stream_info.bandwidth,
                                  getResolution(playlist), playlist.stream_info.codecs)
             print(line)
         print()

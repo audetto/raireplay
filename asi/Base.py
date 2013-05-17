@@ -1,8 +1,5 @@
-
-
-import datetime
 import os
-import urllib.request
+import urllib
 
 from asi import Utils
 
