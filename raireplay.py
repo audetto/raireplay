@@ -14,12 +14,12 @@ def main():
     parser.add_argument("--download", action = "store", default = "update", choices = ["always", "update", "never", "shm"],
                         help = "Default is update")
     parser.add_argument("--format", action = "store", choices = ["h264", "ts", "tsmp4", "mms"])
-    parser.add_argument("--bwidth", action = "store")
+    parser.add_argument("--bwidth", action = "store", default = "high")
     parser.add_argument("--ip", action = "store_true", default = False)
-    parser.add_argument("--tor", action = "store")
+    parser.add_argument("--tor", action = "store", help = "coutry code for tor exit nodes")
     parser.add_argument("--tor-pass", action = "store")
     parser.add_argument("--proxy", action = "store")
-    parser.add_argument("--overwrite", action = "store_true", default = False)
+    parser.add_argument("--overwrite", action = "store_true", default = False, help = "overwrite program")
     parser.add_argument("--location", action = "store", help = "path where to download programs")
 
     parser.add_argument("--page",   action = "store", help = "RAI On Demand Page")
@@ -37,9 +37,9 @@ def main():
     parser.add_argument("--follow", action = "append")
 
     parser.add_argument("--nolist", action = "store_true", default = False)
-    parser.add_argument("--get", action = "store_true", default = False)
-    parser.add_argument("--info", action = "store_true", default = False)
-    parser.add_argument("--re", action = "store_true", default = False)
+    parser.add_argument("--get", action = "store_true", default = False, help = "download program")
+    parser.add_argument("--info", action = "store_true", default = False, help = "print IP info")
+    parser.add_argument("--re", action = "store_true", default = False, help = "filters are RegExp")
 
     parser.add_argument("pid", nargs = "*")
 
