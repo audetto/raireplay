@@ -11,6 +11,7 @@ from asi import Demand
 from asi import Config
 from asi import Pluzz
 from asi import TF1
+from asi import Mediaset
 from asi import Console
 
 import re
@@ -148,6 +149,9 @@ def process(args):
 
     if args.tf1:
         TF1.download(db, grabber, args.download)
+
+    if args.mediaset:
+        Mediaset.download(db, grabber, args.download)
 
     if args.item:
         p = Item.Demand(grabber, args.item, args.download, len(db))

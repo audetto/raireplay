@@ -17,6 +17,7 @@ demandFolder  = createFolder(os.path.join(dataFolder, "demand"))
 juniorFolder  = createFolder(os.path.join(dataFolder, "junior"))
 searchFolder  = createFolder(os.path.join(dataFolder, "search"))
 tgFolder      = createFolder(os.path.join(dataFolder, "tg"))
+mediasetFolder = createFolder(os.path.join(dataFolder, "mediaset"))
 pluzzFolder   = createFolder(os.path.join(dataFolder, "pluzz"))
 tf1Folder     = createFolder(os.path.join(dataFolder, "tf1"))
 
