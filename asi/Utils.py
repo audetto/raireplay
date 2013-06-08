@@ -116,8 +116,23 @@ def download(grabber, progress, url, localName, downType, encoding, checkTime = 
 
 
 def findPlaylist(m3, bandwidth):
-    if len(m3.playlists) == 1:
-        return m3.playlists[0]
+    data = {}
+
+    # bandwidth is alaways in Kb.
+    # so we divide by 1000
+
+    for p in m3.playlists:
+        b = int(p.stream_info.bandwidth) // 1000
+        data[b] = p
+
+    opt = findUrlByBandwidth(data, bandwidth)
+
+    return opt
+
+
+def findUrlByBandwidth(data, bandwidth):
+    if len(data) == 1:
+        return data.iter
 
     if bandwidth == "high":
         b1 = sys.maxsize
@@ -129,12 +144,11 @@ def findPlaylist(m3, bandwidth):
     opt = None
     dist = float('inf')
 
-    for p in m3.playlists:
-        b2 = int(p.stream_info.bandwidth)
+    for b2, v in data.items():
         d = abs(b2 - b1)
         if d < dist:
             dist = d
-            opt = p
+            opt = v
 
     return opt
 
@@ -215,7 +229,7 @@ def downloadM3U8(grabber, folder, m3, options, pid, filename, remux):
             raise
 
 
-def downloadH264(grabber, folder, url, options, pid, filename):
+def downloadH264(grabber, folder, h264, options, pid, filename):
     localFilename = os.path.join(folder, filename + ".mp4")
 
     if (not options.overwrite) and os.path.exists(localFilename):
@@ -223,6 +237,11 @@ def downloadH264(grabber, folder, url, options, pid, filename):
         print("{0} already there as {1}".format(pid, localFilename))
         print()
         return
+
+    url = findUrlByBandwidth(h264, options.bwidth)
+
+    print("Downloading:")
+    print(url)
 
     print()
     print("Saving {0} as {1}".format(pid, localFilename))
@@ -278,6 +297,7 @@ def setTorExitNodes(country, password):
     tn.write("QUIT\n".encode("ascii"))
     tn.close()
 
+
 def getTorExitNodes(password):
     try:
         tn = telnetlib.Telnet("127.0.0.1", 9051)
@@ -313,13 +333,22 @@ def getResolution(p):
 
 def displayM3U8(m3):
     if m3 and m3.is_variant:
-        print()
         for playlist in m3.playlists:
             fmt = "\tProgram: {0:>2}, Bandwidth: {1:>10}, Resolution: {2:>10}, Codecs: {3}"
 
-            line = fmt.format(playlist.stream_info.program_id, playlist.stream_info.bandwidth,
+            # bandwidth is alaways in Kb.
+            # so we divide by 1000
+
+            line = fmt.format(playlist.stream_info.program_id, int(playlist.stream_info.bandwidth) // 1000,
                                  getResolution(playlist), playlist.stream_info.codecs)
             print(line)
+        print()
+
+
+def displayH264(h264):
+    if h264:
+        for k, v in h264.items():
+            print("h264[{0}]: {1}".format(k, v))
         print()
 
 

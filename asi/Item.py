@@ -129,7 +129,7 @@ class Demand(Base.Base):
 
         self.title = self.values.title
         self.ts = self.values.videoUrlM3U8
-        self.h264 = self.values.videoUrlH264
+        self.h264[0] = self.values.videoUrlH264
 
         if self.values.date:
             self.datetime = datetime.datetime.strptime(self.values.date, "%d/%m/%Y")

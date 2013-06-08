@@ -188,7 +188,7 @@ class Episode(Base.Base):
         self.datetime = datetime.datetime.strptime(date, "%d-%m-%Y")
         self.length = length
 
-        self.h264 = h264
+        self.h264[0] = h264
         self.ts = ts
         self.mms = mms
 
@@ -205,7 +205,7 @@ class Episode(Base.Base):
         print("Length:", self.length)
         print()
         print("URL:", self.url)
-        print("h264:", self.h264)
+        Utils.displayH264(self.h264)
         print("m3u8:", self.ts)
         print("mms:", self.mms)
         print()

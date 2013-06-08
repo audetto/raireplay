@@ -125,7 +125,7 @@ class Program(Base.Base):
         strtime = date.replace("-", "/")
         self.datetime = datetime.datetime.strptime(strtime, "%d/%m/%Y %H:%M")
         if h264:
-            self.h264 = h264
+            self.h264[0] = h264
         if m3u8:
             self.ts = m3u8
 
@@ -145,8 +145,9 @@ class Program(Base.Base):
         print("Filename:", self.filename)
         print("Link:", self.link)
         print()
-        print("h264:", self.h264)
+        Utils.displayH264(self.h264)
         print("m3u8:", self.ts)
+        print()
 
         m3 = self.getTabletPlaylist()
         Utils.displayM3U8(self.m3)

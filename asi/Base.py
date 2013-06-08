@@ -16,7 +16,7 @@ class Base(object):
         self.datetime      = None
 
         self.filename      = None
-        self.h264          = None
+        self.h264          = {}
         self.ts            = None
         self.mms           = None
         self.m3            = None

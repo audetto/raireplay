@@ -4,6 +4,7 @@ import os
 import urllib.parse
 import datetime
 import json
+import re
 
 from asi import Utils
 from asi import Config
@@ -44,6 +45,22 @@ def getFullUrl(tablet, phone):
     return fullUrl
 
 
+# we want to extract all the
+# h264_DIGIT
+# which are now used for bwidth selection for MP4
+
+def extractH264Ext(value):
+    res = {}
+    reg = "^h264_(\d+)"
+    for k in value:
+        m = re.match(reg, k)
+        url = value[k]
+        if m and url:
+            bwidth = int(m.group(1))
+            res[bwidth] = url
+    return res
+
+
 def parseItem(grabber, channel, date, time, value, db):
     name = value["t"]
     desc = value["d"]
@@ -54,7 +71,9 @@ def parseItem(grabber, channel, date, time, value, db):
     if secs != "":
         length = datetime.timedelta(seconds = int(secs))
 
-    h264 = value["h264"]
+    h264 = extractH264Ext(value)
+    if not h264:
+        h264[0] = value["h264"]
     tablet = value["urlTablet"]
     smartPhone = value["urlSmartPhone"]
     pid = value["i"]
@@ -130,8 +149,9 @@ class Program(Base.Base):
         print("Length:", self.length)
         print("Filename:", self.filename)
         print()
-        print("h264:", self.h264)
+        Utils.displayH264(self.h264)
         print("ts:  ", self.ts)
+        print()
 
         m3 = self.getTabletPlaylist()
         Utils.displayM3U8(self.m3)

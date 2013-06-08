@@ -31,7 +31,7 @@ class Elem(Base.Base):
         self.datetime      = datetime.datetime.strptime(strTime, "%d/%m/%Y")
 
         # extra experimental data
-        self.h264          = data.findtext("h264")
+        self.h264[0]       = data.findtext("h264")
         self.ts            = data.findtext("m3u8")
 
         self.id            = data.findtext("localid")
@@ -53,7 +53,7 @@ class Elem(Base.Base):
         print("Filename:", self.filename)
         print()
         print("URL:", self.url)
-        print("h264:", self.h264)
+        Utils.displayH264(self.h264)
         print("m3u8:", self.ts)
         print()
 
