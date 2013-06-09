@@ -132,6 +132,17 @@ class Program(Base.Base):
         self.filename = self.pid + "-" + name
 
 
+    def download(self, folder, options):
+        if not self.h264:
+            content = Utils.getStringFromUrl(self.grabber, self.url)
+            root = ElementTree.fromstring(content)
+            if root.tag == "smil":
+                url = root.find("body").find("switch").find("video").attrib.get("src")
+                self.h264[0] = url
+
+        super(Program, self).download(folder, options)
+
+
     def display(self, width):
         print("=" * width)
         print("PID:", self.pid)
@@ -143,6 +154,3 @@ class Program(Base.Base):
         print("Filename:", self.filename)
         print()
         print("url:", self.url)
-
-        m3 = self.getTabletPlaylist()
-        Utils.displayM3U8(self.m3)
