@@ -132,7 +132,7 @@ def findPlaylist(m3, bandwidth):
 
 def findUrlByBandwidth(data, bandwidth):
     if len(data) == 1:
-        return data.iter
+        return next(iter(data.values()))
 
     if bandwidth == "high":
         b1 = sys.maxsize
