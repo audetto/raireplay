@@ -70,12 +70,12 @@ class Program(Base.Base):
         print()
 
         m3 = self.getTabletPlaylist()
-        Utils.displayM3U8(self.m3)
+        Utils.displayM3U8(m3)
 
 
     def follow(self, db, downType):
         pid = Utils.getNewPID(db, self.pid)
-        p = Item.Demand(self.grabber, self.link, downType, self.pid)
+        p = Item.Demand(self.grabber, self.link, downType, pid)
         Utils.addToDB(db, p)
 
 

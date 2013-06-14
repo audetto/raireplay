@@ -64,6 +64,7 @@ def processSet(grabber, progress, folder, f, db, downType):
 
     return (index, total)
 
+
 def processBlock(grabber, progress, folder, f, db, downType):
     h = html.parser.HTMLParser()
 
@@ -102,7 +103,6 @@ def process(grabber, progress, folder, f, db, downType):
 
     for e in root:
         if e.tag == "elemento":
-            titolo     = e.find("titolo").text
             uniqueNameNode = e.find("uniqueName")
             if uniqueNameNode is not None:
                 uniqueName = uniqueNameNode.text
@@ -211,4 +211,4 @@ class Episode(Base.Base):
         print()
 
         m3 = self.getTabletPlaylist()
-        Utils.displayM3U8(self.m3)
+        Utils.displayM3U8(m3)

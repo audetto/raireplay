@@ -97,7 +97,7 @@ def process(grabber, f, db):
 
         for date, v2 in v1.items():
             for time, value in v2.items():
-                p = parseItem(grabber, channel, date, time, value, db)
+                parseItem(grabber, channel, date, time, value, db)
 
 
 def download(db, grabber, downType):
@@ -154,7 +154,7 @@ class Program(Base.Base):
         print()
 
         m3 = self.getTabletPlaylist()
-        Utils.displayM3U8(self.m3)
+        Utils.displayM3U8(m3)
 
 
     # use RAI m3u8 url to get a "nice" filename

@@ -171,7 +171,7 @@ class Demand(Base.Base):
         print("mms:        ", self.mms)
 
         m3 = self.getTabletPlaylist()
-        Utils.displayM3U8(self.m3)
+        Utils.displayM3U8(m3)
 
 
     def follow(self, db, downType):

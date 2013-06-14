@@ -89,4 +89,4 @@ class Program(Base.Base):
         print("url:", self.ts)
 
         m3 = self.getTabletPlaylist()
-        Utils.displayM3U8(self.m3)
+        Utils.displayM3U8(m3)

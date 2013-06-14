@@ -45,7 +45,7 @@ def processGroup(grabber, f, name, db):
     o = json.load(f)
 
     for prog in o:
-        p = parseItem(grabber, prog, name, db)
+        parseItem(grabber, prog, name, db)
 
 
 def processNews(grabber, f, folder, progress, downType, db):
@@ -150,4 +150,4 @@ class Program(Base.Base):
         print("url:", self.ts)
 
         m3 = self.getTabletPlaylist()
-        Utils.displayM3U8(self.m3)
+        Utils.displayM3U8(m3)

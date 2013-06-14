@@ -407,7 +407,7 @@ def getMMSUrl(grabber, url):
     urlScheme = urllib.parse.urlsplit(url).scheme
     if urlScheme == "mms":
         # if it is already mms, don't look further
-        mms = self.values.videoUrl
+        mms = url
     else:
         # search for the mms url
         content = getStringFromUrl(grabber, url)
