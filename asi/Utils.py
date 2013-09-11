@@ -34,36 +34,40 @@ def httpFilename(url):
 
 # simply download a file and saves it to localName
 def downloadFile(grabber, progress, url, localName):
-    if progress:
-        progress.setName(localName)
-
-    request = urllib.request.Request(url, headers = httpHeaders)
-    with grabber.open(request) as response, open(localName, "wb") as f:
-        # same length as shutil.copyfileobj
-
-        # the rest is the same logic as urllib.request.urlretrieve
-        # which unfortunately does not work with proxies
-        blockSize = 1024 * 16
-        size = -1
-
-        headers = response.info()
-        if "content-length" in headers:
-            size = int(headers["Content-Length"])
-
+    try:
         if progress:
-            progress.start(size)
+            progress.setName(localName)
 
-        while 1:
-            buf = response.read(blockSize)
-            if not buf:
-                break
-            amountRead = len(buf)
-            f.write(buf)
+        request = urllib.request.Request(url, headers = httpHeaders)
+        with grabber.open(request) as response, open(localName, "wb") as f:
+            # same length as shutil.copyfileobj
+
+            # the rest is the same logic as urllib.request.urlretrieve
+            # which unfortunately does not work with proxies
+            blockSize = 1024 * 16
+            size = -1
+
+            headers = response.info()
+            if "content-length" in headers:
+                size = int(headers["Content-Length"])
+
             if progress:
-                progress.update(amountRead)
+                progress.start(size)
 
-        if progress:
-            progress.done()
+            while 1:
+                buf = response.read(blockSize)
+                if not buf:
+                    break
+                amountRead = len(buf)
+                f.write(buf)
+                if progress:
+                    progress.update(amountRead)
+
+            if progress:
+                progress.done()
+    except:
+        print("Failed to download program file: {0}".format(url))
+        raise
 
 
 #def downloadFile(grabber, progress, url, localName):
@@ -79,40 +83,45 @@ def downloadFile(grabber, progress, url, localName):
 # download a file and returns a file object
 # with optional encoding, checking if it exists already...
 def download(grabber, progress, url, localName, downType, encoding, checkTime = False):
-    request = urllib.request.Request(url, headers = httpHeaders)
+    try:
+        request = urllib.request.Request(url, headers = httpHeaders)
 
-    if downType == "shm":
-        f = grabber.open(request)
-        if encoding:
-            decoder = codecs.getreader(encoding)
-            f = decoder(f)
+        if downType == "shm":
+            f = grabber.open(request)
+            if encoding:
+                decoder = codecs.getreader(encoding)
+                f = decoder(f)
+            else:
+                # make it seekable
+                f = io.BytesIO(f.read())
         else:
-            # make it seekable
-            f = io.BytesIO(f.read())
-    else:
-        # here we need to download (maybe), copy local and open
-        exists = os.path.exists(localName)
-        exists = exists and os.path.getsize(localName) > 0
+            # here we need to download (maybe), copy local and open
+            exists = os.path.exists(localName)
+            exists = exists and os.path.getsize(localName) > 0
 
-        if downType == "never" and not exists:
-            raise Exception("Will not download missing file: {0} -> {1}".format(url, localName))
+            if downType == "never" and not exists:
+                raise Exception("Will not download missing file: {0} -> {1}".format(url, localName))
 
-        if exists and checkTime:
-            # if it is more than a day old, we redownload it
-            age = datetime.datetime.today() - datetime.datetime.fromtimestamp(os.path.getmtime(localName))
-            maximum = datetime.timedelta(days = 1)
-            exists = age < maximum
+            if exists and checkTime:
+                # if it is more than a day old, we redownload it
+                age = datetime.datetime.today() - datetime.datetime.fromtimestamp(os.path.getmtime(localName))
+                maximum = datetime.timedelta(days = 1)
+                exists = age < maximum
 
-        if downType == "always" or (downType == "update" and not exists):
-            downloadFile(grabber, progress, url, localName)
+            if downType == "always" or (downType == "update" and not exists):
+                downloadFile(grabber, progress, url, localName)
 
-        # now the file exists on the local filesystem
-        if not encoding:
-            f = open(localName, "rb")
-        else:
-            f = codecs.open(localName, "r", encoding = encoding)
+            # now the file exists on the local filesystem
+            if not encoding:
+                f = open(localName, "rb")
+            else:
+                f = codecs.open(localName, "r", encoding = encoding)
 
-    return f
+        return f
+
+    except:
+        print("Failed to download data file: {0}".format(url))
+        raise
 
 
 def findPlaylist(m3, bandwidth):
