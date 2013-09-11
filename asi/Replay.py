@@ -72,13 +72,18 @@ def parseItem(grabber, channel, date, time, value, db):
         length = datetime.timedelta(seconds = int(secs))
 
     h264 = extractH264Ext(value)
+
+    # if the detailed h264 is not found, try with "h264"
     if not h264:
-        h264[0] = value["h264"]
+        single = value["h264"]
+        if single:
+            h264[0] = single
+
     tablet = value["urlTablet"]
     smartPhone = value["urlSmartPhone"]
     pid = value["i"]
 
-    if h264 != "" or tablet != "" or smartPhone != "" :
+    if h264 or tablet or smartPhone:
         pid = Utils.getNewPID(db, pid)
         p = Program(grabber, channels[channel], date, time, pid, length, name, desc, h264, tablet, smartPhone)
         Utils.addToDB(db, p)
