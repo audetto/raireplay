@@ -11,7 +11,7 @@ from asi import Config
 from asi import Base
 from asi import RAIUrls
 
-channels = {"1": "RaiUno", "2": "RaiDue", "3": "RaiTre", "31": "RaiCinque"}
+channels = {"1": "RaiUno", "2": "RaiDue", "3": "RaiTre", "31": "RaiCinque", "32": "RaiPremium"}
 
 # tablet and phone url contain an overlapping set of bitrates
 # this function makes the union of the 2
