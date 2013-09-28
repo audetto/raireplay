@@ -31,7 +31,9 @@ class Elem(Base.Base):
         self.datetime      = datetime.datetime.strptime(strTime, "%d/%m/%Y")
 
         # extra experimental data
-        self.h264[0]       = data.findtext("h264")
+        h264               = data.findtext("h264")
+        if h264:
+            self.h264[0]   = h264
         self.ts            = data.findtext("m3u8")
 
         self.id            = data.findtext("localid")

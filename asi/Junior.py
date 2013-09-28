@@ -188,7 +188,9 @@ class Episode(Base.Base):
         self.datetime = datetime.datetime.strptime(date, "%d-%m-%Y")
         self.length = length
 
-        self.h264[0] = h264
+        if h264:
+            self.h264[0] = h264
+
         self.ts = ts
         self.mms = mms
 
