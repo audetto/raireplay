@@ -119,9 +119,10 @@ def download(grabber, progress, url, localName, downType, encoding, checkTime = 
 
         return f
 
-    except:
+    except Exception as e:
+        print("Exception: {0}".format(e))
         print("Failed to download data file: {0}".format(url))
-        raise
+        return None
 
 
 def findPlaylist(m3, bandwidth):

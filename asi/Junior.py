@@ -95,7 +95,9 @@ def processPage(grabber, progress, folder, f, db, downType):
             localFilename = os.path.join(folder, name)
 
             g = Utils.download(grabber, progress, url, localFilename, downType, None, True)
-            processBlock(grabber, progress, folder, g, db, downType)
+
+            if g:
+                processBlock(grabber, progress, folder, g, db, downType)
 
 
 def process(grabber, progress, folder, f, db, downType):
@@ -113,7 +115,9 @@ def process(grabber, progress, folder, f, db, downType):
                     localFilename = os.path.join(folder, name)
 
                     g = Utils.download(grabber, progress, url, localFilename, downType, None, True)
-                    processPage(grabber, progress, folder, g, db, downType)
+
+                    if g:
+                        processPage(grabber, progress, folder, g, db, downType)
 
 
 def download(db, grabber, downType):

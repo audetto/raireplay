@@ -77,7 +77,9 @@ def processItem(grabber, progress, downType, title, time, url, db):
     localName = os.path.join(folder, name)
 
     f = Utils.download(grabber, progress, url, localName, downType, "utf-8", True)
-    processSet(grabber, title, time, f, db)
+
+    if f:
+        processSet(grabber, title, time, f, db)
 
 
 def processGroup(grabber, progress, downType, prog, db):

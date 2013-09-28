@@ -89,15 +89,21 @@ def downloadGroup(grabber, name, groupId, folder, progress, downType, db):
     # and subject to continuous changes
     checkTimestamp = True
 
+    # .0
     url_0 = getDataUrl(groupId, 0)
     localName_0 = os.path.join(folder, str(groupId) + ".0.json")
     f_0 = Utils.download(grabber, progress, url_0, localName_0, downType, "utf-8", checkTimestamp)
-    processGroup(grabber, f_0, name, db)
 
+    if f_0:
+        processGroup(grabber, f_0, name, db)
+
+    # .1
     url_1 = getDataUrl(groupId, 1)
     localName_1 = os.path.join(folder, str(groupId) + ".1.json")
     f_1 = Utils.download(grabber, progress, url_1, localName_1, downType, "utf-8", checkTimestamp)
-    processGroup(grabber, f_1, name, db)
+
+    if f_1:
+        processGroup(grabber, f_1, name, db)
 
 
 def download(db, grabber, downType):

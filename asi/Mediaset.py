@@ -77,14 +77,15 @@ def downloadItems(grabber, url, which, conf, folder, progress, downType, db):
 
     f = Utils.download(grabber, progress, url, localName, downType, "utf-8", True)
 
-    if which == FULL_VIDEO:
-        processFullVideo(grabber, f, "episodi_interi", conf, folder, progress, downType, db)
-    elif which == PROGRAM_LIST:
-        processProgramList(grabber, f, conf, folder, progress, downType, db)
-    elif which == PROGRAM:
-        processProgram(grabber, f, conf, folder, progress, downType, db)
-    elif which == PROGRAM_VIDEO:
-        processFullVideo(grabber, f, "brand", conf, folder, progress, downType, db)
+    if f:
+        if which == FULL_VIDEO:
+            processFullVideo(grabber, f, "episodi_interi", conf, folder, progress, downType, db)
+        elif which == PROGRAM_LIST:
+            processProgramList(grabber, f, conf, folder, progress, downType, db)
+        elif which == PROGRAM:
+            processProgram(grabber, f, conf, folder, progress, downType, db)
+        elif which == PROGRAM_VIDEO:
+            processFullVideo(grabber, f, "brand", conf, folder, progress, downType, db)
 
 
 def download(db, grabber, downType):

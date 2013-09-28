@@ -122,7 +122,9 @@ def download(db, grabber, downType):
             localName = os.path.join(folder, filename)
 
             f = Utils.download(grabber, progress, url, localName, downType, "utf-8")
-            process(grabber, f, db)
+
+            if f:
+                process(grabber, f, db)
 
     print()
 
