@@ -75,23 +75,27 @@ class Base(object):
 
 
     def downloadMMS(self, folder, options):
-        import libmimms.core
-
         mms = Utils.getMMSUrl(self.grabber, self.mms)
 
-        localFilename = os.path.join(folder, self.filename + ".wmv")
+        try:
+            import libmimms.core
 
-        if (not options.overwrite) and os.path.exists(localFilename):
-            print("{0} already there as {1}".format(self.pid, localFilename))
-            return
+            localFilename = os.path.join(folder, self.filename + ".wmv")
 
-        opt = Utils.Obj()
-        opt.quiet        = False
-        opt.url          = mms
-        opt.resume       = False
-        opt.bandwidth    = 1e6
-        opt.filename     = localFilename
-        opt.clobber      = True
-        opt.time         = 0
+            if (not options.overwrite) and os.path.exists(localFilename):
+                print("{0} already there as {1}".format(self.pid, localFilename))
+                return
 
-        libmimms.core.download(opt)
+            opt = Utils.Obj()
+            opt.quiet        = False
+            opt.url          = mms
+            opt.resume       = False
+            opt.bandwidth    = 1e6
+            opt.filename     = localFilename
+            opt.clobber      = True
+            opt.time         = 0
+
+            libmimms.core.download(opt)
+
+        except ImportError as e:
+            print("\nMissing libmimms.\nCannot downalod: {0}.".format(mms))
