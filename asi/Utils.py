@@ -432,11 +432,15 @@ def getMMSUrl(grabber, url):
 
                 if asf:
                     # use urlgrab to make it work with ConfigParser
-                    content = getStringFromUrl(grabber, asf)
-                    config = configparser.ConfigParser()
-                    config.read_string(content)
-                    mms = config.get("Reference", "ref1")
-                    mms = mms.replace("http://", "mms://")
+                    urlScheme = urllib.parse.urlsplit(asf).scheme
+                    if urlScheme == "mms":
+                        mms = asf
+                    else:
+                        content = getStringFromUrl(grabber, asf)
+                        config = configparser.ConfigParser()
+                        config.read_string(content)
+                        mms = config.get("Reference", "ref1")
+                        mms = mms.replace("http://", "mms://")
             elif root.tag == "playList":
                 # adaptive streaming - unsupported
                 pass
