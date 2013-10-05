@@ -139,7 +139,7 @@ class Program(Base.Base):
             root = ElementTree.fromstring(content)
             if root.tag == "smil":
                 url = root.find("body").find("switch").find("video").attrib.get("src")
-                self.h264[0] = url
+                Utils.addH264Url(self.h264, 0, url)
 
         super(Program, self).download(folder, options)
 

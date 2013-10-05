@@ -40,8 +40,7 @@ class Program(Base.Base):
         else:
             self.datetime = datetime.datetime.now()
 
-        if h264:
-            self.h264[0] = h264
+        Utils.addH264Url(self.h264, 0, h264)
 
         if m3u8:
             self.ts = m3u8

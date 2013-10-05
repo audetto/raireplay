@@ -126,8 +126,7 @@ class Program(Base.Base):
         self.channel = channel
         strtime = date.replace("-", "/")
         self.datetime = datetime.datetime.strptime(strtime, "%d/%m/%Y %H:%M")
-        if h264:
-            self.h264[0] = h264
+        Utils.addH264Url(self.h264, 0, h264)
         if m3u8:
             self.ts = m3u8
 

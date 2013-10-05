@@ -448,3 +448,12 @@ def getMMSUrl(grabber, url):
                 print("Unknown root tag: " + root.tag)
 
     return mms
+
+
+def addH264Url(h264, bwidth, url):
+    # we do not want to add a None
+    # so that
+    # "if h264:"
+    # can still be used
+    if url:
+        h264[bwidth] = url

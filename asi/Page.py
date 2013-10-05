@@ -32,8 +32,8 @@ class Elem(Base.Base):
 
         # extra experimental data
         h264               = data.findtext("h264")
-        if h264:
-            self.h264[0]   = h264
+        Utils.addH264Url(self.h264, 0, h264)
+
         self.ts            = data.findtext("m3u8")
 
         self.id            = data.findtext("localid")

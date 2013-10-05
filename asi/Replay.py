@@ -57,7 +57,8 @@ def extractH264Ext(value):
         url = value[k]
         if m and url:
             bwidth = int(m.group(1))
-            res[bwidth] = url
+            Utils.addH264Url(res, bwidth, url)
+
     return res
 
 
@@ -76,8 +77,7 @@ def parseItem(grabber, channel, date, time, value, db):
     # if the detailed h264 is not found, try with "h264"
     if not h264:
         single = value["h264"]
-        if single:
-            h264[0] = single
+        Utils.addH264Url(h264, 0, single)
 
     tablet = value["urlTablet"]
     smartPhone = value["urlSmartPhone"]
