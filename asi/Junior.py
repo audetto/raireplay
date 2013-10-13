@@ -211,10 +211,5 @@ class Episode(Base.Base):
         print("Length:", self.length)
         print()
         print("URL:", self.url)
-        Utils.displayH264(self.h264)
-        print("m3u8:", self.ts)
-        print("mms:", self.mms)
-        print()
 
-        m3 = self.getTabletPlaylist()
-        Utils.displayM3U8(m3)
+        super(Episode, self).display(width)

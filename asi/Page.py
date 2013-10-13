@@ -56,9 +56,8 @@ class Elem(Base.Base):
         print("Follow: ENABLED")
         print()
         print("URL:", self.url)
-        Utils.displayH264(self.h264)
-        print("m3u8:", self.ts)
-        print()
+
+        super(Elem, self).display(width)
 
 
     def follow(self, db, downType):

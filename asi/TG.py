@@ -147,12 +147,8 @@ class Program(Base.Base):
         print("Link:", self.link)
         print("Follow: ENABLED")
         print()
-        Utils.displayH264(self.h264)
-        print("m3u8:", self.ts)
-        print()
 
-        m3 = self.getTabletPlaylist()
-        Utils.displayM3U8(m3)
+        super(Program, self).display(width)
 
 
     def follow(self, db, downType):

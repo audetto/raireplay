@@ -167,12 +167,8 @@ class Demand(Base.Base):
         print()
         print("URL:        ", self.url)
         print("videourl:   ", self.values.videoUrl)
-        print("h264:       ", self.values.videoUrlH264)
-        print("m3u8:       ", self.values.videoUrlM3U8)
-        print("mms:        ", self.mms)
 
-        m3 = self.getTabletPlaylist()
-        Utils.displayM3U8(m3)
+        super(Demand, self).display(width)
 
 
     def follow(self, db, downType):

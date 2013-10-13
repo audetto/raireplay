@@ -99,3 +99,15 @@ class Base(object):
 
         except ImportError as e:
             print("\nMissing libmimms.\nCannot downalod: {0}.".format(mms))
+
+
+    def display(self, width):
+        Utils.displayH264(self.h264)
+        if self.ts:
+            print("ts:  ", self.ts)
+        if self.mms:
+            print("mms: ", self.mms)
+        print()
+
+        m3 = self.getTabletPlaylist()
+        Utils.displayM3U8(m3)

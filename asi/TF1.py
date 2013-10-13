@@ -153,7 +153,5 @@ class Program(Base.Base):
         print("Filename:", self.filename)
         print("Category:", self.category)
         print()
-        print("url:", self.ts)
 
-        m3 = self.getTabletPlaylist()
-        Utils.displayM3U8(m3)
+        super(Program, self).display(width)

@@ -156,12 +156,8 @@ class Program(Base.Base):
         print("Length:", self.length)
         print("Filename:", self.filename)
         print()
-        Utils.displayH264(self.h264)
-        print("ts:  ", self.ts)
-        print()
 
-        m3 = self.getTabletPlaylist()
-        Utils.displayM3U8(m3)
+        super(Program, self).display(width)
 
 
     # use RAI m3u8 url to get a "nice" filename
