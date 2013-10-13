@@ -157,16 +157,16 @@ class Demand(Base.Base):
 
     def display(self, width):
         print("=" * width)
-        print("PID:        ", self.pid)
-        print("Title:      ", self.values.title)
-        print("Type:       ", self.values.type)
-        print("Program:    ", self.values.program)
+        print("PID:", self.pid)
+        print("Title:", self.values.title)
+        print("Type:", self.values.type)
+        print("Program:", self.values.program)
         print("Description:", self.values.description)
-        print("Filename:   ", self.filename)
-        print("Page:       ", self.values.page)
+        print("Filename:", self.filename)
+        print("Page:", self.values.page)
         print()
-        print("URL:        ", self.url)
-        print("videourl:   ", self.values.videoUrl)
+        print("URL:", self.url)
+        print("videourl:", self.values.videoUrl)
 
         super(Demand, self).display(width)
 
