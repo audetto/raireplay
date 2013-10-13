@@ -325,6 +325,9 @@ def getTorExitNodes(password):
 
 
 def makeFilename(value):
+    if not value:
+        return value
+
     translateTo = "_"
     charactersToRemove = " /:^,|'"
     translateTable = dict((ord(char), translateTo) for char in charactersToRemove)
