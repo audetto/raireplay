@@ -50,8 +50,9 @@ class Group(Base.Base):
         print("PID:", self.pid)
         print("Title:", self.title)
         print("Channel:", self.channel)
+        print("Follow: ENABLED")
+        print()
         print("URL:", self.url)
-
         print()
 
 

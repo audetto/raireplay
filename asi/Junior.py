@@ -149,6 +149,7 @@ class Item(Base.Base):
         print("PID:", self.pid)
         print("Title:", self.title)
         print("Description:", self.description)
+        print("Follow: ENABLED")
         print()
         print("URL:", self.url)
         print()

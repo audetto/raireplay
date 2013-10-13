@@ -62,6 +62,7 @@ class Program(Base.Base):
         print("Date:", Utils.strDate(self.datetime))
         print("Filename:", self.filename)
         print("Link:", self.link)
+        print("Follow: ENABLED")
         print()
         Utils.displayH264(self.h264)
         print("m3u8:", self.ts)

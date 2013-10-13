@@ -53,6 +53,7 @@ class Elem(Base.Base):
         print("Date:", Utils.strDate(self.datetime))
         print("Length:", self.length)
         print("Filename:", self.filename)
+        print("Follow: ENABLED")
         print()
         print("URL:", self.url)
         Utils.displayH264(self.h264)
