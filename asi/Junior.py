@@ -139,6 +139,7 @@ class Item(Base.Base):
         self.pid = pid
         self.grabber = grabber
 
+        self.channel = "junior"
         self.url = url
         self.title = group
         self.description = title

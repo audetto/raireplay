@@ -28,6 +28,8 @@ def isThereADate(oldDate, description):
 def processSet(grabber, title, time, f, db):
     o = json.load(f)
 
+    channel = "TG"
+
     prog = o.get("integrale")
     if prog:
         link          = prog["weblink"]
@@ -46,7 +48,7 @@ def processSet(grabber, title, time, f, db):
         datetime      = date + " " + time
 
         pid = Utils.getNewPID(db, None)
-        p = Program(grabber, link, title, datetime, pid, title, description, h264, m3u8)
+        p = Program(grabber, link, channel, datetime, pid, title, description, h264, m3u8)
         Utils.addToDB(db, p)
     else:
         # get the list
@@ -66,7 +68,7 @@ def processSet(grabber, title, time, f, db):
                 description   = prg["desc"]
 
                 pid = Utils.getNewPID(db, None)
-                p = Program(grabber, link, title, dt, pid, aTitle, description, h264, m3u8)
+                p = Program(grabber, link, channel, dt, pid, aTitle, description, h264, m3u8)
                 Utils.addToDB(db, p)
 
 

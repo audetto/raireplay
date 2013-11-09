@@ -19,9 +19,10 @@ def process(grabber, f, db):
         title         = prog["name"]
         date          = prog["date"]
         description   = prog["desc"]
+        channel       = "search"
 
         pid = Utils.getNewPID(db, None)
-        p = Program(grabber, link, title, date, pid, title, description, h264, m3u8, wmv)
+        p = Program(grabber, link, channel, date, pid, title, description, h264, m3u8, wmv)
         Utils.addToDB(db, p)
 
 

@@ -28,7 +28,7 @@ class Base(object):
         else:
             ts = None
 
-        str1 = fmt.format(self.pid, ts, self.title)
+        str1 = fmt.format(self.pid, ts, self.channel, self.title)
         return str1
 
 

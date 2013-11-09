@@ -25,7 +25,7 @@ def displayOrGet(item, nolist, info, get, options):
         item.display(width)
     elif not nolist:
         # this is list
-        fmt = "{0:>9}: {1} {2}"
+        fmt = "{0:>9}: {1} {2:13} {3}"
         print(item.short(fmt))
 
     if get:
@@ -45,15 +45,14 @@ def listDisplayOrGet(items, nolist, info, get, options):
         displayOrGet(p, nolist, info, get, options)
 
 
-def checkDate(prog, date):
-    prog_date = prog.datetime
-    if prog_date >= date and prog_date < date + datetime.timedelta(days = 1):
-        return True
-    else:
-        return False
-
-
 def filterByDate(db, value):
+    lower_date = date
+    uppper_date = date + datetime.timedelta(days = 1)
+
+    def checkDate(prog):
+        prog_date = prog.datetime
+        return prog_date >= lower_date and prog_date < upper_date
+
     # this nonsense is because today() returns the same as now()
     # and date.today() is not compatible with datetime... all pythonic!
 
@@ -64,7 +63,17 @@ def filterByDate(db, value):
     else:
         date = datetime.datetime.strptime(value, "%Y-%m-%d")
 
-    res = dict((k, v) for k, v in db.items() if checkDate(v, date))
+    res = dict((k, v) for k, v in db.items() if checkDate(v))
+    return res
+
+
+def filterByChannel(db, value):
+    channel = value.lower()
+
+    def checkChannel(v):
+        return v.channel and (v.channel.lower() == channel)
+
+    res = dict((k, v) for k, v in db.items() if checkChannel(v))
     return res
 
 
@@ -72,7 +81,7 @@ def find(db, pid, isre, subset):
     if pid in db:
         subset[pid] = db[pid]
     else:
-        fmt = "{2}"
+        fmt = "{3}"
         match = pid.lower()
         for ppid, p in db.items():
             title = p.short(fmt)
@@ -166,6 +175,9 @@ def process(args):
 
     if args.date:
         subset = filterByDate(subset, args.date)
+
+    if args.channel:
+        subset = filterByChannel(subset, args.channel)
 
     # we should only copy over
     # format, bwidth, overwrite, quiet

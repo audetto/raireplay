@@ -24,6 +24,7 @@ class Elem(Base.Base):
         self.pid           = pid
         self.title         = data.findtext("titolo")
         self.description   = data.findtext("descrizione")
+        self.channel       = data.findtext("dominio")
         self.grabber       = grabber
         strTime            = data.findtext("datapubblicazione")
 

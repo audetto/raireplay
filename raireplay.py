@@ -35,6 +35,7 @@ def main():
     parser.add_argument("--item", action = "store", help = "RAI On Demand Item")
 
     parser.add_argument("--date", action = "store", help = "Filter by date YYYY-MM-DD")
+    parser.add_argument("--channel", action = "store", help = "Filter by channel")
     parser.add_argument("--follow", action = "append")
 
     parser.add_argument("--nolist", action = "store_true", default = False)

@@ -127,6 +127,7 @@ class Demand(Base.Base):
 
         self.values = parser.values
 
+        self.channel = "item"
         self.title = self.values.title
         self.ts = self.values.videoUrlM3U8
 
@@ -158,6 +159,7 @@ class Demand(Base.Base):
     def display(self, width):
         print("=" * width)
         print("PID:", self.pid)
+        print("Channel:", self.channel)
         print("Title:", self.values.title)
         print("Type:", self.values.type)
         print("Program:", self.values.program)
