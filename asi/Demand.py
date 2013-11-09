@@ -2,6 +2,8 @@
 
 import json
 import os.path
+import datetime
+import time
 
 from asi import Utils
 from asi import Config
@@ -39,7 +41,7 @@ class Group(Base.Base):
         self.pid = pid
         self.grabber = grabber
         self.title = title
-        self.somedate = float(date)
+        self.datetime = datetime.datetime.fromtimestamp(int(date) / 1000)
         self.channel = channel
 
         self.url = RAIUrls.base + link
