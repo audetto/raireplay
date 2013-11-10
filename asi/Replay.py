@@ -124,8 +124,6 @@ def download(db, grabber, downType):
             if f:
                 process(grabber, f, db)
 
-    print()
-
 
 class Program(Base.Base):
     def __init__(self, grabber, channel, date, hour, pid, length, title, desc, h264, tablet, smartPhone):
