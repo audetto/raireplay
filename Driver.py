@@ -13,6 +13,7 @@ from asi import Pluzz
 from asi import TF1
 from asi import Mediaset
 from asi import Console
+from asi import M6
 
 import re
 import datetime
@@ -158,6 +159,9 @@ def process(args):
 
     if args.tf1:
         TF1.download(db, grabber, args.download)
+
+    if args.m6:
+        M6.download(db, grabber, args.download)
 
     if args.mediaset:
         Mediaset.download(db, grabber, args.download)

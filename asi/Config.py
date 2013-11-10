@@ -20,5 +20,6 @@ tgFolder      = createFolder(os.path.join(dataFolder, "tg"))
 mediasetFolder = createFolder(os.path.join(dataFolder, "mediaset"))
 pluzzFolder   = createFolder(os.path.join(dataFolder, "pluzz"))
 tf1Folder     = createFolder(os.path.join(dataFolder, "tf1"))
+m6Folder      = createFolder(os.path.join(dataFolder, "m6"))
 
 programFolder = createFolder(os.path.join(rootFolder, "programs"))
