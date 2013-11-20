@@ -47,13 +47,6 @@ def listDisplayOrGet(items, nolist, info, get, options):
 
 
 def filterByDate(db, value):
-    lower_date = date
-    uppper_date = date + datetime.timedelta(days = 1)
-
-    def checkDate(prog):
-        prog_date = prog.datetime
-        return prog_date >= lower_date and prog_date < upper_date
-
     # this nonsense is because today() returns the same as now()
     # and date.today() is not compatible with datetime... all pythonic!
 
@@ -63,6 +56,13 @@ def filterByDate(db, value):
         date = datetime.datetime.today().replace(hour = 0, minute = 0, second = 0, microsecond = 0) - datetime.timedelta(days = 1)
     else:
         date = datetime.datetime.strptime(value, "%Y-%m-%d")
+
+    lower_date = date
+    upper_date = date + datetime.timedelta(days = 1)
+
+    def checkDate(prog):
+        prog_date = prog.datetime
+        return prog_date >= lower_date and prog_date < upper_date
 
     res = dict((k, v) for k, v in db.items() if checkDate(v))
     return res
