@@ -11,38 +11,6 @@ from asi import RAIUrls
 
 channels = {"1": "RaiUno", "2": "RaiDue", "3": "RaiTre", "31": "RaiCinque", "32": "RaiPremium"}
 
-# tablet and phone url contain an overlapping set of bitrates
-# this function makes the union of the 2
-def getFullUrl(tablet, phone):
-    if tablet == "":
-        return phone
-
-    if phone == "":
-        return tablet
-
-    posOfFirstCommaT = tablet.find(",")
-    posOfLastCommaT  = tablet.rfind(",")
-    midTablet = tablet[posOfFirstCommaT + 1 : posOfLastCommaT]
-
-    posOfFirstCommaP = phone.find(",")
-    posOfLastCommaP  = phone.rfind(",")
-    midPhone = phone[posOfFirstCommaP + 1 : posOfLastCommaP]
-
-    tabletSizes = midTablet.split(",")
-    phoneSizes  = midPhone.split(",")
-
-    sizes = set()
-    sizes.update(tabletSizes)
-    sizes.update(phoneSizes)
-
-    fullUrl = tablet[0 : posOfFirstCommaT]
-    for s in sorted(sizes, key = int):
-        fullUrl = fullUrl + "," + s
-    fullUrl = fullUrl + tablet[posOfLastCommaT :]
-
-    return fullUrl
-
-
 # we want to extract all the
 # h264_DIGIT
 # which are now used for bwidth selection for MP4
@@ -134,7 +102,12 @@ class Program(Base.Base):
         self.h264 = h264
         self.description = desc
         self.channel = channel
-        self.ts = getFullUrl(tablet, smartPhone)
+
+        if tablet:    # higher quality normally
+            self.ts = tablet
+        else:
+            self.ts = smartPhone
+
         self.datetime = datetime.datetime.strptime(date + " " + hour, "%Y-%m-%d %H:%M")
 
         self.grabber = grabber
