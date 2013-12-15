@@ -2,7 +2,8 @@ import os
 import json
 import datetime
 import time
-import hashlib
+
+from xml.etree import ElementTree
 
 from asi import Utils
 from asi import Config
@@ -15,7 +16,14 @@ from asi import Base
 
 # but it seems to be broken
 
+# this plugin has been moved to use the iphone machinery
+
 channels = ["m6", "w9", "6ter"]
+
+def getTSUrl(link):
+    ts = "https://lb.cdn.m6web.fr/s/su/s/m6replay_iphone/iphone/{0}".format(link)
+    return ts
+
 
 def getCatalogueUrl(channel):
     catalogueUrl = "http://static.m6replay.fr/catalog/m6group_web/{0}replay/catalogue.json"
@@ -24,45 +32,10 @@ def getCatalogueUrl(channel):
 
 
 def getInfoUrl(channel, clip):
-    infoUrl = "http://static.m6replay.fr/catalog/m6group_web/{0}replay/clip/{1}/clip_infos-{2}.json"
+    infoUrl = "http://static.m6replay.fr/catalog/m6group_iphone/{0}replay/clip/{1}/clip_infos-{2}.xml"
     clip_key = clip[-2:] + '/' + clip[-4:-2]
     url = infoUrl.format(channel, clip_key, clip)
     return url
-
-
-def getLink(url):
-    if url.startswith("mp4:"):
-        return url
-    if url.endswith(".f4m"):
-        name = url.split("/")[-1].replace(".f4m", ".mp4")
-        link = "mp4:production/regienum/" + name
-        return link
-
-
-def MD5Hash(s):
-    md5 = hashlib.md5()
-    md5.update(s.encode("ascii"))
-    md5hash = md5.hexdigest()
-    return md5hash
-
-
-def encodePlayPath(app, playPath, timestamp):
-    delay = 86400
-    secretKey = "vw8kuo85j2xMc"
-    url = "{0}?s={1}&e={2}".format(playPath, timestamp, timestamp + delay)
-    urlHash = MD5Hash(secretKey + "/" + app + "/" + url[4:])
-    tokenUrl = url + "&h=" + urlHash
-    return tokenUrl
-
-
-def getRTMPUrl(palyPath):
-    rtmp = "rtmpe://groupemsix.fcod.llnwd.net"
-    app = "a2883/e1"
-    swfUrl = "http://www.6play.fr/rel-3/M6ReplayV3Application-3.swf"
-    timestamp = int(time.time())
-    tokenUrl = encodePlayPath(app, palyPath, timestamp)
-    rtmpUrl = 'rtmpdump -r "' + rtmp + "/" + app + "/" + tokenUrl + '" --swfVfy ' + swfUrl + " -m 10"
-    return rtmpUrl
 
 
 def process(grabber, downType, f, channel, db):
@@ -79,10 +52,8 @@ def process(grabber, downType, f, channel, db):
 
             length = datetime.timedelta(seconds = int(seconds))
 
-            url = None
-
             pid = Utils.getNewPID(db, k)
-            p = Program(grabber, downType, channel, date, pid, k, length, title, desc, url)
+            p = Program(grabber, downType, channel, date, pid, k, length, title, desc)
             Utils.addToDB(db, p)
 
 
@@ -102,7 +73,7 @@ def download(db, grabber, downType):
 
 
 class Program(Base.Base):
-    def __init__(self, grabber, downType, channel, date, pid, key, length, title, desc, url):
+    def __init__(self, grabber, downType, channel, date, pid, key, length, title, desc):
         super(Program, self).__init__()
 
         self.pid = pid
@@ -111,7 +82,7 @@ class Program(Base.Base):
         self.channel = channel
         self.key = key
         self.downType = downType
-        self.rtmp = {}
+        self.url = getInfoUrl(self.channel, self.key);
 
         if date:
             self.datetime = datetime.datetime.strptime(date, "%Y-%m-%d %H:%M:%S")
@@ -135,34 +106,25 @@ class Program(Base.Base):
         print("Length:", self.length)
         print("Filename:", self.filename)
         print()
-
-        self.getRTMP()
-        for k, v in self.rtmp.items():
-            print("RTMP[{0}]: {1}".format(k, v))
-        print()
+        print("URL:", self.url)
 
         super(Program, self).display(width)
 
 
-    def getRTMP(self):
-        if self.rtmp:
-            return
+    def getTabletPlaylist(self):
+        if not self.ts:
+            folder = Config.m6Folder
+            name = Utils.httpFilename(self.url)
+            localName = os.path.join(folder, name)
+            progress = Utils.getProgress()
 
-        url = getInfoUrl(self.channel, self.key);
-        folder = Config.m6Folder
-        name = Utils.httpFilename(url)
-        localName = os.path.join(folder, name)
-        progress = Utils.getProgress()
+            f = Utils.download(self.grabber, progress, self.url, localName, self.downType, "utf-8", True)
+            if (f):
+                root = ElementTree.parse(f).getroot()
+                asset = root.find("asset")
+                for v in asset.findall("assetItem"):
+                    if not self.ts:
+                        u = v.find("url").text
+                        self.ts = getTSUrl(u)
 
-        f = Utils.download(self.grabber, progress, url, localName, self.downType, "utf-8", True)
-        if (f):
-            o = json.load(f)
-            asset = o["asset"]
-            for k, v in asset.items():
-                u = v["url"]
-                if u:
-                    link = getLink(u)
-                    if link:
-                        rtmpUrl = getRTMPUrl(link)
-                        quality = v["quality"]
-                        self.rtmp[quality] = rtmpUrl
+        return super(Program, self).getTabletPlaylist()
