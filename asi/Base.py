@@ -102,12 +102,13 @@ class Base(object):
 
 
     def display(self, width):
+        m3 = self.getTabletPlaylist()
+
         Utils.displayH264(self.h264)
         if self.ts:
-            print("ts:  ", self.ts)
+            print("ts:", self.ts)
         if self.mms:
-            print("mms: ", self.mms)
+            print("mms:", self.mms)
         print()
 
-        m3 = self.getTabletPlaylist()
         Utils.displayM3U8(m3)
