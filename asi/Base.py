@@ -3,8 +3,6 @@ import urllib
 
 from asi import Utils
 
-# super(Program, self).__init__()
-
 class Base(object):
     def __init__(self):
         self.pid           = None
@@ -15,11 +13,13 @@ class Base(object):
 
         self.datetime      = None
 
+        self.length        = None
         self.filename      = None
         self.h264          = {}
         self.ts            = None
         self.mms           = None
         self.m3            = None
+        self.canFollow     = False
 
 
     def short(self, fmt):
@@ -44,11 +44,12 @@ class Base(object):
         if self.m3:
             return self.m3
 
-        try:
-            ts = self.getTS()
-            self.m3 = Utils.load_m3u8_from_url(self.grabber, ts)
-        except urllib.error.HTTPError:
-            pass
+        ts = self.getTS()
+        if ts:
+            try:
+                self.m3 = Utils.load_m3u8_from_url(self.grabber, ts)
+            except urllib.error.HTTPError:
+                pass
 
         return self.m3
 
@@ -113,13 +114,32 @@ class Base(object):
 
 
     def display(self, width):
+        print("=" * width)
+        print("PID:", self.pid)
+        print("Channel:", self.channel)
+        print("Title:", self.title)
+        if self.description:
+            print("Description:", self.description)
+        if self.datetime:
+            print("Date:", Utils.strDate(self.datetime))
+        if self.length:
+            print("Length:", self.length)
+        if self.filename:
+            print("Filename:", self.filename)
+        print()
+
+        if self.canFollow:
+            print("Follow: ENABLED")
+            print()
+
         m3 = self.getTabletPlaylist()
 
         Utils.displayH264(self.getH264())
-        if self.getTS():
-            print("ts:", self.getTS())
-        if self.mms:
-            print("mms:", self.mms)
-        print()
+        if self.getTS() or self.mms:
+            if self.getTS():
+                print("ts:", self.getTS())
+            if self.mms:
+                print("mms:", self.mms)
+            print()
 
         Utils.displayM3U8(m3)

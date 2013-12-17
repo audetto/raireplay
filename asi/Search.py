@@ -12,7 +12,7 @@ def process(grabber, f, db):
     o = json.load(f)
 
     for prog in o["list"]:
-        link          = prog["weblink"]
+        url           = prog["weblink"]
         h264          = prog["h264"]
         m3u8          = prog["m3u8"]
         wmv           = prog["wmv"]
@@ -22,15 +22,15 @@ def process(grabber, f, db):
         channel       = "search"
 
         pid = Utils.getNewPID(db, None)
-        p = Program(grabber, link, channel, date, pid, title, description, h264, m3u8, wmv)
+        p = Program(grabber, url, channel, date, pid, title, description, h264, m3u8, wmv)
         Utils.addToDB(db, p)
 
 
 class Program(Base.Base):
-    def __init__(self, grabber, link, channel, date, pid, title, desc, h264, m3u8, wmv):
+    def __init__(self, grabber, url, channel, date, pid, title, desc, h264, m3u8, wmv):
         super(Program, self).__init__()
 
-        self.link = link
+        self.url = url
         self.pid = pid
         self.title = title
         self.description = desc
@@ -53,25 +53,18 @@ class Program(Base.Base):
 
         self.filename = Utils.makeFilename(self.title)
 
+        self.canFollow = True
 
     def display(self, width):
-        print("=" * width)
-        print("PID:", self.pid)
-        print("Channel:", self.channel)
-        print("Title:", self.title)
-        print("Description:", self.description)
-        print("Date:", Utils.strDate(self.datetime))
-        print("Filename:", self.filename)
-        print("Link:", self.link)
-        print("Follow: ENABLED")
-        print()
-
         super(Program, self).display(width)
+
+        print("URL:", self.url)
+        print()
 
 
     def follow(self, db, downType):
         pid = Utils.getNewPID(db, self.pid)
-        p = Item.Demand(self.grabber, self.link, downType, pid)
+        p = Item.Demand(self.grabber, self.url, downType, pid)
         Utils.addToDB(db, p)
 
 

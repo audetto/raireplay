@@ -155,20 +155,14 @@ class Demand(Base.Base):
 
 
     def display(self, width):
-        print("=" * width)
-        print("PID:", self.pid)
-        print("Channel:", self.channel)
-        print("Title:", self.values.title)
+        super(Demand, self).display(width)
+
         print("Type:", self.values.type)
         print("Program:", self.values.program)
-        print("Description:", self.values.description)
-        print("Filename:", self.filename)
         print("Page:", self.values.page)
-        print()
         print("URL:", self.url)
         print("videourl:", self.values.videoUrl)
-
-        super(Demand, self).display(width)
+        print()
 
 
     def follow(self, db, downType):

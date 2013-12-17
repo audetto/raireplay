@@ -42,15 +42,12 @@ class Group(Base.Base):
         self.channel = channel
 
         self.url = RAIUrls.base + link
+        self.canFollow = True
 
 
     def display(self, width):
-        print("=" * width)
-        print("PID:", self.pid)
-        print("Title:", self.title)
-        print("Channel:", self.channel)
-        print("Follow: ENABLED")
-        print()
+        super(Group, self).display(width)
+
         print("URL:", self.url)
         print()
 

@@ -44,20 +44,14 @@ class Elem(Base.Base):
 
         self.filename      = Utils.makeFilename(self.title)
 
+        self.cafFollow     = True
+
 
     def display(self, width):
-        print("=" * width)
-        print("PID:", self.pid)
-        print("Title:", self.title)
-        print("Description:", self.description)
-        print("Date:", Utils.strDate(self.datetime))
-        print("Length:", self.length)
-        print("Filename:", self.filename)
-        print("Follow: ENABLED")
-        print()
-        print("URL:", self.url)
-
         super(Elem, self).display(width)
+
+        print("URL:", self.url)
+        print()
 
 
     def follow(self, db, downType):

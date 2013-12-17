@@ -146,13 +146,7 @@ class Program(Base.Base):
 
 
     def display(self, width):
-        print("=" * width)
-        print("PID:", self.pid)
-        print("Channel:", self.channel)
-        print("Title:", self.title)
-        print("Description:", self.description)
-        print("Date:", Utils.strDate(self.datetime))
-        print("Length:", self.length)
-        print("Filename:", self.filename)
+        super(Program, self).display(width)
+
+        print("URL:", self.url)
         print()
-        print("url:", self.url)

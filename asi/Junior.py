@@ -203,14 +203,7 @@ class Episode(Base.Base):
 
 
     def display(self, width):
-        print("=" * width)
-        print("PID:", self.pid)
-        print("Title:", self.title)
-        print("Description:", self.description)
-        print("Filename:", self.filename)
-        print("Date:", Utils.strDate(self.datetime))
-        print("Length:", self.length)
-        print()
-        print("URL:", self.url)
-
         super(Episode, self).display(width)
+
+        print("URL:", self.url)
+        print()

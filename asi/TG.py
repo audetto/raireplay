@@ -134,21 +134,14 @@ class Program(Base.Base):
 
         name = Utils.makeFilename(self.title)
         self.filename = name + "-" + self.datetime.strftime("%Y-%m-%d")
+        self.canFollow = True
 
 
     def display(self, width):
-        print("=" * width)
-        print("PID:", self.pid)
-        print("Channel:", self.channel)
-        print("Title:", self.title)
-        print("Description:", self.description)
-        print("Date:", Utils.strDate(self.datetime))
-        print("Filename:", self.filename)
-        print("Link:", self.link)
-        print("Follow: ENABLED")
-        print()
-
         super(Program, self).display(width)
+
+        print("Link:", self.link)
+        print()
 
 
     def follow(self, db, downType):
