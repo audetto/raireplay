@@ -30,7 +30,7 @@ def processSet(grabber, title, time, f, db):
 
     prog = o.get("integrale")
     if prog:
-        link          = prog["weblink"]
+        url           = prog["weblink"]
         h264          = prog["h264"]
         m3u8          = prog["m3u8"]
         if time == "LIS":
@@ -46,7 +46,7 @@ def processSet(grabber, title, time, f, db):
         datetime      = date + " " + time
 
         pid = Utils.getNewPID(db, None)
-        p = Program(grabber, link, channel, datetime, pid, title, description, h264, m3u8)
+        p = Program(grabber, url, channel, datetime, pid, title, description, h264, m3u8)
         Utils.addToDB(db, p)
     else:
         # get the list
@@ -58,7 +58,7 @@ def processSet(grabber, title, time, f, db):
         for prg in lst:
             tp = prg["type"]
             if tp != "empty":
-                link          = prg["weblink"]
+                url           = prg["weblink"]
                 h264          = prg["h264"]
                 m3u8          = prg["m3u8"]
                 dt            = prg["date"] + " 00:00"
@@ -66,7 +66,7 @@ def processSet(grabber, title, time, f, db):
                 description   = prg["desc"]
 
                 pid = Utils.getNewPID(db, None)
-                p = Program(grabber, link, channel, dt, pid, aTitle, description, h264, m3u8)
+                p = Program(grabber, url, channel, dt, pid, aTitle, description, h264, m3u8)
                 Utils.addToDB(db, p)
 
 
@@ -116,10 +116,10 @@ def download(db, grabber, downType):
 
 
 class Program(Base.Base):
-    def __init__(self, grabber, link, channel, date, pid, title, desc, h264, m3u8):
+    def __init__(self, grabber, url, channel, date, pid, title, desc, h264, m3u8):
         super(Program, self).__init__()
 
-        self.link = link
+        self.url = url
         self.pid = pid
         self.title = title
         self.description = desc
@@ -140,11 +140,11 @@ class Program(Base.Base):
     def display(self, width):
         super(Program, self).display(width)
 
-        print("Link:", self.link)
+        print("URL:", self.url)
         print()
 
 
     def follow(self, db, downType):
         pid = Utils.getNewPID(db, self.pid)
-        p = Item.Demand(self.grabber, self.link, downType, pid)
+        p = Item.Demand(self.grabber, self.url, downType, pid)
         Utils.addToDB(db, p)
