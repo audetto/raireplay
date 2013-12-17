@@ -56,6 +56,7 @@ def download(db, grabber, downType):
             with z.open(a) as f:
                 process(grabber, decoder(f), db)
 
+
 class Program(Base.Base):
     def __init__(self, grabber, channel, date, hour, pid, length, title, desc, url):
         super(Program, self).__init__()

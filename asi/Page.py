@@ -44,6 +44,7 @@ class Elem(Base.Base):
 
         self.filename      = Utils.makeFilename(self.title)
 
+
     def display(self, width):
         print("=" * width)
         print("PID:", self.pid)
