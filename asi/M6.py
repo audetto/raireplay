@@ -110,20 +110,20 @@ class Program(Base.Base):
         super(Program, self).display(width)
 
 
-    def getTabletPlaylist(self):
-        if not self.ts:
-            folder = Config.m6Folder
-            name = Utils.httpFilename(self.url)
-            localName = os.path.join(folder, name)
-            progress = Utils.getProgress()
+    def getTS(self):
+        if self.ts:
+            return self.ts
 
-            f = Utils.download(self.grabber, progress, self.url, localName, self.downType, "utf-8", True)
-            if (f):
-                root = ElementTree.parse(f).getroot()
-                asset = root.find("asset")
-                for v in asset.findall("assetItem"):
-                    if not self.ts:
-                        u = v.find("url").text
-                        self.ts = getTSUrl(u)
+        folder = Config.m6Folder
+        name = Utils.httpFilename(self.url)
+        localName = os.path.join(folder, name)
+        progress = Utils.getProgress()
 
-        return super(Program, self).getTabletPlaylist()
+        f = Utils.download(self.grabber, progress, self.url, localName, self.downType, "utf-8", True)
+        if (f):
+            root = ElementTree.parse(f).getroot()
+            asset = root.find("asset")
+            for v in asset.findall("assetItem"):
+                u = v.find("url").text
+                self.ts = getTSUrl(u)
+                return self.ts

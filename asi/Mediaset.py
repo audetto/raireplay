@@ -133,15 +133,16 @@ class Program(Base.Base):
         self.filename = self.pid + "-" + name
 
 
-    def download(self, folder, options):
-        if not self.h264:
-            content = Utils.getStringFromUrl(self.grabber, self.url)
-            root = ElementTree.fromstring(content)
-            if root.tag == "smil":
-                url = root.find("body").find("switch").find("video").attrib.get("src")
-                Utils.addH264Url(self.h264, 0, url)
+    def getH264(self):
+        if self.h264:
+            return self.h264
 
-        super(Program, self).download(folder, options)
+        content = Utils.getStringFromUrl(self.grabber, self.url)
+        root = ElementTree.fromstring(content)
+        if root.tag == "smil":
+            url = root.find("body").find("switch").find("video").attrib.get("src")
+            Utils.addH264Url(self.h264, 0, url)
+        return self.h264
 
 
     def display(self, width):

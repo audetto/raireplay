@@ -32,10 +32,21 @@ class Base(object):
         return str1
 
 
+    def getTS(self):
+        return self.ts
+
+
+    def getH264(self):
+        return self.h264
+
+
     def getTabletPlaylist(self):
+        if self.m3:
+            return self.m3
+
         try:
-            if (not self.m3) and self.ts:
-                self.m3 = Utils.load_m3u8_from_url(self.grabber, self.ts)
+            ts = self.getTS()
+            self.m3 = Utils.load_m3u8_from_url(self.grabber, ts)
         except urllib.error.HTTPError:
             pass
 
@@ -55,7 +66,7 @@ class Base(object):
         elif options.format == "mms":
             self.downloadMMS(folder, options)
         elif not options.format:
-            if self.h264:
+            if self.getH264():
                 self.downloadH264(folder, options)
             else:
                 m3 = self.getTabletPlaylist()
@@ -71,7 +82,7 @@ class Base(object):
 
 
     def downloadH264(self, folder, options):
-        Utils.downloadH264(self.grabber, folder, self.h264, options, self.pid, self.filename)
+        Utils.downloadH264(self.grabber, folder, self.getH264(), options, self.pid, self.filename)
 
 
     def downloadMMS(self, folder, options):
@@ -104,9 +115,9 @@ class Base(object):
     def display(self, width):
         m3 = self.getTabletPlaylist()
 
-        Utils.displayH264(self.h264)
-        if self.ts:
-            print("ts:", self.ts)
+        Utils.displayH264(self.getH264())
+        if self.getTS():
+            print("ts:", self.getTS())
         if self.mms:
             print("mms:", self.mms)
         print()
