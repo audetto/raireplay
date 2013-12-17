@@ -1,7 +1,6 @@
 import json
 import os.path
 import datetime
-import time
 
 from asi import Utils
 from asi import Config

@@ -1,7 +1,6 @@
 import os
 import json
 import datetime
-import time
 
 from xml.etree import ElementTree
 
@@ -11,12 +10,12 @@ from asi import Base
 
 # this comes from M6group.groovy
 # https://bitbucket.org/Illico/serviio_plugins/wiki/M6group.groovy
-# and maybe earlier frm XBMC
+# and maybe earlier from XBMC
 # http://mirrors.xbmc.org/addons/frodo/plugin.video.m6groupe/
-
 # but it seems to be broken
 
 # this plugin has been moved to use the iphone machinery
+# which seems to work
 
 channels = ["m6", "w9", "6ter"]
 

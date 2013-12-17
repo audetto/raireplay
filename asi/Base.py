@@ -97,7 +97,7 @@ class Base(object):
 
             libmimms.core.download(opt)
 
-        except ImportError as e:
+        except ImportError:
             print("\nMissing libmimms.\nCannot downalod: {0}.".format(mms))
 
 
