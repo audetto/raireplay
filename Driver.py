@@ -107,10 +107,12 @@ def process(args):
     if args.tor:
         # we use privoxy to access tor
         Utils.setTorExitNodes(args.tor, args.tor_pass)
-        proxy = { "http" : "http://127.0.0.1:8118" }
+        proxy = { "http"  : "http://127.0.0.1:8118",
+                  "https" : "http://127.0.0.1:8118" }
     else:
         if args.proxy:
-            proxy = { "http" : args.proxy }
+            proxy = { "http"  : args.proxy,
+                      "https" : args.proxy }
 
     proxyHandler = urllib.request.ProxyHandler(proxy)
 
