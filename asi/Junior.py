@@ -143,15 +143,12 @@ class Item(Base.Base):
         self.url = url
         self.title = group
         self.description = title
+        self.canFollow = True
 
 
     def display(self, width):
-        print("=" * width)
-        print("PID:", self.pid)
-        print("Title:", self.title)
-        print("Description:", self.description)
-        print("Follow: ENABLED")
-        print()
+        super(Item, self).display(width)
+
         print("URL:", self.url)
         print()
 
