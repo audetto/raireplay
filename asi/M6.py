@@ -1,5 +1,4 @@
 import os
-import json
 import datetime
 
 from xml.etree import ElementTree
@@ -25,7 +24,10 @@ def getTSUrl(link):
 
 
 def getCatalogueUrl(channel):
-    catalogueUrl = "http://static.m6replay.fr/catalog/m6group_web/{0}replay/catalogue.json"
+# old catalogue
+#    catalogueUrl = "http://static.m6replay.fr/catalog/m6group_web/{0}replay/catalogue.json"
+# iphone catalogue
+    catalogueUrl = "http://static.m6replay.fr/catalog/m6group_iphone/{0}replay/catalogue.xml"
     url = catalogueUrl.format(channel)
     return url
 
@@ -38,22 +40,22 @@ def getInfoUrl(channel, clip):
 
 
 def process(grabber, downType, f, channel, db):
-    o = json.load(f)
+    root = ElementTree.parse(f).getroot()
 
-    clpList = o["clpList"]
+    clpList = root.find("clpList")
 
-    for k, v in clpList.items():
-        if v["type"] == "vi":
-            title = v["programName"] + " - " + v["clpName"]
-            desc = v["desc"]
-            date = v["antennaDate"]
-            seconds = v["duration"]
+    for clp in clpList:
+        k = clp.get("id")
+        title = clp.find("programName").text + " - " + clp.find("clpName").text
+        desc = clp.find("desc").text
+        date = clp.find("antennaDate").text
+        seconds = clp.find("duration").text
 
-            length = datetime.timedelta(seconds = int(seconds))
+        length = datetime.timedelta(seconds = int(seconds))
 
-            pid = Utils.getNewPID(db, k)
-            p = Program(grabber, downType, channel, date, pid, k, length, title, desc)
-            Utils.addToDB(db, p)
+        pid = Utils.getNewPID(db, k)
+        p = Program(grabber, downType, channel, date, pid, k, length, title, desc)
+        Utils.addToDB(db, p)
 
 
 def download(db, grabber, downType):
