@@ -49,6 +49,8 @@ def process(grabber, downType, f, channel, db):
         title = clp.find("programName").text + " - " + clp.find("clpName").text
         desc = clp.find("desc").text
         date = clp.find("antennaDate").text
+        if not date:
+            date = clp.find("publiDate").text
         seconds = clp.find("duration").text
 
         length = datetime.timedelta(seconds = int(seconds))
