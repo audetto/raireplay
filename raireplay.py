@@ -30,6 +30,7 @@ def main():
     parser.add_argument("--search", action = "store", help = "Search RAI TV")
 
     parser.add_argument("--mediaset", action = "store_true", default = False, help = "Video Mediaset")
+    parser.add_argument("--tg5", action = "store_true", default = False, help = "TG Mediaset")
     parser.add_argument("--pluzz", action = "store_true", default = False, help = "Pluzz France Television")
     parser.add_argument("--m6", action = "store_true", default = False, help = "M6")
     parser.add_argument("--tf1", action = "store_true", default = False, help = "MY TF1")

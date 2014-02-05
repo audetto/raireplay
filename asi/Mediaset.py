@@ -88,7 +88,7 @@ def downloadItems(grabber, url, which, conf, folder, progress, downType, db):
             processFullVideo(grabber, f, "brand", conf, folder, progress, downType, db)
 
 
-def download(db, grabber, downType):
+def download(db, grabber, downType, mediasetType):
     progress = Utils.getProgress()
     name = Utils.httpFilename(configUrl)
 
@@ -100,11 +100,12 @@ def download(db, grabber, downType):
     root = ElementTree.fromstring(s)
     conf = parseConfig(root)
 
-    url = conf["ProgramListRequestUrl"]
-    downloadItems(grabber, url, PROGRAM_LIST, conf, folder, progress, downType, db)
-
-    url = conf["FullVideoRequestUrl"].replace("http://ww.", "http://www.")
-    downloadItems(grabber, url, FULL_VIDEO, conf, folder, progress, downType, db)
+    if mediasetType == "tg5":
+        url = conf["FullVideoRequestUrl"].replace("http://ww.", "http://www.")
+        downloadItems(grabber, url, FULL_VIDEO, conf, folder, progress, downType, db)
+    else:
+        url = conf["ProgramListRequestUrl"]
+        downloadItems(grabber, url, PROGRAM_LIST, conf, folder, progress, downType, db)
 
 
 def getMediasetLink(conf, num):

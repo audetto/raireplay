@@ -166,7 +166,10 @@ def process(args):
         M6.download(db, grabber, args.download)
 
     if args.mediaset:
-        Mediaset.download(db, grabber, args.download)
+        Mediaset.download(db, grabber, args.download, "mediaset")
+
+    if args.tg5:
+        Mediaset.download(db, grabber, args.download, "tg5")
 
     if args.item:
         p = Item.Demand(grabber, args.item, args.download, len(db))
