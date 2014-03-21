@@ -1,5 +1,6 @@
 import sys
 import os.path
+import posixpath
 import urllib.parse
 import m3u8
 import codecs
@@ -300,7 +301,7 @@ def load_m3u8_from_url(grabber, uri):
     base_path = posixpath.normpath(parsed_url.path + '/..')
     base_uri = urllib.parse.urljoin(prefix, base_path)
 
-    return m3u8.M3U8(content, base_uri)
+    return m3u8.M3U8(content, base_uri = base_uri)
 
 
 def setTorExitNodes(country, password):
