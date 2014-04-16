@@ -14,6 +14,7 @@ from asi import TF1
 from asi import Mediaset
 from asi import Console
 from asi import M6
+from asi import Playlist
 
 import re
 import datetime
@@ -173,6 +174,10 @@ def process(args):
 
     if args.item:
         p = Item.Demand(grabber, args.item, args.download, len(db))
+        db[p.pid] = p
+
+    if args.m3u8:
+        p = Playlist.process(grabber, args.m3u8, len(db))
         db[p.pid] = p
 
     if args.pid:
