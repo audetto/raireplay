@@ -9,7 +9,7 @@ from asi import Config
 from asi import Base
 from asi import RAIUrls
 
-channels = {"1": "RaiUno", "2": "RaiDue", "3": "RaiTre", "31": "RaiCinque", "32": "RaiPremium", "38": "RaiYoyo"}
+channels = {"1": "RaiUno", "2": "RaiDue", "3": "RaiTre", "23": "RaiGulp", "31": "RaiCinque", "32": "RaiPremium", "38": "RaiYoyo"}
 
 # we want to extract all the
 # h264_DIGIT
