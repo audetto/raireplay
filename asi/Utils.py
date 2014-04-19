@@ -335,7 +335,7 @@ def makeFilename(value):
         return value
 
     translateTo = "_"
-    charactersToRemove = " /:^,|'"
+    charactersToRemove = " /:^,|'\\."
     translateTable = dict((ord(char), translateTo) for char in charactersToRemove)
     name = value.translate(translateTable)
     name = removeAccents(name)
