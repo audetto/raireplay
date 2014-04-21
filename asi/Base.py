@@ -79,11 +79,11 @@ class Base(object):
 
     def downloadTablet(self, folder, options, remux):
         m3 = self.getTabletPlaylist()
-        Utils.downloadM3U8(self.grabber, folder, m3, options, self.pid, self.filename, remux)
+        Utils.downloadM3U8(self.grabber, folder, m3, options, self.pid, self.filename, self.title, remux)
 
 
     def downloadH264(self, folder, options):
-        Utils.downloadH264(self.grabber, folder, self.getH264(), options, self.pid, self.filename)
+        Utils.downloadH264(self.grabber, folder, self.getH264(), options, self.pid, self.filename, self.title)
 
 
     def downloadMMS(self, folder, options):

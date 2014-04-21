@@ -164,16 +164,17 @@ def findUrlByBandwidth(data, bandwidth):
     return opt
 
 
-def remuxToMP4(inFile, outFile):
+def remuxToMP4(inFile, outFile, title):
     # -absf aac_adtstoasc
     # seems to be needed by ffmpeg (Fedora), not by avconv (Pi)
     cmdLine = ["ffmpeg", "-i", inFile, "-vcodec", "copy", "-acodec", "copy", "-absf", "aac_adtstoasc", "-y", outFile]
     code = subprocess.call(cmdLine)
     if code != 0:
         raise Exception("ffmpeg filed: exit code {0}".format(code))
+    setMP4Tag(outFile, title)
 
 
-def downloadM3U8(grabber, folder, m3, options, pid, filename, remux):
+def downloadM3U8(grabber, folder, m3, options, pid, filename, title, remux):
     if m3 and m3.is_variant:
         if remux:
             ext = ".mp4"
@@ -223,7 +224,7 @@ def downloadM3U8(grabber, folder, m3, options, pid, filename, remux):
                 progress.done()
 
             if remux:
-                remuxToMP4(localFilenameTS, localFilename)
+                remuxToMP4(localFilenameTS, localFilename, title)
                 os.remove(localFilenameTS)
 
 
@@ -240,7 +241,7 @@ def downloadM3U8(grabber, folder, m3, options, pid, filename, remux):
             raise
 
 
-def downloadH264(grabber, folder, h264, options, pid, filename):
+def downloadH264(grabber, folder, h264, options, pid, filename, title):
     localFilename = os.path.join(folder, filename + ".mp4")
 
     if (not options.overwrite) and os.path.exists(localFilename):
@@ -263,6 +264,8 @@ def downloadH264(grabber, folder, h264, options, pid, filename):
 
         if os.path.getsize(localFilename) == len(RAIUrls.invalidMP4):
             raise Exception("{0} only available in Italy".format(url))
+
+        setMP4Tag(localFilename, title)
 
         print()
         print("Saved {0} as {1}".format(pid, filename))
@@ -466,3 +469,23 @@ def addH264Url(h264, bwidth, url):
     # can still be used
     if url:
         h264[bwidth] = url
+
+
+# sometimes the downloaded mp4 contains bad tag for the title
+# TG5 has the title set to "unspecified"
+# as this is then used by minidlna, it must be decent enough
+# to be able to find it in the list
+#
+# we could as well remove it
+# btw, the ones that are remux don't have the tag, so they are not wrong
+# for symmetry we set the title tag to all of them
+def setMP4Tag(filename, title):
+    # this is allowed to fail as mutagen(x) is somehow hard to obtain
+    try:
+        import mutagen.easymp4
+        a = mutagen.easymp4.EasyMP4(filename)
+        a["title"] = title
+        a.save()
+    except Exception as e:
+        print("Warning: {0}".format(e))
+        print("Failed to set MP4 tag to : {0}".format(filename))
