@@ -149,7 +149,7 @@ class Demand(Base.Base):
         self.values.videoUrl = self.values.videoUrl.replace("relinkerServlet.mp4", "relinkerServlet.htm")
 
         #make a nice filename
-        self.filename = Utils.makeFilename(self.values.title)
+        self.filename = Utils.makeFilename(self.title)
 
         self.mms = self.values.videoUrl
 

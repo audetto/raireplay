@@ -55,6 +55,7 @@ class Program(Base.Base):
 
         self.canFollow = True
 
+
     def display(self, width):
         super(Program, self).display(width)
 
