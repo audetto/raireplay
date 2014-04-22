@@ -174,7 +174,7 @@ def remuxToMP4(inFile, outFile, title):
     setMP4Tag(outFile, title)
 
 
-def downloadM3U8(grabber, folder, m3, options, pid, filename, title, remux):
+def downloadM3U8(grabberMetadata, grabberProgram, folder, m3, options, pid, filename, title, remux):
     if m3:
         if remux:
             ext = ".mp4"
@@ -197,7 +197,7 @@ def downloadM3U8(grabber, folder, m3, options, pid, filename, title, remux):
             print(playlist)
 
             uri = playlist.absolute_uri
-            item = load_m3u8_from_url(grabber, uri)
+            item = load_m3u8_from_url(grabberMetadata, uri)
         else:
             if len(m3.segments) == 0:
                 return
@@ -213,7 +213,7 @@ def downloadM3U8(grabber, folder, m3, options, pid, filename, title, remux):
             with open(localFilenameTS, "wb") as out:
                 for seg in item.segments:
                     uri = seg.absolute_uri
-                    with grabber.open(uri) as s:
+                    with grabberProgram.open(uri) as s:
                         b = s.read()
                         size = len(b)
                         if progress:
@@ -243,7 +243,7 @@ def downloadM3U8(grabber, folder, m3, options, pid, filename, title, remux):
             raise
 
 
-def downloadH264(grabber, folder, h264, options, pid, filename, title):
+def downloadH264(grabberMetadata, grabberProgram, folder, h264, options, pid, filename, title):
     localFilename = os.path.join(folder, filename + ".mp4")
 
     if (not options.overwrite) and os.path.exists(localFilename):
@@ -262,7 +262,7 @@ def downloadH264(grabber, folder, h264, options, pid, filename, title):
 
     try:
         progress = getProgress()
-        downloadFile(grabber, progress, url, localFilename)
+        downloadFile(grabberProgram, progress, url, localFilename)
 
         if os.path.getsize(localFilename) == len(RAIUrls.invalidMP4):
             raise Exception("{0} only available in Italy".format(url))

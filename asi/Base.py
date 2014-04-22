@@ -54,39 +54,39 @@ class Base(object):
         return self.m3
 
 
-    def download(self, folder, options):
+    def download(self, folder, options, grabber):
         if not os.path.exists(folder):
             os.makedirs(folder)
 
         if options.format == "h264":
-            self.downloadH264(folder, options)
+            self.downloadH264(folder, options, grabber)
         elif options.format == "ts":
-            self.downloadTablet(folder, options, False)
+            self.downloadTablet(folder, options, grabber, False)
         elif options.format == "tsmp4":
-            self.downloadTablet(folder, options, True)
+            self.downloadTablet(folder, options, grabber, True)
         elif options.format == "mms":
-            self.downloadMMS(folder, options)
+            self.downloadMMS(folder, options, grabber)
         elif not options.format:
             if self.getH264():
-                self.downloadH264(folder, options)
+                self.downloadH264(folder, options, grabber)
             else:
                 m3 = self.getTabletPlaylist()
                 if m3:
-                    self.downloadTablet(folder, options, True)
+                    self.downloadTablet(folder, options, grabber, True)
                 elif self.mms:
-                    self.downloadMMS(folder, options)
+                    self.downloadMMS(folder, options, grabber)
 
 
-    def downloadTablet(self, folder, options, remux):
+    def downloadTablet(self, folder, options, grabber, remux):
         m3 = self.getTabletPlaylist()
-        Utils.downloadM3U8(self.grabber, folder, m3, options, self.pid, self.filename, self.title, remux)
+        Utils.downloadM3U8(self.grabber, grabber, folder, m3, options, self.pid, self.filename, self.title, remux)
 
 
-    def downloadH264(self, folder, options):
+    def downloadH264(self, folder, options, grabber):
         Utils.downloadH264(self.grabber, folder, self.getH264(), options, self.pid, self.filename, self.title)
 
 
-    def downloadMMS(self, folder, options):
+    def downloadMMS(self, folder, options, grabber):
         mms = Utils.getMMSUrl(self.grabber, self.mms)
 
         try:

@@ -18,6 +18,7 @@ def main():
     parser.add_argument("--ip", action = "store_true", default = False)
     parser.add_argument("--tor", action = "store", help = "coutry code for tor exit nodes")
     parser.add_argument("--tor-pass", action = "store")
+    parser.add_argument("--tor-only-metadata", action = "store_true", default = False, help = "do not use tor for actual download")
     parser.add_argument("--proxy", action = "store")
     parser.add_argument("--overwrite", action = "store_true", default = False, help = "overwrite program")
     parser.add_argument("--location", action = "store", help = "path where to download programs")

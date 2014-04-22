@@ -21,7 +21,7 @@ import datetime
 import urllib
 
 
-def displayOrGet(item, nolist, info, get, options):
+def displayOrGet(item, nolist, info, get, options, grabber):
     if info:
         width = Console.terminal_width()
         item.display(width)
@@ -32,19 +32,20 @@ def displayOrGet(item, nolist, info, get, options):
 
     if get:
         try:
-            item.download(Config.programFolder, options)
+            item.download(Config.programFolder, options, grabber)
         except Exception as e:
             print("Exception: {0}".format(e))
             print()
+            raise
 
 
-def listDisplayOrGet(items, nolist, info, get, options):
+def listDisplayOrGet(items, nolist, info, get, options, grabber):
     if nolist:
         print()
         print("INFO: {0} programmes found".format(len(items)))
 
     for p in sorted(items.values(), key = lambda x: (x.datetime, x.title)):
-        displayOrGet(p, nolist, info, get, options)
+        displayOrGet(p, nolist, info, get, options, grabber)
 
 
 def filterByDate(db, value):
@@ -122,6 +123,15 @@ def process(args):
     # (m3u8 and urlretrieve)
     urllib.request.install_opener(grabber)
 
+    grabberForDownload = None
+    if args.tor and args.tor_only_metadata:
+        # we do not want to use to for the actual download
+        # only for the metadata
+        grabberForDownload = urllib.request.build_opener()
+    else:
+        # use the same opener everywhere
+        grabberForDownload = grabber
+
     if args.ip:
         width = Console.terminal_width()
         Info.display(grabber, width, args.tor)
@@ -152,7 +162,6 @@ def process(args):
             for p in subset.values():
                 p.follow(db, args.download)
             follows = follows[1:] # continue with one element less
-
 
     if args.replay:
         Replay.download(db, grabber, args.download)
@@ -197,4 +206,4 @@ def process(args):
     # format, bwidth, overwrite, quiet
     options = args
 
-    listDisplayOrGet(subset, args.nolist, args.info, args.get, options)
+    listDisplayOrGet(subset, args.nolist, args.info, args.get, options, grabberForDownload)
