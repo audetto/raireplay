@@ -175,7 +175,7 @@ def remuxToMP4(inFile, outFile, title):
 
 
 def downloadM3U8(grabber, folder, m3, options, pid, filename, title, remux):
-    if m3 and m3.is_variant:
+    if m3:
         if remux:
             ext = ".mp4"
         else:
@@ -190,16 +190,18 @@ def downloadM3U8(grabber, folder, m3, options, pid, filename, title, remux):
             print()
             return
 
-        playlist = findPlaylist(m3, options.bwidth)
+        if m3.is_variant:
+            playlist = findPlaylist(m3, options.bwidth)
 
-        print("Downloading:")
-        print(playlist)
+            print("Downloading:")
+            print(playlist)
 
-        uri = playlist.absolute_uri
-        item = load_m3u8_from_url(grabber, uri)
-        if not m3.is_variant:
-            print("m3u8 @ {0} is not a playlist".format(uri))
-            return
+            uri = playlist.absolute_uri
+            item = load_m3u8_from_url(grabber, uri)
+        else:
+            if len(m3.segments) == 0:
+                return
+            item = m3
 
         print()
         print("Saving {0} as {1}".format(pid, localFilename))
@@ -354,17 +356,25 @@ def getResolution(p):
 
 
 def displayM3U8(m3):
-    if m3 and m3.is_variant:
-        for playlist in m3.playlists:
-            fmt = "\tProgram: {0:>2}, Bandwidth: {1:>10}, Resolution: {2:>10}, Codecs: {3}"
+    if m3:
+        if m3.is_variant:
+            for playlist in m3.playlists:
+                fmt = "\tProgram: {0:>2}, Bandwidth: {1:>10}, Resolution: {2:>10}, Codecs: {3}"
 
-            # bandwidth is alaways in Kb.
-            # so we divide by 1000
+                # bandwidth is alaways in Kb.
+                # so we divide by 1000
 
-            line = fmt.format(playlist.stream_info.program_id, int(playlist.stream_info.bandwidth) // 1000,
-                                 getResolution(playlist), playlist.stream_info.codecs)
-            print(line)
-        print()
+                line = fmt.format(playlist.stream_info.program_id, int(playlist.stream_info.bandwidth) // 1000,
+                                     getResolution(playlist), playlist.stream_info.codecs)
+                print(line)
+            print()
+        else:
+            numberOfSegments = len(m3.segments)
+            if numberOfSegments:
+                fmt = "\tPlaylist: {0} segments"
+                line = fmt.format(numberOfSegments)
+                print(line)
+                print()
 
 
 def displayH264(h264):
