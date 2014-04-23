@@ -83,7 +83,7 @@ class Base(object):
 
 
     def downloadH264(self, folder, options, grabber):
-        Utils.downloadH264(self.grabber, folder, self.getH264(), options, self.pid, self.filename, self.title)
+        Utils.downloadH264(self.grabber, grabber, folder, self.getH264(), options, self.pid, self.filename, self.title)
 
 
     def downloadMMS(self, folder, options, grabber):
