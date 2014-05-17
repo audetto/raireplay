@@ -113,20 +113,5 @@ class Program(Base.Base):
         self.grabber = grabber
         self.length = length
 
-        self.filename = self.getFilename()
-
-
-    # use RAI m3u8 url to get a "nice" filename
-    # as opposed to only use the pid
-    def getFilename(self):
-        if self.ts == "":
-            return self.pid
-
-        fullName = os.path.split(os.path.split(urllib.parse.urlsplit(self.ts).path)[0])[1]
-        tmp = fullName.split(",")[0]
-        posOfDash = tmp.rfind("-")
-        nice = tmp[0 : posOfDash]
-
-        filename = self.pid + "-" + nice
-
-        return filename
+        name = Utils.makeFilename(self.title)
+        self.filename = self.pid + "-" + name
