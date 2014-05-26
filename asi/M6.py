@@ -16,7 +16,7 @@ from asi import Base
 # this plugin has been moved to use the iphone machinery
 # which seems to work
 
-channels = ["m6", "w9", "6ter"]
+channels = ["m6replay", "w9replay", "6terreplay", "styles", "stories", "comedy", "crazy_kitchen"]
 
 def getTSUrl(link):
     ts = "https://lb.cdn.m6web.fr/s/su/s/m6replay_iphone/iphone/{0}".format(link)
@@ -27,13 +27,13 @@ def getCatalogueUrl(channel):
 # old catalogue
 #    catalogueUrl = "http://static.m6replay.fr/catalog/m6group_web/{0}replay/catalogue.json"
 # iphone catalogue
-    catalogueUrl = "http://static.m6replay.fr/catalog/m6group_iphone/{0}replay/catalogue.xml"
+    catalogueUrl = "http://static.m6replay.fr/catalog/m6group_iphone/{0}/catalogue.xml"
     url = catalogueUrl.format(channel)
     return url
 
 
 def getInfoUrl(channel, clip):
-    infoUrl = "http://static.m6replay.fr/catalog/m6group_iphone/{0}replay/clip/{1}/clip_infos-{2}.xml"
+    infoUrl = "http://static.m6replay.fr/catalog/m6group_iphone/{0}/clip/{1}/clip_infos-{2}.xml"
     clip_key = clip[-2:] + '/' + clip[-4:-2]
     url = infoUrl.format(channel, clip_key, clip)
     return url
