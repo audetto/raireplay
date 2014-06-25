@@ -350,7 +350,7 @@ def makeFilename(value):
 
 def getResolution(p):
     if not p.stream_info.resolution:
-        return None
+        return "N/A"
     res = "{0:>4}x{1:>4}".format(p.stream_info.resolution[0], p.stream_info.resolution[1])
     return res
 
