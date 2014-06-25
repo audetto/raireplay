@@ -21,13 +21,12 @@ import datetime
 import urllib
 
 
-def displayOrGet(item, nolist, info, get, options, grabber):
+def displayOrGet(item, nolist, info, get, options, grabber, fmt):
     if info:
         width = Console.terminal_width()
         item.display(width)
     elif not nolist:
         # this is list
-        fmt = "{0:>9}: {1} {2:13} {3}"
         print(item.short(fmt))
 
     if get:
@@ -44,8 +43,20 @@ def listDisplayOrGet(items, nolist, info, get, options, grabber):
         print()
         print("INFO: {0} programmes found".format(len(items)))
 
+    # dynamically select width of fields
+    # as they change according to broadcaster
+    # as we try not too make them too wide for nothing
+    maxLengthOfPID = 0
+    maxLengthOfChannel = 0
+
+    for p in items.values():
+        maxLengthOfPID = max(maxLengthOfPID, len(str(p.pid)))
+        maxLengthOfChannel = max(maxLengthOfChannel, len(str(p.channel)))
+
+    fmt = " {{0:>{0}}}: {{1}} {{2:{1}}} {{3}}".format(maxLengthOfPID, maxLengthOfChannel)
+
     for p in sorted(items.values(), key = lambda x: (x.datetime, x.title)):
-        displayOrGet(p, nolist, info, get, options, grabber)
+        displayOrGet(p, nolist, info, get, options, grabber, fmt)
 
 
 def filterByDate(db, value):
@@ -84,10 +95,9 @@ def find(db, pid, isre, subset):
     if pid in db:
         subset[pid] = db[pid]
     else:
-        fmt = "{3}"
         match = pid.lower()
         for ppid, p in db.items():
-            title = p.short(fmt)
+            title = p.title
             if isre:
                 if re.match(pid, title):
                     subset[ppid] = p
