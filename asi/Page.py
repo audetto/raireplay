@@ -44,7 +44,7 @@ class Elem(Base.Base):
 
         self.filename      = Utils.makeFilename(self.title)
 
-        self.cafFollow     = True
+        self.canFollow     = True
 
 
     def display(self, width):
