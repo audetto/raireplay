@@ -12,6 +12,7 @@ import io
 import configparser
 import socket
 import re
+import gzip
 
 from xml.etree import ElementTree
 
@@ -299,7 +300,18 @@ def load_m3u8_from_url(grabber, uri):
     request = urllib.request.Request(uri, headers = httpHeaders)
     stream = grabber.open(request)
 
-    content = stream.read().decode('ascii').strip()
+    encoding = None
+
+    # TF1 returns gzipped m3u8 playlists
+    info = stream.info()
+    if "Content-Encoding" in info:
+        encoding = info["Content-Encoding"]
+
+    data = stream.read()
+    if encoding == "gzip":
+        data = gzip.decompress(data)
+
+    content = data.decode('ascii').strip()
 
     parsed_url = urllib.parse.urlparse(uri)
     prefix = parsed_url.scheme + '://' + parsed_url.netloc
