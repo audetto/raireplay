@@ -207,6 +207,9 @@ def downloadM3U8(grabberMetadata, grabberProgram, folder, m3, options, pid, file
         print()
         print("Saving {0} as {1}".format(pid, localFilename))
 
+        # maximum number of attempts per segment
+        max_attempts = options.ts_tries
+
         try:
             numberOfFiles = len(item.segments)
             progress = getProgress(numberOfFiles, filename + ".ts")
@@ -214,14 +217,24 @@ def downloadM3U8(grabberMetadata, grabberProgram, folder, m3, options, pid, file
             with open(localFilenameTS, "wb") as out:
                 for seg in item.segments:
                     uri = seg.absolute_uri
-                    with grabberProgram.open(uri) as s:
-                        b = s.read()
-                        size = len(b)
-                        if progress:
-                            progress.start(size)
-                        out.write(b)
-                        if progress:
-                            progress.update(size)
+                    attempt = 0
+                    while True:
+                        try:
+                            attempt = attempt + 1
+                            with grabberProgram.open(uri) as s:
+                                b = s.read()
+                                size = len(b)
+                                if progress:
+                                    progress.start(size)
+                                out.write(b)
+                                if progress:
+                                    progress.update(size)
+                            break
+                        except:# urllib.error.HTTPError as error:
+                            if attempt <= max_attempts:
+                                progress.update(0)
+                            else:
+                                raise
 
             if progress:
                 progress.done()
