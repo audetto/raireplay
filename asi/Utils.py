@@ -230,7 +230,7 @@ def downloadM3U8(grabberMetadata, grabberProgram, folder, m3, options, pid, file
                                 if progress:
                                     progress.update(size)
                             break
-                        except:# urllib.error.HTTPError as error:
+                        except urllib.error.HTTPError:
                             if attempt <= max_attempts:
                                 progress.update(0)
                             else:
