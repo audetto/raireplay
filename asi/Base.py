@@ -110,7 +110,7 @@ class Base(object):
             libmimms.core.download(opt)
 
         except ImportError:
-            print("\nMissing libmimms.\nCannot downalod: {0}.".format(mms))
+            print("\nMissing libmimms.\nCannot download: {0}.".format(mms))
 
 
     def display(self, width):

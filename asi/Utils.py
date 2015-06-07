@@ -171,7 +171,7 @@ def remuxToMP4(inFile, outFile, title):
     cmdLine = ["ffmpeg", "-i", inFile, "-vcodec", "copy", "-acodec", "copy", "-absf", "aac_adtstoasc", "-y", outFile]
     code = subprocess.call(cmdLine)
     if code != 0:
-        raise Exception("ffmpeg filed: exit code {0}".format(code))
+        raise Exception("ffmpeg failed: exit code {0}".format(code))
     setMP4Tag(outFile, title)
 
 
