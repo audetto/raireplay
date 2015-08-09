@@ -285,8 +285,10 @@ def downloadH264(grabberMetadata, grabberProgram, folder, h264, options, pid, fi
         progress = getProgress()
         downloadFile(grabberMetadata, grabberProgram, progress, url, localFilename)
 
-        if os.path.getsize(localFilename) == len(RAIUrls.invalidMP4):
-            raise Exception("{0} only available in Italy".format(url))
+        size = os.path.getsize(localFilename)
+        for a in RAIUrls.invalidMP4:
+            if size == len(a):
+                raise Exception("{0} only available in Italy".format(url))
 
         setMP4Tag(localFilename, title)
 
@@ -476,7 +478,7 @@ def getMMSUrl(grabber, url):
         # search for the mms url
         content = getStringFromUrl(grabber, url)
 
-        if content == RAIUrls.invalidMP4:
+        if content in RAIUrls.invalidMP4:
             # is this the case of videos only available in Italy?
             mms = content
         else:

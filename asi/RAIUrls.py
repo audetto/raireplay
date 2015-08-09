@@ -3,10 +3,12 @@ import urllib.parse
 onDemand     = "http://www.rai.tv/dl/RaiTV/programmi/ricerca/ContentSet-6445de64-d321-476c-a890-ae4ed32c729e-darivedere.html"
 replay       = "http://www.rai.it/dl/portale/html/palinsesti/replaytv/static"
 info         = "http://www.rai.tv/dl/RaiTV/iphone/assets/tg_json.js?NS=0-1-4c61b46e9a4ab09b25da2246ae52d31edb528475-5.1.1"
-invalidMP4   = "http://creativemedia3.rai.it/video_no_available.mp4"
 junior       = "http://www.junior.rai.it/dl/junior/pages/H1/ContentSet-94000ddd-f6c6-4a24-87d6-7a63817ae207.html"
-
 base         = "http://www.rai.tv"
+
+invalidMP4   = {"http://creativemedia3.rai.it/video_no_available.mp4",
+                '<Mediapolis><url type="content">http://download.rai.it/video_no_available.mp4</url><url type="bumper"></url><url type="bumperend"></url><ct>mp4</ct><bitrate>0</bitrate><smooth>N</smooth><is_live>N</is_live><description>Rai</description><geoprotection>N</geoprotection><category>11111</category><plVod></plVod><plLive></plLive><logo></logo><poster>http://www.rai.tv/dl/RaiTV/2012/images/ogImage.jpg</poster><duration></duration><krpano></krpano></Mediapolis>'}
+
 
 def getItemUrl(name):
     url = "http://www.rai.tv/dl/RaiTV/programmi/media/" + name + ".html"
