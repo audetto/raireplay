@@ -45,8 +45,20 @@ def parseItem(grabber, channel, date, time, value, db):
         single = value["h264"]
         Utils.addH264Url(h264, 0, single)
 
+    # sometimes RAI puts the same url for h264 and TS
+    # normally this is only a valid h264,
+    # so we skip it in TS
+
+    h264Urls = h264.values()
+
     tablet = value["urlTablet"]
+    if tablet in h264Urls:
+        tablet = None
+
     smartPhone = value["urlSmartPhone"]
+    if smartPhone in h264Urls:
+        smartPhone = None
+
     pid = value["i"]
 
     if h264 or tablet or smartPhone:
