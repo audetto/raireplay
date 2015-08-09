@@ -35,44 +35,51 @@ def httpFilename(url):
 
 
 # simply download a file and saves it to localName
-def downloadFile(grabber, progress, url, localName):
+def downloadFile(grabberMetadata, grabberProgram, progress, url, localName):
     try:
         if progress:
             progress.setName(localName)
 
         request = urllib.request.Request(url, headers = httpHeaders)
-        with grabber.open(request) as response, open(localName, "wb") as f:
-            # same length as shutil.copyfileobj
 
-            # the rest is the same logic as urllib.request.urlretrieve
-            # which unfortunately does not work with proxies
-            blockSize = 1024 * 16
-            size = -1
+        with grabberMetadata.open(request) as response:
+            actualUrl = response.geturl()
+            if actualUrl != url and grabberMetadata != grabberProgram:
+                print("REDIRECTION: {0}".format(actualUrl))
+                return downloadFile(grabberProgram, grabberProgram, progress, actualUrl, localName)
 
-            headers = response.info()
-            if "content-length" in headers:
-                size = int(headers["Content-Length"])
+            with open(localName, "wb") as f:
+                # same length as shutil.copyfileobj
 
-            if progress:
-                progress.start(size)
+                # the rest is the same logic as urllib.request.urlretrieve
+                # which unfortunately does not work with proxies
+                blockSize = 1024 * 16
+                size = -1
 
-            while 1:
-                buf = response.read(blockSize)
-                if not buf:
-                    break
-                amountRead = len(buf)
-                f.write(buf)
+                headers = response.info()
+                if "content-length" in headers:
+                    size = int(headers["Content-Length"])
+
                 if progress:
-                    progress.update(amountRead)
+                    progress.start(size)
 
-            if progress:
-                progress.done()
+                while 1:
+                    buf = response.read(blockSize)
+                    if not buf:
+                        break
+                    amountRead = len(buf)
+                    f.write(buf)
+                    if progress:
+                        progress.update(amountRead)
+
+                if progress:
+                    progress.done()
     except:
         print("Failed to download program file: {0}".format(url))
         raise
 
 
-#def downloadFile(grabber, progress, url, localName):
+#def downloadFile(grabberMetadata, grabberProgram, progress, url, localName):
 #    if progress:
 #        progress.setName(localName)
 #    request = urllib.request.Request(url, headers = httpHeaders)
@@ -111,7 +118,7 @@ def download(grabber, progress, url, localName, downType, encoding, checkTime = 
                 exists = age < maximum
 
             if downType == "always" or (downType == "update" and not exists):
-                downloadFile(grabber, progress, url, localName)
+                downloadFile(grabber, grabber, progress, url, localName)
 
             # now the file exists on the local filesystem
             if not encoding:
@@ -276,7 +283,7 @@ def downloadH264(grabberMetadata, grabberProgram, folder, h264, options, pid, fi
 
     try:
         progress = getProgress()
-        downloadFile(grabberProgram, progress, url, localFilename)
+        downloadFile(grabberMetadata, grabberProgram, progress, url, localFilename)
 
         if os.path.getsize(localFilename) == len(RAIUrls.invalidMP4):
             raise Exception("{0} only available in Italy".format(url))
