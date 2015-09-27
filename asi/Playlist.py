@@ -20,3 +20,4 @@ class Program(Base.Base):
         self.filename = os.path.basename(filename)
 
         self.m3 = m3u8.load(filename)
+        self.channel = "m3u8"
