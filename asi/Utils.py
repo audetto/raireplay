@@ -205,7 +205,7 @@ def downloadM3U8(grabberMetadata, grabberProgram, folder, m3, options, pid, file
             print(playlist)
 
             uri = playlist.absolute_uri
-            item = load_m3u8_from_url(grabberMetadata, uri)
+            item = load_m3u8_from_url(grabberProgram, uri)
         else:
             if len(m3.segments) == 0:
                 return
