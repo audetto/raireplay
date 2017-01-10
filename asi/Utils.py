@@ -6,13 +6,14 @@ import m3u8
 import codecs
 import datetime
 import unicodedata
-import telnetlib
 import subprocess
 import io
 import configparser
 import socket
 import re
 import gzip
+import stem
+import stem.connection
 
 from xml.etree import ElementTree
 
@@ -341,32 +342,6 @@ def load_m3u8_from_url(grabber, uri):
     base_uri = urllib.parse.urljoin(prefix, base_path)
 
     return m3u8.M3U8(content, base_uri = base_uri)
-
-
-def setTorExitNodes(country, password):
-    tn = telnetlib.Telnet("127.0.0.1", 9051)
-    if not password:
-        password = ""
-    tn.write('AUTHENTICATE "{0}"\n'.format(password).encode("ascii"))
-    tn.write("SETCONF ExitNodes={{{0}}}\n".format(country).encode("ascii"))
-    tn.write("QUIT\n".encode("ascii"))
-    tn.close()
-
-
-def getTorExitNodes(password):
-    try:
-        tn = telnetlib.Telnet("127.0.0.1", 9051)
-        if not password:
-            password = ""
-        tn.write('AUTHENTICATE "{0}"\n'.format(password).encode("ascii"))
-        tn.read_until(b'\n')
-        tn.write("GETCONF ExitNodes\n".encode("ascii"))
-        res = tn.read_until(b'\n')
-        tn.write("QUIT\n".encode("ascii"))
-        tn.close()
-        return res
-    except socket.error:
-        return None
 
 
 def makeFilename(value):

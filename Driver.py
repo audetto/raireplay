@@ -15,6 +15,7 @@ from asi import Mediaset
 from asi import Console
 from asi import M6
 from asi import Playlist
+from asi import Tor
 
 import re
 import datetime
@@ -116,14 +117,15 @@ def process(args):
         Config.programFolder = Config.createFolder(args.location)
 
     if args.tor:
+        Tor.setTorExitNodes(args.tor)
+
+    if args.tor or args.tor_proxy:
         # we use privoxy to access tor
-        Utils.setTorExitNodes(args.tor, args.tor_pass)
         proxy = { "http"  : "http://127.0.0.1:8118",
                   "https" : "http://127.0.0.1:8118" }
-    else:
-        if args.proxy:
-            proxy = { "http"  : args.proxy,
-                      "https" : args.proxy }
+    elif args.proxy:
+        proxy = { "http"  : args.proxy,
+                  "https" : args.proxy }
 
     proxyHandler = urllib.request.ProxyHandler(proxy)
 
@@ -133,7 +135,7 @@ def process(args):
     urllib.request.install_opener(grabber)
 
     grabberForDownload = None
-    if proxy and args.tor_only_metadata:
+    if proxy and not args.tor_only:
         # we do not want to use tor/proxy for the actual download
         # only for the metadata
         grabberForDownload = urllib.request.build_opener()
@@ -141,9 +143,14 @@ def process(args):
         # use the same opener everywhere
         grabberForDownload = grabber
 
+    if args.tor_search and args.tor:
+        width = Console.terminal_width()
+        Info.searchTor(grabber, width, args.tor, int(args.tor_search))
+        return
+
     if args.ip:
         width = Console.terminal_width()
-        Info.display(grabber, width, args.tor)
+        Info.display(grabber, width)
         return
 
     if args.page:
