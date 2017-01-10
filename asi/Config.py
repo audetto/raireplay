@@ -11,6 +11,7 @@ rootFolder    = createFolder(os.path.join(homeFolder, ".raireplay"))
 dataFolder    = createFolder(os.path.join(rootFolder, "data"))
 
 replayFolder  = createFolder(os.path.join(dataFolder, "replay"))
+raiplayFolder = createFolder(os.path.join(dataFolder, "raiplay"))
 itemFolder    = createFolder(os.path.join(dataFolder, "items"))
 pageFolder    = createFolder(os.path.join(dataFolder, "pages"))
 demandFolder  = createFolder(os.path.join(dataFolder, "demand"))

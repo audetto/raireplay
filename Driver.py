@@ -2,6 +2,7 @@
 from asi import Utils
 from asi import Info
 from asi import Replay
+from asi import RaiPlay
 from asi import Page
 from asi import Item
 from asi import TG
@@ -181,6 +182,9 @@ def process(args):
 
     if args.replay:
         Replay.download(db, grabber, args.download)
+
+    if args.raiplay:
+        RaiPlay.download(db, grabber, args.download)
 
     if args.pluzz:
         Pluzz.download(db, grabber, args.download)
