@@ -1,8 +1,7 @@
-import stem
-import stem.connection
-
-
 def setTorExitNodes(country):
+    import stem
+    import stem.connection
+
     with stem.control.Controller.from_port() as controller:
         controller.authenticate()
         controller.set_conf("ExcludeNodes", "")
@@ -13,6 +12,9 @@ def setTorExitNodes(country):
 
 
 def setTorExcludeNodes(skip):
+    import stem
+    import stem.connection
+
     with stem.control.Controller.from_port() as controller:
         controller.authenticate()
         controller.set_conf("ExcludeNodes", skip)
@@ -20,6 +22,9 @@ def setTorExcludeNodes(skip):
 
 def getTorExitNodes():
     try:
+        import stem
+        import stem.connection
+
         with stem.control.Controller.from_port() as controller:
             controller.authenticate()
             res = controller.get_conf("ExitNodes")
@@ -29,6 +34,9 @@ def getTorExitNodes():
 
 def getTorExcludeNodes():
     try:
+        import stem
+        import stem.connection
+
         with stem.control.Controller.from_port() as controller:
             controller.authenticate()
             res = controller.get_conf("ExcludeNodes")

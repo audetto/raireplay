@@ -12,8 +12,6 @@ import configparser
 import socket
 import re
 import gzip
-import stem
-import stem.connection
 
 from xml.etree import ElementTree
 
