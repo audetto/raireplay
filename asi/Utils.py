@@ -111,10 +111,10 @@ def download(grabber, progress, url, localName, downType, encoding, checkTime = 
                 raise Exception("Will not download missing file: {0} -> {1}".format(url, localName))
 
             if exists and checkTime:
-                # if it is more than a day old, we redownload it
-                age = datetime.datetime.today() - datetime.datetime.fromtimestamp(os.path.getmtime(localName))
-                maximum = datetime.timedelta(days = 1)
-                exists = age < maximum
+                # if it is from yesterday or before, we re-download it
+                today = datetime.date.today()
+                fileTime = datetime.datetime.fromtimestamp(os.path.getmtime(localName))
+                exists = today == fileTime.date()
 
             if downType == "always" or (downType == "update" and not exists):
                 downloadFile(grabber, grabber, progress, url, localName)
