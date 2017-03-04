@@ -62,10 +62,13 @@ def download(db, grabber, downType):
         filename = "canale=" + channel
         url = RAIUrls.raiplay + filename
         localName = os.path.join(folder, filename + ".json")
-        f = Utils.download(grabber, progress, url, localName, downType, "utf-8", True)
+        try:
+            f = Utils.download(grabber, progress, url, localName, downType, "utf-8", True)
 
-        if f:
-            process(grabber, downType, f, db, dup)
+            if f:
+                process(grabber, downType, f, db, dup)
+        except json.decoder.JSONDecodeError as e:
+            print(channel + ": " + str(e))
 
 
 class Program(Base.Base):
