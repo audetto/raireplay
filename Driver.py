@@ -6,8 +6,6 @@ from asi import RaiPlay
 from asi import Page
 from asi import Item
 from asi import TG
-from asi import Search
-from asi import Junior
 from asi import Demand
 from asi import Config
 from asi import Pluzz
@@ -162,12 +160,6 @@ def process(args):
 
     if args.tg:
         TG.download(db, grabber, args.download)
-
-    if args.junior:
-        Junior.download(db, grabber, args.download)
-
-    if args.search:
-        Search.download(db, grabber, args.search, args.download)
 
     if args.follow:
         follows = args.follow

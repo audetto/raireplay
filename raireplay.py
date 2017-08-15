@@ -30,8 +30,6 @@ def main():
     parser.add_argument("--raiplay", action = "store_true", default = False, help = "RaiPlay")
     parser.add_argument("--ondemand", action = "store_true", default = False, help = "RAI On Demand List")
     parser.add_argument("--tg", action = "store_true", default = False, help = "Telegiornali RAI")
-    parser.add_argument("--junior", action = "store_true", default = False, help = "RAI Junior")
-    parser.add_argument("--search", action = "store", help = "Search RAI TV")
 
     parser.add_argument("--mediaset", action = "store_true", default = False, help = "Video Mediaset")
     parser.add_argument("--tg5", action = "store_true", default = False, help = "TG Mediaset")
