@@ -83,13 +83,16 @@ class Program(Base.Base):
 
         self.url = RAIUrls.base + pathID
 
-        self.datetime = datetime.datetime.strptime(date + " " + hour, "%d/%m/%Y %H:%M")
+        if date and hour:
+            self.datetime = datetime.datetime.strptime(date + " " + hour, "%d/%m/%Y %H:%M")
+        else:
+            self.datetime = datetime.datetime.now()
 
         self.grabber = grabber
         self.length = length
 
         name = Utils.makeFilename(self.title)
-        self.filename = self.pid + "-" + name
+        self.filename = name
 
 
     def getTS(self):
