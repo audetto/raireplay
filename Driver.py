@@ -17,6 +17,7 @@ from asi import M6
 from asi import Playlist
 from asi import Tor
 
+import os
 import re
 import datetime
 import urllib
@@ -115,6 +116,9 @@ def process(args):
 
     if args.location:
         Config.programFolder = Config.createFolder(args.location)
+
+    if args.here:
+        Config.programFolder = os.getcwd()
 
     if args.tor:
         Tor.setTorExitNodes(args.tor)
