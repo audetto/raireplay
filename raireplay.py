@@ -18,7 +18,7 @@ def main():
     parser.add_argument("--ip", action = "store_true", default = False)
     parser.add_argument("--tor", action = "store", help = "coutry code for tor exit nodes")
     parser.add_argument("--tor-proxy", action = "store_true", default = False, help = "use tor proxy")
-    parser.add_argument("--tor-search", action = "store", help = "search for a tor exit node [attempts]")
+    parser.add_argument("--tor-search", action = "store", help = "search for a tor exit node [attempts,skip]")
     parser.add_argument("--tor-only", action = "store_true", default = False, help = "use tor for everything")
     parser.add_argument("--proxy", action = "store")
     parser.add_argument("--overwrite", action = "store_true", default = False, help = "overwrite program")

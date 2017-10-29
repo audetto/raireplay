@@ -149,7 +149,7 @@ def process(args):
 
     if args.tor_search and args.tor:
         width = Console.terminal_width()
-        Info.searchTor(grabber, width, args.tor, int(args.tor_search))
+        Info.searchTor(grabber, width, args.tor, args.tor_search)
         return
 
     if args.ip:

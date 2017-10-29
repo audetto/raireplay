@@ -1,4 +1,5 @@
 import re
+import json
 
 from asi import Utils
 from asi import Config
@@ -15,12 +16,22 @@ userLocation = "http://mediapolis.rai.it/relinker/relinkerServlet.htm?cont=82681
 userIP = "http://api.prod.capptain.com/ip-to-country"
 userIP = "https://api.ipify.org"
 
+geoIP = "https://freegeoip.net/json/"
+
 targets = {'it': 'ITA'}
 
-def searchTor(grabber, width, country, attempts):
+def searchTor(grabber, width, country, attemptsAndSkip):
+    args = attemptsAndSkip.split(",")
+    attempts = int(args[0])
+
+    if len(args) > 1:
+        skip = int(args[1])
+    else:
+        skip = 0
+
     excludes = ""
 
-    p = re.compile('setUserLocation\("(.*)"\)')
+    p = re.compile('setUserLocation\("(.*)\)"')
 
     target = targets[country]
 
@@ -28,16 +39,20 @@ def searchTor(grabber, width, country, attempts):
         Tor.setTorExcludeNodes(excludes)
 
         rai = Utils.getStringFromUrl(grabber, userLocation)
-        ip =  Utils.getStringFromUrl(grabber, userIP)
+        ip = Utils.getStringFromUrl(grabber, userIP)
 
         detected = p.match(rai)
 
         if detected:
             s = detected.group(1)
-            print(ip, s)
             if s == target:
-                Tor.setTorExitNodes(ip)
-                break
+                if skip > 0:
+                    print(ip, s, "SKIP")
+                    skip -= 1
+                else:
+                    print(ip, s, "ACCEPTED")
+                    Tor.setTorExitNodes(ip)
+                    break
 
         if excludes:
             excludes = excludes + "," + ip
