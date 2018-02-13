@@ -9,7 +9,6 @@ from asi import Item
 from asi import TG
 from asi import Demand
 from asi import Config
-from asi import Pluzz
 from asi import TF1
 from asi import Mediaset
 from asi import Console
@@ -185,9 +184,6 @@ def process(args):
 
     if args.programma:
         Programma.download(db, grabber, args.programma, args.download)
-
-    if args.pluzz:
-        Pluzz.download(db, grabber, args.download)
 
     if args.tf1:
         TF1.download(db, grabber, args.download)
