@@ -1,24 +1,11 @@
-import re
 import json
 
 from asi import Utils
 from asi import Config
 from asi import Tor
 
-# this returns some JavaScript like
-# setUserLocation("ESTERO");
-userLocation = "http://mediapolis.rai.it/relinker/relinkerServlet.htm?cont=826819"
-
-# an other use location
-#http://mediapolisgs.rai.it/relinker/relinkerServlet.htm?cont=201342
-
-# this one is from TF1
-userIP = "http://api.prod.capptain.com/ip-to-country"
 userIP = "https://api.ipify.org"
-
 geoIP = "https://freegeoip.net/json/"
-
-targets = {'it': 'ITA'}
 
 def searchTor(grabber, width, country, attemptsAndSkip):
     args = attemptsAndSkip.split(",")
@@ -31,28 +18,20 @@ def searchTor(grabber, width, country, attemptsAndSkip):
 
     excludes = ""
 
-    p = re.compile('setUserLocation\("(.*)\)"')
-
-    target = targets[country]
-
-    for a in range(1, attempts):
+    for a in range(attempts):
         Tor.setTorExcludeNodes(excludes)
 
-        rai = Utils.getStringFromUrl(grabber, userLocation)
-        ip = Utils.getStringFromUrl(grabber, userIP)
+        ip, geo = getGeoIp(grabber)
 
-        detected = p.match(rai)
-
-        if detected:
-            s = detected.group(1)
-            if s == target:
-                if skip > 0:
-                    print(ip, s, "SKIP")
-                    skip -= 1
-                else:
-                    print(ip, s, "ACCEPTED")
-                    Tor.setTorExitNodes(ip)
-                    break
+        if geo.upper() == country.upper():
+            if skip > 0:
+                # skip the first matches if they have not worked
+                print(ip, geo, "SKIP")
+                skip -= 1
+            else:
+                print(ip, geo, "ACCEPTED")
+                Tor.setTorExitNodes(ip)
+                break
 
         if excludes:
             excludes = excludes + "," + ip
@@ -60,10 +39,16 @@ def searchTor(grabber, width, country, attemptsAndSkip):
             excludes = ip
 
 
-def display(grabber, width):
+def getGeoIp(grabber):
+    geo = Utils.getStringFromUrl(grabber, geoIP)
+    data = json.loads(geo)
+    ip = data['ip']
+    country = data['country_code']
+    return ip, country
 
-    rai = Utils.getStringFromUrl(grabber, userLocation)
-    ip =  Utils.getStringFromUrl(grabber, userIP)
+
+def display(grabber, width):
+    ip, country = getGeoIp(grabber)
 
     exitNodes = Tor.getTorExitNodes()
     excluded = Tor.getTorExcludeNodes()
@@ -72,8 +57,8 @@ def display(grabber, width):
 
     print("Root folder:", Config.rootFolder)
     print("Location:   ", Config.programFolder)
-    print("RAI:        ", rai)
     print("IP:         ", ip)
+    print("Country:    ", country)
     print("Exit:       ", exitNodes)
     print("Excluded:   ", excluded)
 
