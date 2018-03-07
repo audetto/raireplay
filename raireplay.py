@@ -15,7 +15,7 @@ def main():
                         help = "Default is update")
     parser.add_argument("--format", action = "store", choices = ["h264", "ts", "tsmp4", "mms"])
     parser.add_argument("--bwidth", action = "store", default = "high")
-    parser.add_argument("--ip", action = "store_true", default = False)
+    parser.add_argument("--ip", action = "store_true", default = False, help = "print IP info")
     parser.add_argument("--tor", action = "store", help = "coutry code for tor exit nodes")
     parser.add_argument("--tor-proxy", action = "store_true", default = False, help = "use tor proxy")
     parser.add_argument("--tor-search", action = "store", help = "search for a tor exit node [attempts,skip]")
@@ -29,7 +29,7 @@ def main():
     parser.add_argument("--page",   action = "store", help = "RAI On Demand Page")
     parser.add_argument("--replay", action = "store_true", default = False, help = "RAI Replay")
     parser.add_argument("--raiplay", action = "store_true", default = False, help = "RaiPlay")
-    parser.add_argument("--programma", action = "store", default = False, help = "RaiPlay Program")
+    parser.add_argument("--programma", action = "store", default = False, help = "RaiPlay Program URL")
     parser.add_argument("--ondemand", action = "store_true", default = False, help = "RAI On Demand List")
     parser.add_argument("--tg", action = "store_true", default = False, help = "Telegiornali RAI")
 
@@ -47,7 +47,7 @@ def main():
 
     parser.add_argument("--nolist", action = "store_true", default = False)
     parser.add_argument("--get", action = "store_true", default = False, help = "download program")
-    parser.add_argument("--info", action = "store_true", default = False, help = "print IP info")
+    parser.add_argument("--info", action = "store_true", default = False, help = "display program info")
     parser.add_argument("--re", action = "store_true", default = False, help = "filters are RegExp")
 
     parser.add_argument("pid", nargs = "*")
