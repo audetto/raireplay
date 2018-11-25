@@ -71,7 +71,7 @@ def download(db, grabber, downType):
         localName = os.path.join(folder, name)
 
         f = Utils.download(grabber, progress, url, localName, downType, "utf-8", True)
-        if (f):
+        if f:
             process(grabber, downType, f, channel, db)
 
 
@@ -116,7 +116,7 @@ class Program(Base.Base):
         progress = Utils.getProgress()
 
         f = Utils.download(self.grabber, progress, self.url, localName, self.downType, "utf-8", True)
-        if (f):
+        if f:
             root = ElementTree.parse(f).getroot()
             asset = root.find("asset")
             for v in asset.findall("assetItem"):
