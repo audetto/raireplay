@@ -1,7 +1,10 @@
 import os
 import urllib
 
-from asi import Utils
+import asi.Utils
+import asi.formats.H264
+import asi.formats.M3U8
+
 
 class Base(object):
     def __init__(self):
@@ -24,7 +27,7 @@ class Base(object):
 
     def short(self, fmt):
         if self.datetime:
-            ts = Utils.strDate(self.datetime)
+            ts = asi.Utils.strDate(self.datetime)
         else:
             ts = None
 
@@ -47,7 +50,7 @@ class Base(object):
         ts = self.getTS()
         if ts:
             try:
-                self.m3 = Utils.load_m3u8_from_url(self.grabber, ts)
+                self.m3 = asi.formats.M3U8.load_m3u8_from_url(self.grabber, ts)
             except urllib.error.HTTPError:
                 pass
 
@@ -79,15 +82,15 @@ class Base(object):
 
     def downloadTablet(self, folder, options, grabber, remux):
         m3 = self.getTabletPlaylist()
-        Utils.downloadM3U8(self.grabber, grabber, folder, m3, options, self.pid, self.filename, self.title, remux)
+        asi.formats.M3U8.downloadM3U8(self.grabber, grabber, folder, m3, options, self.pid, self.filename, self.title, remux)
 
 
     def downloadH264(self, folder, options, grabber):
-        Utils.downloadH264(self.grabber, grabber, folder, self.getH264(), options, self.pid, self.filename, self.title)
+        asi.formats.H264.downloadH264(self.grabber, grabber, folder, self.getH264(), options, self.pid, self.filename, self.title)
 
 
     def downloadMMS(self, folder, options, grabber):
-        mms = Utils.getMMSUrl(self.grabber, self.mms)
+        mms = asi.Utils.getMMSUrl(self.grabber, self.mms)
 
         try:
             import libmimms.core
@@ -98,7 +101,7 @@ class Base(object):
                 print("{0} already there as {1}".format(self.pid, localFilename))
                 return
 
-            opt = Utils.Obj()
+            opt = asi.Utils.Obj()
             opt.quiet        = False
             opt.url          = mms
             opt.resume       = False
@@ -121,7 +124,7 @@ class Base(object):
         if self.description:
             print("Description:", self.description)
         if self.datetime:
-            print("Date:", Utils.strDate(self.datetime))
+            print("Date:", asi.Utils.strDate(self.datetime))
         if self.length:
             print("Length:", self.length)
         if self.filename:
@@ -134,7 +137,7 @@ class Base(object):
 
         m3 = self.getTabletPlaylist()
 
-        Utils.displayH264(self.getH264())
+        asi.formats.H264.displayH264(self.getH264())
         if self.getTS() or self.mms:
             if self.getTS():
                 print("ts:", self.getTS())
@@ -142,4 +145,4 @@ class Base(object):
                 print("mms:", self.mms)
             print()
 
-        Utils.displayM3U8(m3)
+        asi.formats.M3U8.displayM3U8(m3)

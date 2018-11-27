@@ -8,6 +8,8 @@ from asi import Utils
 from asi import Config
 from asi import Base
 from asi import RAIUrls
+from asi.formats import H264
+
 
 # <meta name="videourl" content="....." />
 
@@ -129,7 +131,7 @@ class Demand(Base.Base):
         self.title = self.values.title
         self.ts = self.values.videoUrlM3U8
 
-        Utils.addH264Url(self.h264, 0, self.values.videoUrlH264)
+        H264.addH264Url(self.h264, 0, self.values.videoUrlH264)
 
         if self.values.date:
             self.datetime = datetime.datetime.strptime(self.values.date, "%d/%m/%Y")
@@ -145,8 +147,9 @@ class Demand(Base.Base):
         if not self.values.videoUrl:
             self.values.videoUrl = self.values.videoPath
 
-        #sometimes we get .mp4 which does not work
-        self.values.videoUrl = self.values.videoUrl.replace("relinkerServlet.mp4", "relinkerServlet.htm")
+        if self.values.videoUrl:
+            #sometimes we get .mp4 which does not work
+            self.values.videoUrl = self.values.videoUrl.replace("relinkerServlet.mp4", "relinkerServlet.htm")
 
         #make a nice filename
         self.filename = Utils.makeFilename(self.title)

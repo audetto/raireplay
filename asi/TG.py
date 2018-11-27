@@ -7,6 +7,8 @@ from asi import Utils
 from asi import Config
 from asi import Base
 from asi import RAIUrls
+from asi.formats import H264
+
 
 # try to guess a date from a description like
 # "TG2 ore 23:30 del 14/01/2013"
@@ -126,7 +128,7 @@ class Program(Base.Base):
         self.channel = channel
         strtime = date.replace("-", "/")
         self.datetime = datetime.datetime.strptime(strtime, "%d/%m/%Y %H:%M")
-        Utils.addH264Url(self.h264, 0, h264)
+        H264.addH264Url(self.h264, 0, h264)
         if m3u8:
             self.ts = m3u8
 

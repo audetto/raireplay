@@ -8,6 +8,7 @@ from asi import Config
 from asi import Item
 from asi import Base
 from asi import RAIUrls
+from asi.formats import H264
 
 # example: without xls we get a nice XML,
 # numContent is compulsory, but it seems a big number is accepted and gives the whole list
@@ -31,7 +32,7 @@ class Elem(Base.Base):
 
         # extra experimental data
         h264               = data.findtext("h264")
-        Utils.addH264Url(self.h264, 0, h264)
+        H264.addH264Url(self.h264, 0, h264)
 
         self.ts            = data.findtext("m3u8")
 

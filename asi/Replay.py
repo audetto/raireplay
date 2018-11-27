@@ -1,5 +1,4 @@
 import os
-import urllib.parse
 import datetime
 import json
 import re
@@ -8,6 +7,7 @@ from asi import Utils
 from asi import Config
 from asi import Base
 from asi import RAIUrls
+from asi.formats import H264
 
 channels = {"1": "RaiUno", "2": "RaiDue", "3": "RaiTre", "23": "RaiGulp", "31": "RaiCinque", "32": "RaiPremium", "38": "RaiYoyo"}
 
@@ -23,7 +23,7 @@ def extractH264Ext(value):
         url = value[k]
         if m and url:
             bwidth = int(m.group(1))
-            Utils.addH264Url(res, bwidth, url)
+            H264.addH264Url(res, bwidth, url)
 
     return res
 
@@ -43,7 +43,7 @@ def parseItem(grabber, channel, date, time, value, db):
     # if the detailed h264 is not found, try with "h264"
     if not h264:
         single = value["h264"]
-        Utils.addH264Url(h264, 0, single)
+        H264.addH264Url(h264, 0, single)
 
     tablet = value["urlTablet"]
     smartPhone = value["urlSmartPhone"]

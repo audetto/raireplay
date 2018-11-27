@@ -7,6 +7,7 @@ from xml.etree import ElementTree
 from asi import Utils
 from asi import Base
 from asi import Config
+from asi.formats import H264
 
 configUrl = "http://app.mediaset.it/app/videomediaset/iPhone/2.0.2/videomediaset_iphone_config.plist"
 
@@ -142,7 +143,7 @@ class Program(Base.Base):
         root = ElementTree.fromstring(content)
         if root.tag == "smil":
             url = root.find("body").find("switch").find("video").attrib.get("src")
-            Utils.addH264Url(self.h264, 0, url)
+            H264.addH264Url(self.h264, 0, url)
         return self.h264
 
 

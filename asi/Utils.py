@@ -1,17 +1,13 @@
 import sys
 import os.path
-import posixpath
 import urllib.parse
-import m3u8
 import codecs
 import datetime
 import unicodedata
 import subprocess
 import io
 import configparser
-import socket
 import re
-import gzip
 
 from xml.etree import ElementTree
 
@@ -181,127 +177,6 @@ def remuxToMP4(inFile, outFile, title):
     setMP4Tag(outFile, title)
 
 
-def downloadM3U8(grabberMetadata, grabberProgram, folder, m3, options, pid, filename, title, remux):
-    if m3:
-        if remux:
-            ext = ".mp4"
-        else:
-            ext = ".ts"
-
-        localFilename   = os.path.join(folder, filename + ext)
-        localFilenameTS = os.path.join(folder, filename + ".ts")
-
-        if (not options.overwrite) and os.path.exists(localFilename):
-            print()
-            print("{0} already there as {1}".format(pid, localFilename))
-            print()
-            return
-
-        if m3.is_variant:
-            playlist = findPlaylist(m3, options.bwidth)
-
-            print("Downloading:")
-            print(playlist)
-
-            uri = playlist.absolute_uri
-            item = load_m3u8_from_url(grabberProgram, uri)
-        else:
-            if len(m3.segments) == 0:
-                return
-            item = m3
-
-        print()
-        print("Saving {0} as {1}".format(pid, localFilename))
-
-        # maximum number of attempts per segment
-        max_attempts = options.ts_tries
-
-        try:
-            numberOfFiles = len(item.segments)
-            progress = getProgress(numberOfFiles, filename + ".ts")
-
-            with open(localFilenameTS, "wb") as out:
-                for seg in item.segments:
-                    uri = seg.absolute_uri
-                    attempt = 0
-                    while True:
-                        try:
-                            attempt = attempt + 1
-                            with grabberProgram.open(uri) as s:
-                                b = s.read()
-                                size = len(b)
-                                if progress:
-                                    progress.start(size)
-                                out.write(b)
-                                if progress:
-                                    progress.update(size)
-                            break
-                        except urllib.error.HTTPError:
-                            if attempt <= max_attempts:
-                                progress.update(0)
-                            else:
-                                raise
-
-            if progress:
-                progress.done()
-
-            if remux:
-                remuxToMP4(localFilenameTS, localFilename, title)
-                os.remove(localFilenameTS)
-
-
-            print()
-            print("Saved {0} as {1}".format(pid, localFilename))
-            print()
-
-        except:
-            print("Exception: removing {0}".format(localFilename))
-            if os.path.exists(localFilename):
-                os.remove(localFilename)
-            if remux and os.path.exists(localFilenameTS):
-                os.remove(localFilenameTS)
-            raise
-
-
-def downloadH264(grabberMetadata, grabberProgram, folder, h264, options, pid, filename, title):
-    localFilename = os.path.join(folder, filename + ".mp4")
-
-    if (not options.overwrite) and os.path.exists(localFilename):
-        print()
-        print("{0} already there as {1}".format(pid, localFilename))
-        print()
-        return
-
-    url = findUrlByBandwidth(h264, options.bwidth)
-
-    print("Downloading:")
-    print(url)
-
-    print()
-    print("Saving {0} as {1}".format(pid, localFilename))
-
-    try:
-        progress = getProgress()
-        downloadFile(grabberMetadata, grabberProgram, progress, url, localFilename)
-
-        size = os.path.getsize(localFilename)
-        for a in RAIUrls.invalidMP4:
-            if size == len(a):
-                raise Exception("{0} only available in Italy".format(url))
-
-        setMP4Tag(localFilename, title)
-
-        print()
-        print("Saved {0} as {1}".format(pid, filename))
-        print()
-
-    except:
-        print("Exception: removing {0}".format(localFilename))
-        if os.path.exists(localFilename):
-            os.remove(localFilename)
-        raise
-
-
 # sometimes RAI sends invalid XML
 # we get "reference to invalid character number"
 def removeInvalidXMLCharacters(s):
@@ -315,31 +190,6 @@ def removeAccents(input_str):
     nkfd_form = unicodedata.normalize('NFKD', input_str)
     result = "".join([c for c in nkfd_form if not unicodedata.combining(c)])
     return result
-
-
-def load_m3u8_from_url(grabber, uri):
-    request = urllib.request.Request(uri, headers = httpHeaders)
-    stream = grabber.open(request)
-
-    encoding = None
-
-    # TF1 returns gzipped m3u8 playlists
-    info = stream.info()
-    if "Content-Encoding" in info:
-        encoding = info["Content-Encoding"]
-
-    data = stream.read()
-    if encoding == "gzip":
-        data = gzip.decompress(data)
-
-    content = data.decode('ascii').strip()
-
-    parsed_url = urllib.parse.urlparse(uri)
-    prefix = parsed_url.scheme + '://' + parsed_url.netloc
-    base_path = posixpath.normpath(parsed_url.path + '/..')
-    base_uri = urllib.parse.urljoin(prefix, base_path)
-
-    return m3u8.M3U8(content, base_uri = base_uri)
 
 
 def makeFilename(value):
@@ -360,35 +210,6 @@ def getResolution(p):
         return "N/A"
     res = "{0:>4}x{1:>4}".format(p.stream_info.resolution[0], p.stream_info.resolution[1])
     return res
-
-
-def displayM3U8(m3):
-    if m3:
-        if m3.is_variant:
-            for playlist in m3.playlists:
-                fmt = "\tProgram: {0:>2}, Bandwidth: {1:>10}, Resolution: {2:>10}, Codecs: {3}"
-
-                # bandwidth is alaways in Kb.
-                # so we divide by 1000
-
-                line = fmt.format(playlist.stream_info.program_id, int(playlist.stream_info.bandwidth) // 1000,
-                                     getResolution(playlist), playlist.stream_info.codecs)
-                print(line)
-            print()
-        else:
-            numberOfSegments = len(m3.segments)
-            if numberOfSegments:
-                fmt = "\tPlaylist: {0} segments"
-                line = fmt.format(numberOfSegments)
-                print(line)
-                print()
-
-
-def displayH264(h264):
-    if h264:
-        for k, v in h264.items():
-            print("h264[{0}]: {1}".format(k, v))
-        print()
 
 
 def getProgress(numberOfFiles = 1, filename = None):
@@ -477,15 +298,6 @@ def getMMSUrl(grabber, url):
                 print("Unknown root tag: " + root.tag)
 
     return mms
-
-
-def addH264Url(h264, bwidth, url):
-    # we do not want to add a None
-    # so that
-    # "if h264:"
-    # can still be used
-    if url:
-        h264[bwidth] = url
 
 
 # sometimes the downloaded mp4 contains bad tag for the title
