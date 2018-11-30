@@ -23,13 +23,16 @@ import urllib
 import logging
 
 
-def displayOrGet(item, nolist, info, get, options, grabber, fmt):
+def displayOrGet(item, nolist, info, get, cast, options, grabber, fmt):
     if info:
         width = Console.terminal_width()
         item.display(width)
     elif not nolist:
         # this is list
         print(item.short(fmt))
+
+    if cast:
+        item.cast(options)
 
     if get:
         try:
@@ -39,10 +42,15 @@ def displayOrGet(item, nolist, info, get, options, grabber, fmt):
             print()
 
 
-def listDisplayOrGet(items, nolist, info, get, options, grabber):
+def listDisplayOrGet(items, nolist, info, get, cast, options, grabber):
+    numberOfItems = len(items)
+
     if nolist:
         print()
-        print("INFO: {0} programmes found".format(len(items)))
+        print("INFO: {0} programmes found".format(numberOfItems))
+
+    if cast and numberOfItems > 1:
+        raise Exception("Cannot cast {} items".format(numberOfItems))
 
     # dynamically select width of fields
     # as they change according to broadcaster
@@ -57,7 +65,7 @@ def listDisplayOrGet(items, nolist, info, get, options, grabber):
     fmt = " {{0:>{0}}}: {{1}} {{2:{1}}} {{3}}".format(maxLengthOfPID, maxLengthOfChannel)
 
     for p in sorted(items.values(), key = lambda x: (x.datetime, x.title)):
-        displayOrGet(p, nolist, info, get, options, grabber, fmt)
+        displayOrGet(p, nolist, info, get, cast, options, grabber, fmt)
 
 
 def filterByDate(db, value):
@@ -223,4 +231,4 @@ def process(args):
     # format, bwidth, overwrite, quiet
     options = args
 
-    listDisplayOrGet(subset, args.nolist, args.info, args.get, options, grabberForDownload)
+    listDisplayOrGet(subset, args.nolist, args.info, args.get, args.cast, options, grabberForDownload)

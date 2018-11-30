@@ -4,7 +4,7 @@ import asi.RAIUrls
 import logging
 
 
-def downloadH264(grabberMetadata, grabberProgram, folder, h264, options, pid, filename, title):
+def downloadH264(grabberMetadata, grabberProgram, folder, url, options, pid, filename, title):
     localFilename = os.path.join(folder, filename + ".mp4")
 
     if (not options.overwrite) and os.path.exists(localFilename):
@@ -12,8 +12,6 @@ def downloadH264(grabberMetadata, grabberProgram, folder, h264, options, pid, fi
         print("{0} already there as {1}".format(pid, localFilename))
         print()
         return
-
-    url = asi.Utils.findUrlByBandwidth(h264, options.bwidth)
 
     print("Downloading:")
     print(url)

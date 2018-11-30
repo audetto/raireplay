@@ -7,88 +7,76 @@ import gzip
 import logging
 
 
-def downloadM3U8(grabberMetadata, grabberProgram, folder, m3, options, pid, filename, title, remux):
-    if m3:
+def downloadM3U8(grabberProgram, folder, url, options, pid, filename, title, remux):
+    if remux:
+        ext = ".mp4"
+    else:
+        ext = ".ts"
+
+    localFilename   = os.path.join(folder, filename + ext)
+    localFilenameTS = os.path.join(folder, filename + ".ts")
+
+    if (not options.overwrite) and os.path.exists(localFilename):
+        print()
+        print("{0} already there as {1}".format(pid, localFilename))
+        print()
+        return
+
+    item = load_m3u8_from_url(grabberProgram, url)
+
+    print()
+    print("Saving {0} as {1}".format(pid, localFilename))
+
+    # maximum number of attempts per segment
+    max_attempts = options.ts_tries
+
+    try:
+        numberOfFiles = len(item.segments)
+        progress = asi.Utils.getProgress(numberOfFiles, filename + ".ts")
+
+        with open(localFilenameTS, "wb") as out:
+            for seg in item.segments:
+                uri = seg.absolute_uri
+                attempt = 0
+                while True:
+                    try:
+                        attempt = attempt + 1
+                        with grabberProgram.open(uri) as s:
+                            b = s.read()
+                            size = len(b)
+                            if progress:
+                                progress.start(size)
+                            out.write(b)
+                            if progress:
+                                progress.update(size)
+                        break
+                    except urllib.error.HTTPError:
+                        if attempt <= max_attempts:
+                            progress.update(0)
+                        else:
+                            raise
+
+        if progress:
+            progress.done()
+
         if remux:
-            ext = ".mp4"
-        else:
-            ext = ".ts"
+            asi.Utils.remuxToMP4(localFilenameTS, localFilename, title)
+            os.remove(localFilenameTS)
 
-        localFilename   = os.path.join(folder, filename + ext)
-        localFilenameTS = os.path.join(folder, filename + ".ts")
-
-        if (not options.overwrite) and os.path.exists(localFilename):
-            print()
-            print("{0} already there as {1}".format(pid, localFilename))
-            print()
-            return
-
-        if m3.is_variant:
-            playlist = asi.Utils.findPlaylist(m3, options.bwidth)
-
-            print("Downloading:")
-            print(playlist)
-
-            uri = playlist.absolute_uri
-            item = load_m3u8_from_url(grabberProgram, uri)
-        else:
-            if len(m3.segments) == 0:
-                return
-            item = m3
 
         print()
-        print("Saving {0} as {1}".format(pid, localFilename))
+        print("Saved {0} as {1}".format(pid, localFilename))
+        print()
 
-        # maximum number of attempts per segment
-        max_attempts = options.ts_tries
-
-        try:
-            numberOfFiles = len(item.segments)
-            progress = asi.Utils.getProgress(numberOfFiles, filename + ".ts")
-
-            with open(localFilenameTS, "wb") as out:
-                for seg in item.segments:
-                    uri = seg.absolute_uri
-                    attempt = 0
-                    while True:
-                        try:
-                            attempt = attempt + 1
-                            with grabberProgram.open(uri) as s:
-                                b = s.read()
-                                size = len(b)
-                                if progress:
-                                    progress.start(size)
-                                out.write(b)
-                                if progress:
-                                    progress.update(size)
-                            break
-                        except urllib.error.HTTPError:
-                            if attempt <= max_attempts:
-                                progress.update(0)
-                            else:
-                                raise
-
-            if progress:
-                progress.done()
-
-            if remux:
-                asi.Utils.remuxToMP4(localFilenameTS, localFilename, title)
-                os.remove(localFilenameTS)
-
-
-            print()
-            print("Saved {0} as {1}".format(pid, localFilename))
-            print()
-
-        except BaseException as e:
-            logging.info('Exception: {0}'.format(e))
-            logging.info('Will remove: {0}'.format(localFilename))
-            logging.info('Will remove: {0}'.format(localFilenameTS))
-            if os.path.exists(localFilename):
-                os.remove(localFilename)
-            if remux and os.path.exists(localFilenameTS):
-                os.remove(localFilenameTS)
-            raise
+    except BaseException as e:
+        logging.info('Exception: {0}'.format(e))
+        logging.info('Will remove: {0}'.format(localFilename))
+        logging.info('Will remove: {0}'.format(localFilenameTS))
+        if os.path.exists(localFilename):
+            os.remove(localFilename)
+        if remux and os.path.exists(localFilenameTS):
+            os.remove(localFilenameTS)
+        raise
 
 
 def load_m3u8_from_url(grabber, uri):

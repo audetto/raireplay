@@ -2,9 +2,11 @@ import os
 import urllib
 
 import asi.Utils
+import asi.Cast
 import asi.formats.H264
 import asi.formats.M3U8
 import logging
+
 
 class Base(object):
     def __init__(self):
@@ -24,7 +26,6 @@ class Base(object):
         self.m3            = None
         self.canFollow     = False
 
-
     def short(self, fmt):
         if self.datetime:
             ts = asi.Utils.strDate(self.datetime)
@@ -34,14 +35,11 @@ class Base(object):
         str1 = fmt.format(self.pid, ts, self.channel, self.title)
         return str1
 
-
     def getTS(self):
         return self.ts
 
-
     def getH264(self):
         return self.h264
-
 
     def getTabletPlaylist(self):
         if self.m3:
@@ -57,42 +55,61 @@ class Base(object):
 
         return self.m3
 
+    def cast(self, options):
+        video_format, url = self.get_url_and_format(options)
+        asi.Cast.cast_url(url)
+
+    def get_url_and_format(self, options):
+        if not options.format:
+            if self.getH264():
+                video_format = "h264"
+            else:
+                m3 = self.getTabletPlaylist()
+                if m3:
+                    video_format = "tsmp4"
+                elif self.mms:
+                    video_format = "mms"
+        else:
+            video_format = options.format
+
+        if video_format == "h264":
+            h264 = self.getH264()
+            url = asi.Utils.findUrlByBandwidth(h264, options.bwidth)
+        elif video_format in ["ts", "tsmp4"]:
+            m3 = self.getTabletPlaylist()
+            if not m3.is_variant:
+                raise NotImplementedError
+            playlist = asi.Utils.findPlaylist(m3, options.bwidth)
+            url = playlist.absolute_uri
+        elif video_format == "mms":
+            url = asi.Utils.getMMSUrl(self.grabber, self.mms)
+
+        return video_format, url
 
     def download(self, folder, options, grabber):
         if not os.path.exists(folder):
             os.makedirs(folder)
 
-        if options.format == "h264":
-            self.downloadH264(folder, options, grabber)
-        elif options.format == "ts":
-            self.downloadTablet(folder, options, grabber, False)
-        elif options.format == "tsmp4":
-            self.downloadTablet(folder, options, grabber, True)
-        elif options.format == "mms":
+        video_format, url = self.get_url_and_format(options)
+        logging.info('Video Format: {}'.format(video_format))
+        logging.info('URL: {}'.format(url))
+
+        if video_format == "h264":
+            self.downloadH264(folder, options, grabber, url)
+        elif video_format == "ts":
+            self.downloadTablet(folder, options, grabber, url, False)
+        elif video_format == "tsmp4":
+            self.downloadTablet(folder, options, grabber, url, True)
+        elif video_format == "mms":
             self.downloadMMS(folder, options, grabber)
-        elif not options.format:
-            if self.getH264():
-                self.downloadH264(folder, options, grabber)
-            else:
-                m3 = self.getTabletPlaylist()
-                if m3:
-                    self.downloadTablet(folder, options, grabber, True)
-                elif self.mms:
-                    self.downloadMMS(folder, options, grabber)
 
+    def downloadTablet(self, folder, options, grabber, url, remux):
+        asi.formats.M3U8.downloadM3U8(grabber, folder, url, options, self.pid, self.filename, self.title, remux)
 
-    def downloadTablet(self, folder, options, grabber, remux):
-        m3 = self.getTabletPlaylist()
-        asi.formats.M3U8.downloadM3U8(self.grabber, grabber, folder, m3, options, self.pid, self.filename, self.title, remux)
+    def downloadH264(self, folder, options, grabber, url):
+        asi.formats.H264.downloadH264(self.grabber, grabber, folder, url, options, self.pid, self.filename, self.title)
 
-
-    def downloadH264(self, folder, options, grabber):
-        asi.formats.H264.downloadH264(self.grabber, grabber, folder, self.getH264(), options, self.pid, self.filename, self.title)
-
-
-    def downloadMMS(self, folder, options, grabber):
-        mms = asi.Utils.getMMSUrl(self.grabber, self.mms)
-
+    def downloadMMS(self, folder, options, url):
         try:
             import libmimms.core
 
@@ -104,7 +121,7 @@ class Base(object):
 
             opt = asi.Utils.Obj()
             opt.quiet        = False
-            opt.url          = mms
+            opt.url          = url
             opt.resume       = False
             opt.bandwidth    = 1e6
             opt.filename     = localFilename
