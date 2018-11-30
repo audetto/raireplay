@@ -38,7 +38,7 @@ def process(grabber, progress, folder, downType, f, db):
     blocks = o["Blocks"]
 
     for v1 in blocks:
-        if v1["Name"] == "Episodi":
+        if "Sets" in v1:
             for v2 in v1["Sets"]:
                 path = v2["url"]
                 url = "http://www.raiplay.it/" + path
