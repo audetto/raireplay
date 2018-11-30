@@ -4,6 +4,7 @@ import urllib
 import posixpath
 import m3u8
 import gzip
+import logging
 
 
 def downloadM3U8(grabberMetadata, grabberProgram, folder, m3, options, pid, filename, title, remux):
@@ -79,8 +80,10 @@ def downloadM3U8(grabberMetadata, grabberProgram, folder, m3, options, pid, file
             print("Saved {0} as {1}".format(pid, localFilename))
             print()
 
-        except:
-            print("Exception: removing {0}".format(localFilename))
+        except BaseException as e:
+            logging.info('Exception: {0}'.format(e))
+            logging.info('Will remove: {0}'.format(localFilename))
+            logging.info('Will remove: {0}'.format(localFilenameTS))
             if os.path.exists(localFilename):
                 os.remove(localFilename)
             if remux and os.path.exists(localFilenameTS):
@@ -90,6 +93,7 @@ def downloadM3U8(grabberMetadata, grabberProgram, folder, m3, options, pid, file
 
 def load_m3u8_from_url(grabber, uri):
     request = urllib.request.Request(uri, headers = asi.Utils.httpHeaders)
+    logging.info('M3U8: {}'.format(uri))
     stream = grabber.open(request)
 
     encoding = None

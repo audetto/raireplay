@@ -8,6 +8,7 @@ import subprocess
 import io
 import configparser
 import re
+import logging
 
 from xml.etree import ElementTree
 
@@ -31,47 +32,44 @@ def httpFilename(url):
 
 # simply download a file and saves it to localName
 def downloadFile(grabberMetadata, grabberProgram, progress, url, localName):
-    try:
-        if progress:
-            progress.setName(localName)
+    if progress:
+        progress.setName(localName)
 
-        request = urllib.request.Request(url, headers = httpHeaders)
+    request = urllib.request.Request(url, headers = httpHeaders)
 
-        with grabberMetadata.open(request) as response:
-            actualUrl = response.geturl()
-            if actualUrl != url and grabberMetadata != grabberProgram:
-                print("REDIRECTION: {0}".format(actualUrl))
-                return downloadFile(grabberProgram, grabberProgram, progress, actualUrl, localName)
+    logging.info('URL {}'.format(url))
+    with grabberMetadata.open(request) as response:
+        actualUrl = response.geturl()
+        if actualUrl != url and grabberMetadata != grabberProgram:
+            logging.info('REDIRECTION: {}'.format(actualUrl))
+            return downloadFile(grabberProgram, grabberProgram, progress, actualUrl, localName)
 
-            with open(localName, "wb") as f:
-                # same length as shutil.copyfileobj
+        with open(localName, "wb") as f:
+            # same length as shutil.copyfileobj
 
-                # the rest is the same logic as urllib.request.urlretrieve
-                # which unfortunately does not work with proxies
-                blockSize = 1024 * 16
-                size = -1
+            # the rest is the same logic as urllib.request.urlretrieve
+            # which unfortunately does not work with proxies
+            blockSize = 1024 * 16
+            size = -1
 
-                headers = response.info()
-                if "content-length" in headers:
-                    size = int(headers["Content-Length"])
+            headers = response.info()
+            if "content-length" in headers:
+                size = int(headers["Content-Length"])
 
+            if progress:
+                progress.start(size)
+
+            while 1:
+                buf = response.read(blockSize)
+                if not buf:
+                    break
+                amountRead = len(buf)
+                f.write(buf)
                 if progress:
-                    progress.start(size)
+                    progress.update(amountRead)
 
-                while 1:
-                    buf = response.read(blockSize)
-                    if not buf:
-                        break
-                    amountRead = len(buf)
-                    f.write(buf)
-                    if progress:
-                        progress.update(amountRead)
-
-                if progress:
-                    progress.done()
-    except:
-        print("Failed to download program file: {0}".format(url))
-        raise
+            if progress:
+                progress.done()
 
 
 #def downloadFile(grabberMetadata, grabberProgram, progress, url, localName):
@@ -88,9 +86,9 @@ def downloadFile(grabberMetadata, grabberProgram, progress, url, localName):
 # with optional encoding, checking if it exists already...
 def download(grabber, progress, url, localName, downType, encoding, checkTime = False):
     try:
-        request = urllib.request.Request(url, headers = httpHeaders)
-
         if downType == "shm":
+            request = urllib.request.Request(url, headers = httpHeaders)
+            logging.info('URL {}'.format(url))
             f = grabber.open(request)
             if encoding:
                 decoder = codecs.getreader(encoding)
@@ -124,8 +122,7 @@ def download(grabber, progress, url, localName, downType, encoding, checkTime = 
         return f
 
     except Exception as e:
-        print("Exception: {0}".format(e))
-        print("Failed to download data file: {0}".format(url))
+        logging.info('Exception: {0}'.format(e))
         return None
 
 
@@ -251,6 +248,7 @@ def addToDB(db, prog):
 
 
 def getStringFromUrl(grabber, url):
+    logging.info('String: {}'.format(url))
     with grabber.open(url) as f:
         content = f.read().decode("ascii")
         return content
@@ -316,5 +314,5 @@ def setMP4Tag(filename, title):
         a["title"] = title
         a.save()
     except Exception as e:
-        print("Warning: {0}".format(e))
+        logging.info('Exception: {0}'.format(e))
         print("Failed to set MP4 tag to : {0}".format(filename))

@@ -4,7 +4,7 @@ import urllib
 import asi.Utils
 import asi.formats.H264
 import asi.formats.M3U8
-
+import logging
 
 class Base(object):
     def __init__(self):
@@ -51,7 +51,8 @@ class Base(object):
         if ts:
             try:
                 self.m3 = asi.formats.M3U8.load_m3u8_from_url(self.grabber, ts)
-            except urllib.error.HTTPError:
+            except urllib.error.HTTPError as e:
+                logging.info('Exception: {0}'.format(e))
                 pass
 
         return self.m3

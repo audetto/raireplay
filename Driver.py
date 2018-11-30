@@ -20,6 +20,7 @@ import os
 import re
 import datetime
 import urllib
+import logging
 
 
 def displayOrGet(item, nolist, info, get, options, grabber, fmt):
@@ -34,7 +35,7 @@ def displayOrGet(item, nolist, info, get, options, grabber, fmt):
         try:
             item.download(Config.programFolder, options, grabber)
         except Exception as e:
-            print("Exception: {0}".format(e))
+            logging.info('Exception: {0}'.format(e))
             print()
 
 

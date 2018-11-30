@@ -1,6 +1,7 @@
 import os.path
 import asi.Utils
 import asi.RAIUrls
+import logging
 
 
 def downloadH264(grabberMetadata, grabberProgram, folder, h264, options, pid, filename, title):
@@ -35,8 +36,9 @@ def downloadH264(grabberMetadata, grabberProgram, folder, h264, options, pid, fi
         print("Saved {0} as {1}".format(pid, filename))
         print()
 
-    except:
-        print("Exception: removing {0}".format(localFilename))
+    except BaseException as e:
+        logging.info('Exception: {0}'.format(e))
+        logging.info('Will remove: {0}'.format(localFilename))
         if os.path.exists(localFilename):
             os.remove(localFilename)
         raise

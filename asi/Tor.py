@@ -1,3 +1,5 @@
+import logging
+
 def setTorExitNodes(country):
     import stem
     import stem.connection
@@ -29,8 +31,10 @@ def getTorExitNodes():
             controller.authenticate()
             res = controller.get_conf("ExitNodes")
             return res
-    except:
+    except Exception as e:
+        logging.info('Exception: {0}'.format(e))
         return None
+
 
 def getTorExcludeNodes():
     try:
@@ -41,5 +45,6 @@ def getTorExcludeNodes():
             controller.authenticate()
             res = controller.get_conf("ExcludeNodes")
             return res
-    except:
+    except Exception as e:
+        logging.info('Exception: {0}'.format(e))
         return None

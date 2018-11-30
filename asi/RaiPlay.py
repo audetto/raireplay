@@ -8,6 +8,7 @@ from asi import Utils
 from asi import Config
 from asi import Base
 from asi import RAIUrls
+import logging
 
 channels = ["Rai1", "Rai2", "Rai3", "Rai4", "Rai5", "RaiGulp", "RaiPremium", "RaiYoyo", "RaiSport1", "RaiSport2", "RaiMovie", "RaiStoria", "RaiScuola"]
 
@@ -68,7 +69,8 @@ def download(db, grabber, downType):
             if f:
                 process(grabber, downType, f, db, dup)
         except json.decoder.JSONDecodeError as e:
-            print(channel + ": " + str(e))
+            logging.info('While precessing channel: {0}'.format(channel))
+            logging.info('Exception: {0}'.format(e))
 
 
 class Program(Base.Base):

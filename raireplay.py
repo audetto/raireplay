@@ -4,8 +4,10 @@ import sys
 import platform
 import codecs
 import argparse
+import logging
 
 import Driver
+
 
 def main():
 
@@ -52,7 +54,7 @@ def main():
 
     parser.add_argument("pid", nargs = "*")
 
-
+    logging.basicConfig(level=logging.INFO)
 
     args = parser.parse_args()
 
