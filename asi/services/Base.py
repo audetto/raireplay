@@ -59,6 +59,11 @@ class Base(object):
         video_format, url = self.get_url_and_format(options)
         asi.Cast.cast_url(url)
 
+    def show(self, options):
+        video_format, url = self.get_url_and_format(options)
+        print('Format: {}'.format(video_format))
+        print('URL: {}'.format(url))
+
     def get_url_and_format(self, options):
         if not options.format:
             if self.getH264():

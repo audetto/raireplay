@@ -1,7 +1,7 @@
 import os
 import m3u8
 
-from asi import Base
+from asi.services import Base
 
 
 def process(grabber, filename, pid):

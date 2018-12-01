@@ -4,7 +4,7 @@ import json
 
 from asi import Utils
 from asi import Config
-from asi import Base
+from asi.services import Base
 
 programsUrl = "http://api.tf1.fr/tf1-programs/iphone/limit/100/"
 newsUrl = "http://api.tf1.fr/tf1-homepage-news/iphone/"

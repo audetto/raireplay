@@ -4,8 +4,7 @@ import datetime
 
 from asi import Utils
 from asi import Config
-from asi import Page
-from asi import Base
+from asi.services import Base, Page
 from asi import RAIUrls
 
 

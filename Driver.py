@@ -1,19 +1,8 @@
-
 from asi import Utils
 from asi import Info
-from asi import Replay
-from asi import RaiPlay
-from asi import Programma
-from asi import Page
-from asi import Item
-from asi import TG
-from asi import Demand
+from asi.services import Demand, Mediaset, Page, TG, RaiPlay, TF1, M6, Item, Programma, Replay, Playlist
 from asi import Config
-from asi import TF1
-from asi import Mediaset
 from asi import Console
-from asi import M6
-from asi import Playlist
 from asi import Tor
 
 import os

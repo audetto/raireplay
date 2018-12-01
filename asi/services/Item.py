@@ -6,7 +6,7 @@ from html.parser import HTMLParser
 
 from asi import Utils
 from asi import Config
-from asi import Base
+from asi.services import Base
 from asi import RAIUrls
 from asi.formats import H264
 

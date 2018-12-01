@@ -5,7 +5,7 @@ from xml.etree import ElementTree
 
 from asi import Utils
 from asi import Config
-from asi import Base
+from asi.services import Base
 
 # this comes from M6group.groovy
 # https://bitbucket.org/Illico/serviio_plugins/wiki/M6group.groovy
@@ -19,7 +19,8 @@ from asi import Base
 channels = ["m6replay", "w9replay", "6terreplay", "styles", "stories", "comedy", "crazy_kitchen"]
 
 def getTSUrl(link):
-    ts = "https://lb.cdn.m6web.fr/s/su/s/m6replay_iphone/iphone/{0}".format(link)
+#    ts = "https://lb.cdn.m6web.fr/c/cu/s/m6replay_iphone/iphone/{0}".format(link)
+    ts = "https://lb.cdn.m6web.fr/s/cu/prime/{0}".format(link)
     return ts
 
 

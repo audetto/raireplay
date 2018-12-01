@@ -4,9 +4,7 @@ import json
 
 from asi import Utils
 from asi import Config
-from asi import Base
-from asi import RAIUrls
-from asi import RaiPlay
+from asi.services import RaiPlay
 
 
 def processSet(grabber, downType, f, db):

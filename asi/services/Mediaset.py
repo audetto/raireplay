@@ -5,7 +5,7 @@ import datetime
 from xml.etree import ElementTree
 
 from asi import Utils
-from asi import Base
+from asi.services import Base
 from asi import Config
 from asi.formats import H264
 
@@ -32,7 +32,7 @@ def parseConfig(root):
                     name = nn.text
                 elif nn.tag == "string":
                     result[name] = nn.text
-            
+
     return result
 
 
