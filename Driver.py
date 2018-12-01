@@ -10,20 +10,44 @@ import re
 import datetime
 import urllib
 import logging
+import enum
 
 
-def displayOrGet(item, nolist, info, get, cast, options, grabber, fmt):
-    if info:
+class Action(enum.Enum):
+    INFO = 0
+    GET = 1
+    CAST = 2
+    SHOW = 3
+
+    @staticmethod
+    def get_actions(args):
+        actions = []
+        if args.info:
+            actions.append(Action.INFO)
+        if args.get:
+            actions.append(Action.GET)
+        if args.cast:
+            actions.append(Action.CAST)
+        if args.show:
+            actions.append(Action.SHOW)
+        return actions
+
+
+def item_do_actions(item, nolist, actions, options, grabber, fmt):
+    if Action.INFO in actions:
         width = Console.terminal_width()
         item.display(width)
     elif not nolist:
         # this is list
         print(item.short(fmt))
 
-    if cast:
+    if Action.CAST in actions:
         item.cast(options)
 
-    if get:
+    if Action.SHOW in actions:
+        item.show(options)
+
+    if Action.GET in actions:
         try:
             item.download(Config.programFolder, options, grabber)
         except Exception as e:
@@ -31,14 +55,14 @@ def displayOrGet(item, nolist, info, get, cast, options, grabber, fmt):
             print()
 
 
-def listDisplayOrGet(items, nolist, info, get, cast, options, grabber):
+def list_do_actions(items, nolist, actions, options, grabber):
     numberOfItems = len(items)
 
     if nolist:
         print()
         print("INFO: {0} programmes found".format(numberOfItems))
 
-    if cast and numberOfItems > 1:
+    if (Action.CAST in actions) and (numberOfItems > 1):
         raise Exception("Cannot cast {} items".format(numberOfItems))
 
     # dynamically select width of fields
@@ -54,7 +78,7 @@ def listDisplayOrGet(items, nolist, info, get, cast, options, grabber):
     fmt = " {{0:>{0}}}: {{1}} {{2:{1}}} {{3}}".format(maxLengthOfPID, maxLengthOfChannel)
 
     for p in sorted(items.values(), key = lambda x: (x.datetime, x.title)):
-        displayOrGet(p, nolist, info, get, cast, options, grabber, fmt)
+        item_do_actions(p, nolist, actions, options, grabber, fmt)
 
 
 def filterByDate(db, value):
@@ -220,4 +244,6 @@ def process(args):
     # format, bwidth, overwrite, quiet
     options = args
 
-    listDisplayOrGet(subset, args.nolist, args.info, args.get, args.cast, options, grabberForDownload)
+    actions = Action.get_actions(args)
+
+    list_do_actions(subset, args.nolist, actions, options, grabberForDownload)

@@ -51,6 +51,7 @@ def get_cli_args(defaults):
     parser.add_argument("--nolist", action = "store_true", default = False)
     parser.add_argument("--get", action = "store_true", default = False, help = "download program")
     parser.add_argument("--cast", action = "store_true", default = False, help = "cast")
+    parser.add_argument("--show", action = "store_true", default = False, help = "print video url")
     parser.add_argument("--info", action = "store_true", default = False, help = "display program info")
     parser.add_argument("--re", action = "store_true", default = False, help = "filters are RegExp")
     parser.add_argument("--logging", action = "store", help = "logging configuration")
