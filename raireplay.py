@@ -5,12 +5,13 @@ import platform
 import codecs
 import argparse
 import logging.config
+import os
+import configparser
 
 import Driver
 
 
-def main():
-
+def get_cli_args(defaults):
     parser = argparse.ArgumentParser(description = "Rai Replay", fromfile_prefix_chars = "@")
 
     parser.add_argument("--download", action = "store", default = "update", choices = ["always", "update", "never", "shm"],
@@ -52,13 +53,32 @@ def main():
     parser.add_argument("--cast", action = "store_true", default = False, help = "cast")
     parser.add_argument("--info", action = "store_true", default = False, help = "display program info")
     parser.add_argument("--re", action = "store_true", default = False, help = "filters are RegExp")
-    parser.add_argument("--logging", action = "store", default = None, help = "logging configuration")
+    parser.add_argument("--logging", action = "store", help = "logging configuration")
+
+    parser.set_defaults(**defaults)
 
     parser.add_argument("pid", nargs = "*")
 
     args = parser.parse_args()
 
-    # this function is totally undocumented
+    return args
+
+
+def get_default_configuration():
+    home = os.path.expanduser('~')
+    config_file = os.path.join(home, '.raireplay', 'config.ini')
+    if os.path.exists(config_file):
+        config = configparser.ConfigParser()
+        config.read([config_file])
+        return config.defaults()
+    else:
+        return {}
+
+
+def main():
+    glo_args = get_default_configuration()
+    args = get_cli_args(glo_args)
+
     if args.logging:
         logging.config.fileConfig(args.logging)
 
@@ -66,19 +86,23 @@ def main():
 
     print()
 
-if platform.system() == "Windows":
-    # in windows there are issues when printing utf-8 to the console
-    # it does not work out of the box
-    # no clear solution comes out of google
-    # this "choice" seems to work
-    sys.stdout = codecs.getwriter("cp850")(sys.stdout.buffer, "ignore")
-elif not sys.stdout.encoding:
-    # is this required??? seems a bit of pythonic nonsense
-    # all RAI html is encoded in "utf-8" (decoded as we read)
-    #
-    # and it seems that redirecting the output (e.g. "| less") requires am explicit encoding
-    # done here
-    sys.stdout = codecs.getwriter("utf-8")(sys.stdout.buffer, "ignore")
+
+def fix_codepages():
+    if platform.system() == "Windows":
+        # in windows there are issues when printing utf-8 to the console
+        # it does not work out of the box
+        # no clear solution comes out of google
+        # this "choice" seems to work
+        sys.stdout = codecs.getwriter("cp850")(sys.stdout.buffer, "ignore")
+    elif not sys.stdout.encoding:
+        # is this required??? seems a bit of pythonic nonsense
+        # all RAI html is encoded in "utf-8" (decoded as we read)
+        #
+        # and it seems that redirecting the output (e.g. "| less") requires an explicit encoding
+        # done here
+        sys.stdout = codecs.getwriter("utf-8")(sys.stdout.buffer, "ignore")
+
 
 if __name__ == '__main__':
+    fix_codepages()
     main()
