@@ -4,16 +4,11 @@ import urllib.parse
 import codecs
 import datetime
 import unicodedata
-import subprocess
 import io
-import configparser
 import re
 import logging
 
-from xml.etree import ElementTree
-
 from asi import Meter
-from asi import RAIUrls
 
 
 class Obj:
@@ -127,21 +122,6 @@ def download(grabber, progress, url, local_name, down_type, encoding, check_time
         return None
 
 
-def find_playlist(m3, bandwidth):
-    data = {}
-
-    # bandwidth is alaways in Kb.
-    # so we divide by 1000
-
-    for p in m3.playlists:
-        b = int(p.stream_info.bandwidth) // 1000
-        data[b] = p
-
-    opt = find_url_by_bandwidth(data, bandwidth)
-
-    return opt
-
-
 def find_url_by_bandwidth(data, bandwidth):
     if len(data) == 1:
         return next(iter(data.values()))
@@ -163,16 +143,6 @@ def find_url_by_bandwidth(data, bandwidth):
             opt = v
 
     return opt
-
-
-def remux_to_mp4(inFile, outFile, title):
-    # -absf aac_adtstoasc
-    # seems to be needed by ffmpeg (Fedora), not by avconv (Pi)
-    cmd_line = ["ffmpeg", "-i", inFile, "-vcodec", "copy", "-acodec", "copy", "-absf", "aac_adtstoasc", "-y", outFile]
-    code = subprocess.call(cmd_line)
-    if code != 0:
-        raise Exception("ffmpeg failed: exit code {0}".format(code))
-    set_mp4_tag(outFile, title)
 
 
 # sometimes RAI sends invalid XML
@@ -201,13 +171,6 @@ def make_filename(value):
     name = remove_accents(name)
     name = re.sub("_+", "_", name)
     return name
-
-
-def get_resolution(p):
-    if not p.stream_info.resolution:
-        return "N/A"
-    res = "{0:>4}x{1:>4}".format(p.stream_info.resolution[0], p.stream_info.resolution[1])
-    return res
 
 
 def get_progress(number_of_files=1, filename=None):
@@ -258,62 +221,3 @@ def get_string_from_url(grabber, url):
 def str_date(date):
     s = date.strftime("%Y-%m-%d %H:%M")
     return s
-
-
-def get_mms_url(grabber, url):
-    mms = None
-
-    url_scheme = urllib.parse.urlsplit(url).scheme
-    if url_scheme == "mms":
-        # if it is already mms, don't look further
-        mms = url
-    else:
-        # search for the mms url
-        content = get_string_from_url(grabber, url)
-
-        if content in RAIUrls.invalidMP4:
-            # is this the case of videos only available in Italy?
-            mms = content
-        else:
-            root = ElementTree.fromstring(content)
-            if root.tag == "ASX":
-                asf = root.find("ENTRY").find("REF").attrib.get("HREF")
-
-                if asf:
-                    # use urlgrab to make it work with ConfigParser
-                    url_scheme = urllib.parse.urlsplit(asf).scheme
-                    if url_scheme == "mms":
-                        mms = asf
-                    else:
-                        content = get_string_from_url(grabber, asf)
-                        config = configparser.ConfigParser()
-                        config.read_string(content)
-                        mms = config.get("Reference", "ref1")
-                        mms = mms.replace("http://", "mms://")
-            elif root.tag == "playList":
-                # adaptive streaming - unsupported
-                pass
-            else:
-                print("Unknown root tag: " + root.tag)
-
-    return mms
-
-
-# sometimes the downloaded mp4 contains bad tag for the title
-# TG5 has the title set to "unspecified"
-# as this is then used by minidlna, it must be decent enough
-# to be able to find it in the list
-#
-# we could as well remove it
-# btw, the ones that are remux don't have the tag, so they are not wrong
-# for symmetry we set the title tag to all of them
-def set_mp4_tag(filename, title):
-    # this is allowed to fail as mutagen(x) is somehow hard to obtain
-    try:
-        import mutagen.easymp4
-        a = mutagen.easymp4.EasyMP4(filename)
-        a["title"] = title
-        a.save()
-    except Exception as e:
-        logging.info('Exception: {0}'.format(e))
-        print("Failed to set MP4 tag to : {0}".format(filename))

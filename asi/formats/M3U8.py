@@ -2,6 +2,8 @@ import asi.Utils
 import os
 import urllib
 import posixpath
+
+import asi.formats.MP4
 import m3u8
 import gzip
 import logging
@@ -62,7 +64,7 @@ def download_m3u8(grabber_program, folder, url, options, pid, filename, title, r
             progress.done()
 
         if remux:
-            asi.Utils.remux_to_mp4(local_filename_ts, local_filename, title)
+            asi.formats.MP4.remux_to_mp4(local_filename_ts, local_filename, title)
             os.remove(local_filename_ts)
 
         print()
@@ -115,7 +117,7 @@ def display_m3u8(m3):
                 # bandwidth is always in Kb.
                 # so we divide by 1000
 
-                resolution = asi.Utils.get_resolution(playlist)
+                resolution = get_resolution(playlist)
                 if playlist.stream_info.program_id is None:
                     program_id = "missing"
                 else:
@@ -131,3 +133,25 @@ def display_m3u8(m3):
                 line = fmt.format(number_of_segments)
                 print(line)
                 print()
+
+
+def get_resolution(p):
+    if not p.stream_info.resolution:
+        return "N/A"
+    res = "{0:>4}x{1:>4}".format(p.stream_info.resolution[0], p.stream_info.resolution[1])
+    return res
+
+
+def find_playlist(m3, bandwidth):
+    data = {}
+
+    # bandwidth is alaways in Kb.
+    # so we divide by 1000
+
+    for p in m3.playlists:
+        b = int(p.stream_info.bandwidth) // 1000
+        data[b] = p
+
+    opt = asi.Utils.find_url_by_bandwidth(data, bandwidth)
+
+    return opt

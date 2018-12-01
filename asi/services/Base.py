@@ -5,6 +5,7 @@ import asi.Utils
 import asi.Cast
 import asi.formats.H264
 import asi.formats.M3U8
+import asi.formats.MMS
 import logging
 
 
@@ -84,7 +85,7 @@ class Base:
             m3 = self.get_tablet_playlist()
             if not m3.is_variant:
                 raise NotImplementedError
-            playlist = asi.Utils.find_playlist(m3, options.bwidth)
+            playlist = asi.formats.M3U8.find_playlist(m3, options.bwidth)
             url = playlist.absolute_uri
         elif video_format == "mms":
             url = asi.Utils.get_mms_url(self.grabber, self.mms)
@@ -115,28 +116,7 @@ class Base:
         asi.formats.H264.download_h264(self.grabber, grabber, folder, url, options, self.pid, self.filename, self.title)
 
     def download_mms(self, folder, options, url):
-        try:
-            import libmimms.core
-
-            local_filename = os.path.join(folder, self.filename + ".wmv")
-
-            if (not options.overwrite) and os.path.exists(local_filename):
-                print("{0} already there as {1}".format(self.pid, local_filename))
-                return
-
-            opt = asi.Utils.Obj()
-            opt.quiet = False
-            opt.url = url
-            opt.resume = False
-            opt.bandwidth = 1e6
-            opt.filename = local_filename
-            opt.clobber = True
-            opt.time = 0
-
-            libmimms.core.download(opt)
-
-        except ImportError:
-            print("\nMissing libmimms.\nCannot download: {0}.".format(mms))
+        asi.formats.MMS.download_mms(folder, url, options, self.pid, self.filename)
 
     def display(self, width):
         print("=" * width)
