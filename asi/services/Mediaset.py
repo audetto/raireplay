@@ -9,14 +9,15 @@ from asi.services import Base
 from asi import Config
 from asi.formats import H264
 
-configUrl = "http://app.mediaset.it/app/videomediaset/iPhone/2.0.2/videomediaset_iphone_config.plist"
+config_url = "http://app.mediaset.it/app/videomediaset/iPhone/2.0.2/videomediaset_iphone_config.plist"
 
 FULL_VIDEO = 0
 PROGRAM_LIST = 1
 PROGRAM = 2
 PROGRAM_VIDEO = 3
 
-def parseConfig(root):
+
+def parse_config(root):
     dic = root.find("dict")
 
     result = {}
@@ -36,7 +37,7 @@ def parseConfig(root):
     return result
 
 
-def processFullVideo(grabber, f, tag, conf, folder, progress, downType, db):
+def process_full_video(grabber, f, tag, conf, folder, progress, down_type, db):
     o = json.load(f)
 
     videos = o[tag]["video"]
@@ -57,59 +58,59 @@ def processFullVideo(grabber, f, tag, conf, folder, progress, downType, db):
             Utils.add_to_db(db, p)
 
 
-def processProgramList(grabber, f, conf, folder, progress, downType, db):
+def process_program_list(grabber, f, conf, folder, progress, down_type, db):
     o = json.load(f)
 
     for a in o["programmi"]["programma"]:
         url = a["urlxml"]
-        downloadItems(grabber, url, PROGRAM, conf, folder, progress, downType, db)
+        download_items(grabber, url, PROGRAM, conf, folder, progress, down_type, db)
 
 
-def processProgram(grabber, f, conf, folder, progress, downType, db):
+def process_program(grabber, f, conf, folder, progress, down_type, db):
     o = json.load(f)
 
     url = o["brandinfo"]["url_xmlvideo"]
-    downloadItems(grabber, url, PROGRAM_VIDEO, conf, folder, progress, downType, db)
+    download_items(grabber, url, PROGRAM_VIDEO, conf, folder, progress, down_type, db)
 
 
-def downloadItems(grabber, url, which, conf, folder, progress, downType, db):
+def download_items(grabber, url, which, conf, folder, progress, down_type, db):
     name = Utils.http_filename(url)
-    localName = os.path.join(folder, name)
+    local_name = os.path.join(folder, name)
 
-    f = Utils.download(grabber, progress, url, localName, downType, "utf-8", True)
+    f = Utils.download(grabber, progress, url, local_name, down_type, "utf-8", True)
 
     if f:
         if which == FULL_VIDEO:
-            processFullVideo(grabber, f, "episodi_interi", conf, folder, progress, downType, db)
+            process_full_video(grabber, f, "episodi_interi", conf, folder, progress, down_type, db)
         elif which == PROGRAM_LIST:
-            processProgramList(grabber, f, conf, folder, progress, downType, db)
+            process_program_list(grabber, f, conf, folder, progress, down_type, db)
         elif which == PROGRAM:
-            processProgram(grabber, f, conf, folder, progress, downType, db)
+            process_program(grabber, f, conf, folder, progress, down_type, db)
         elif which == PROGRAM_VIDEO:
-            processFullVideo(grabber, f, "brand", conf, folder, progress, downType, db)
+            process_full_video(grabber, f, "brand", conf, folder, progress, down_type, db)
 
 
-def download(db, grabber, downType, mediasetType):
+def download(db, grabber, down_type, mediaset_type):
     progress = Utils.get_progress()
-    name = Utils.http_filename(configUrl)
+    name = Utils.http_filename(config_url)
 
     folder = Config.mediaset_folder
-    localName = os.path.join(folder, name)
+    local_name = os.path.join(folder, name)
 
-    f = Utils.download(grabber, progress, configUrl, localName, downType, None, True)
+    f = Utils.download(grabber, progress, config_url, local_name, down_type, None, True)
     s = f.read().strip()
     root = ElementTree.fromstring(s)
-    conf = parseConfig(root)
+    conf = parse_config(root)
 
-    if mediasetType == "tg5":
+    if mediaset_type == "tg5":
         url = conf["FullVideoRequestUrl"].replace("http://ww.", "http://www.")
-        downloadItems(grabber, url, FULL_VIDEO, conf, folder, progress, downType, db)
+        download_items(grabber, url, FULL_VIDEO, conf, folder, progress, down_type, db)
     else:
         url = conf["ProgramListRequestUrl"]
-        downloadItems(grabber, url, PROGRAM_LIST, conf, folder, progress, downType, db)
+        download_items(grabber, url, PROGRAM_LIST, conf, folder, progress, down_type, db)
 
 
-def getMediasetLink(conf, num):
+def get_mediaset_link(conf, num):
     url = conf["CDNSelectorRequestUrl"]
     url = url.replace("%@", num)
     return url
@@ -117,7 +118,7 @@ def getMediasetLink(conf, num):
 
 class Program(Base.Base):
     def __init__(self, grabber, conf, datetime, length, pid, title, desc, num, channel):
-        super(Program, self).__init__()
+        super().__init__()
 
         self.pid = pid
         self.title = title
@@ -129,13 +130,12 @@ class Program(Base.Base):
         self.length = length
         self.grabber = grabber
 
-        self.url = getMediasetLink(conf, num)
+        self.url = get_mediaset_link(conf, num)
 
         name = Utils.make_filename(self.title)
         self.filename = self.pid + "-" + name
 
-
-    def getH264(self):
+    def get_h264(self):
         if self.h264:
             return self.h264
 
@@ -146,9 +146,8 @@ class Program(Base.Base):
             H264.add_h264_url(self.h264, 0, url)
         return self.h264
 
-
     def display(self, width):
-        super(Program, self).display(width)
+        super().display(width)
 
         print("URL:", self.url)
         print()

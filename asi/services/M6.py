@@ -18,34 +18,35 @@ from asi.services import Base
 
 channels = ["m6replay", "w9replay", "6terreplay", "styles", "stories", "comedy", "crazy_kitchen"]
 
-def getTSUrl(link):
-#    ts = "https://lb.cdn.m6web.fr/c/cu/s/m6replay_iphone/iphone/{0}".format(link)
+
+def get_ts_url(link):
+    #    ts = "https://lb.cdn.m6web.fr/c/cu/s/m6replay_iphone/iphone/{0}".format(link)
     ts = "https://lb.cdn.m6web.fr/s/cu/prime/{0}".format(link)
     return ts
 
 
-def getCatalogueUrl(channel):
-# old catalogue
-#    catalogueUrl = "http://static.m6replay.fr/catalog/m6group_web/{0}replay/catalogue.json"
-# iphone catalogue
-    catalogueUrl = "http://static.m6replay.fr/catalog/m6group_iphone/{0}/catalogue.xml"
-    url = catalogueUrl.format(channel)
+def get_catalogue_url(channel):
+    # old catalogue
+    #    catalogue_url = "http://static.m6replay.fr/catalog/m6group_web/{0}replay/catalogue.json"
+    # iphone catalogue
+    catalogue_url = "http://static.m6replay.fr/catalog/m6group_iphone/{0}/catalogue.xml"
+    url = catalogue_url.format(channel)
     return url
 
 
-def getInfoUrl(channel, clip):
-    infoUrl = "http://static.m6replay.fr/catalog/m6group_iphone/{0}/clip/{1}/clip_infos-{2}.xml"
+def get_info_url(channel, clip):
+    info_url = "http://static.m6replay.fr/catalog/m6group_iphone/{0}/clip/{1}/clip_infos-{2}.xml"
     clip_key = clip[-2:] + '/' + clip[-4:-2]
-    url = infoUrl.format(channel, clip_key, clip)
+    url = info_url.format(channel, clip_key, clip)
     return url
 
 
-def process(grabber, downType, f, channel, db):
+def process(grabber, down_type, f, channel, db):
     root = ElementTree.parse(f).getroot()
 
-    clpList = root.find("clpList")
+    clp_list = root.find("clpList")
 
-    for clp in clpList:
+    for clp in clp_list:
         k = clp.get("id")
         title = clp.find("programName").text + " - " + clp.find("clpName").text
         desc = clp.find("desc").text
@@ -54,44 +55,44 @@ def process(grabber, downType, f, channel, db):
             date = clp.find("publiDate").text
         seconds = clp.find("duration").text
 
-        length = datetime.timedelta(seconds = int(seconds))
+        length = datetime.timedelta(seconds=int(seconds))
 
         pid = Utils.get_new_pid(db, k)
-        p = Program(grabber, downType, channel, date, pid, k, length, title, desc)
+        p = Program(grabber, down_type, channel, date, pid, k, length, title, desc)
         Utils.add_to_db(db, p)
 
 
-def download(db, grabber, downType):
+def download(db, grabber, down_type):
     progress = Utils.get_progress()
 
     for channel in channels:
-        url = getCatalogueUrl(channel)
+        url = get_catalogue_url(channel)
         name = Utils.http_filename(url) + "." + channel
 
         folder = Config.m6_folder
-        localName = os.path.join(folder, name)
+        local_name = os.path.join(folder, name)
 
-        f = Utils.download(grabber, progress, url, localName, downType, "utf-8", True)
+        f = Utils.download(grabber, progress, url, local_name, down_type, "utf-8", True)
         if f:
-            process(grabber, downType, f, channel, db)
+            process(grabber, down_type, f, channel, db)
 
 
 class Program(Base.Base):
-    def __init__(self, grabber, downType, channel, date, pid, key, length, title, desc):
-        super(Program, self).__init__()
+    def __init__(self, grabber, down_type, channel, date, pid, key, length, title, desc):
+        super().__init__()
 
         self.pid = pid
         self.title = title
         self.description = desc
         self.channel = channel
         self.key = key
-        self.downType = downType
-        self.url = getInfoUrl(self.channel, self.key);
+        self.down_type = down_type
+        self.url = get_info_url(self.channel, self.key)
 
         if date:
             self.datetime = datetime.datetime.strptime(date, "%Y-%m-%d %H:%M:%S")
         else:
-            self.datetime =  datetime.datetime.now()
+            self.datetime = datetime.datetime.now()
 
         self.grabber = grabber
         self.length = length
@@ -99,28 +100,26 @@ class Program(Base.Base):
         name = Utils.make_filename(self.title)
         self.filename = self.pid + "-" + name
 
-
     def display(self, width):
-        super(Program, self).display(width)
+        super().display(width)
 
         print("URL:", self.url)
         print()
 
-
-    def getTS(self):
+    def get_ts(self):
         if self.ts:
             return self.ts
 
         folder = Config.m6_folder
         name = Utils.http_filename(self.url)
-        localName = os.path.join(folder, name)
+        local_name = os.path.join(folder, name)
         progress = Utils.get_progress()
 
-        f = Utils.download(self.grabber, progress, self.url, localName, self.downType, "utf-8", True)
+        f = Utils.download(self.grabber, progress, self.url, local_name, self.down_type, "utf-8", True)
         if f:
             root = ElementTree.parse(f).getroot()
             asset = root.find("asset")
             for v in asset.findall("assetItem"):
                 u = v.find("url").text
-                self.ts = getTSUrl(u)
+                self.ts = get_ts_url(u)
                 return self.ts

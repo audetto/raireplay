@@ -43,7 +43,6 @@ class VideoHTMLParser(HTMLParser):
         self.values.page = None
         self.values.date = None
 
-
     def handle_starttag(self, tag, attrs):
         if tag == "meta":
             val = self.extract(attrs, "videourl")
@@ -91,12 +90,12 @@ class VideoHTMLParser(HTMLParser):
                 if attrs[0][0] == "value":
                     path = attrs[0][1]
                     if path.find("videoPath") == 0:
-                        firstEqual = path.find("=")
-                        firstComma = path.find(",")
-                        self.values.videoPath = path[firstEqual + 1: firstComma]
+                        first_equal = path.find("=")
+                        first_comma = path.find(",")
+                        self.values.videoPath = path[first_equal + 1: first_comma]
 
-
-    def extract(self, attrs, name):
+    @staticmethod
+    def extract(attrs, name):
         if len(attrs) > 1:
             if attrs[0][0] == "name" and attrs[0][1] == name:
                 if attrs[1][0] == "content":
@@ -105,8 +104,8 @@ class VideoHTMLParser(HTMLParser):
 
 
 class Demand(Base.Base):
-    def __init__(self, grabber, url, downType, pid):
-        super(Demand, self).__init__()
+    def __init__(self, grabber, url, down_type, pid):
+        super().__init__()
 
         self.grabber = grabber
 
@@ -118,9 +117,9 @@ class Demand(Base.Base):
         self.pid = pid
 
         folder = Config.item_folder
-        localFilename = os.path.join(folder, Utils.http_filename(self.url))
+        local_filename = os.path.join(folder, Utils.http_filename(self.url))
 
-        f = Utils.download(grabber, None, self.url, localFilename, downType, "utf-8")
+        f = Utils.download(grabber, None, self.url, local_filename, down_type, "utf-8")
 
         parser = VideoHTMLParser()
         parser.feed(f.read())
@@ -148,17 +147,16 @@ class Demand(Base.Base):
             self.values.videoUrl = self.values.videoPath
 
         if self.values.videoUrl:
-            #sometimes we get .mp4 which does not work
+            # sometimes we get .mp4 which does not work
             self.values.videoUrl = self.values.videoUrl.replace("relinkerServlet.mp4", "relinkerServlet.htm")
 
-        #make a nice filename
+        # make a nice filename
         self.filename = Utils.make_filename(self.title)
 
         self.mms = self.values.videoUrl
 
-
     def display(self, width):
-        super(Demand, self).display(width)
+        super().display(width)
 
         print("Type:", self.values.type)
         print("Program:", self.values.program)
@@ -167,6 +165,5 @@ class Demand(Base.Base):
         print("videourl:", self.values.videoUrl)
         print()
 
-
-    def follow(self, db, downType):
+    def follow(self, db, down_type):
         raise Exception("Follow selection must terminate here.")

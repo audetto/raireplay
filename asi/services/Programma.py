@@ -7,7 +7,7 @@ from asi import Config
 from asi.services import RaiPlay
 
 
-def processSet(grabber, downType, f, db):
+def process_set(grabber, down_type, f, db):
     o = json.load(f)
 
     channel = o["Name"]
@@ -23,14 +23,14 @@ def processSet(grabber, downType, f, db):
 
         length = secs
 
-        pathID = value["pathID"]
+        path_id = value["pathID"]
 
         pid = Utils.get_new_pid(db, None)
-        p = RaiPlay.Program(grabber, downType, channel, date, time, pid, length, name, desc, pathID)
+        p = RaiPlay.Program(grabber, down_type, channel, date, time, pid, length, name, desc, path_id)
         Utils.add_to_db(db, p)
 
 
-def process(grabber, progress, folder, downType, f, db):
+def process(grabber, progress, folder, down_type, f, db):
     o = json.load(f)
 
     blocks = o["Blocks"]
@@ -42,13 +42,13 @@ def process(grabber, progress, folder, downType, f, db):
                 url = "http://www.raiplay.it/" + path
 
                 filename = path.replace("/", "_")
-                localName = os.path.join(folder, filename + ".json")
+                local_name = os.path.join(folder, filename + ".json")
 
-                f = Utils.download(grabber, progress, url, localName, downType, "utf-8", True)
-                processSet(grabber, downType, f, db)
+                f = Utils.download(grabber, progress, url, local_name, down_type, "utf-8", True)
+                process_set(grabber, down_type, f, db)
 
 
-def download(db, grabber, programma, downType):
+def download(db, grabber, programma, down_type):
     progress = Utils.get_progress()
 
     folder = Config.raiplay_folder
@@ -56,7 +56,7 @@ def download(db, grabber, programma, downType):
     o = urllib.parse.urlparse(programma)
     filename = o.path.replace("/", "_")
     url = programma + "/?json"
-    localName = os.path.join(folder, filename + ".json")
+    local_name = os.path.join(folder, filename + ".json")
 
-    f = Utils.download(grabber, progress, url, localName, downType, "utf-8", True)
-    process(grabber, progress, folder, downType, f, db)
+    f = Utils.download(grabber, progress, url, local_name, down_type, "utf-8", True)
+    process(grabber, progress, folder, down_type, f, db)

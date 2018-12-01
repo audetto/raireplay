@@ -17,22 +17,22 @@ def process(grabber, f, db):
         Utils.add_to_db(db, p)
 
 
-def download(db, grabber, downType):
+def download(db, grabber, down_type):
     page = Utils.http_filename(RAIUrls.on_demand)
 
     folder = Config.demand_folder
-    localFilename = os.path.join(folder, page)
+    local_filename = os.path.join(folder, page)
 
     progress = Utils.get_progress()
 
-    f = Utils.download(grabber, progress, RAIUrls.on_demand, localFilename, downType, "raw-unicode-escape", True)
+    f = Utils.download(grabber, progress, RAIUrls.on_demand, local_filename, down_type, "raw-unicode-escape", True)
 
     process(grabber, f, db)
 
 
 class Group(Base.Base):
     def __init__(self, grabber, pid, title, link, date, channel):
-        super(Group, self).__init__()
+        super().__init__()
 
         self.pid = pid
         self.grabber = grabber
@@ -43,13 +43,11 @@ class Group(Base.Base):
         self.url = RAIUrls.base + link
         self.canFollow = True
 
-
     def display(self, width):
-        super(Group, self).display(width)
+        super().display(width)
 
         print("URL:", self.url)
         print()
 
-
-    def follow(self, db, downType):
-        Page.download(db, self.grabber, self.url, downType)
+    def follow(self, db, down_type):
+        Page.download(db, self.grabber, self.url, down_type)

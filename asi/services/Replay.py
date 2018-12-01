@@ -15,7 +15,8 @@ channels = {"1": "RaiUno", "2": "RaiDue", "3": "RaiTre", "23": "RaiGulp", "31": 
 # h264_DIGIT
 # which are now used for bwidth selection for MP4
 
-def extractH264Ext(value):
+
+def extract_h264_ext(value):
     res = {}
     reg = "^h264_(\d+)"
     for k in value:
@@ -28,7 +29,7 @@ def extractH264Ext(value):
     return res
 
 
-def parseItem(grabber, channel, date, time, value, db):
+def parse_item(grabber, channel, date, time, value, db):
     name = value["t"]
     desc = value["d"]
     secs = value["l"]
@@ -38,7 +39,7 @@ def parseItem(grabber, channel, date, time, value, db):
     if secs != "":
         length = datetime.timedelta(seconds = int(secs))
 
-    h264 = extractH264Ext(value)
+    h264 = extract_h264_ext(value)
 
     # if the detailed h264 is not found, try with "h264"
     if not h264:
@@ -46,24 +47,24 @@ def parseItem(grabber, channel, date, time, value, db):
         H264.add_h264_url(h264, 0, single)
 
     tablet = value["urlTablet"]
-    smartPhone = value["urlSmartPhone"]
+    smart_phone = value["urlSmartPhone"]
 
     if h264:
         # sometimes RAI puts the same url for h264 and TS
         # normally this is only a valid h264,
         # so we skip it in TS
 
-        h264Urls = h264.values()
-        if tablet in h264Urls:
+        h264_urls = h264.values()
+        if tablet in h264_urls:
             tablet = None
-        if smartPhone in h264Urls:
-            smartPhone = None
+        if smart_phone in h264_urls:
+            smart_phone = None
 
     pid = value["i"]
 
-    if h264 or tablet or smartPhone:
+    if h264 or tablet or smart_phone:
         pid = Utils.get_new_pid(db, pid)
-        p = Program(grabber, channels[channel], date, time, pid, length, name, desc, h264, tablet, smartPhone)
+        p = Program(grabber, channels[channel], date, time, pid, length, name, desc, h264, tablet, smart_phone)
         Utils.add_to_db(db, p)
 
 
@@ -80,10 +81,10 @@ def process(grabber, f, db):
 
         for date, v2 in v1.items():
             for time, value in v2.items():
-                parseItem(grabber, channel, date, time, value, db)
+                parse_item(grabber, channel, date, time, value, db)
 
 
-def download(db, grabber, downType):
+def download(db, grabber, down_type):
     progress = Utils.get_progress()
 
     today = datetime.date.today()
@@ -92,22 +93,22 @@ def download(db, grabber, downType):
 
     for x in range(1, 8):
         day = today - datetime.timedelta(days = x)
-        strDate = day.strftime("_%Y_%m_%d")
+        str_date = day.strftime("_%Y_%m_%d")
 
         for channel in channels.values():
-            filename = channel + strDate + ".html"
+            filename = channel + str_date + ".html"
             url = RAIUrls.replay + "/" + filename
-            localName = os.path.join(folder, filename)
+            local_name = os.path.join(folder, filename)
 
-            f = Utils.download(grabber, progress, url, localName, downType, "utf-8")
+            f = Utils.download(grabber, progress, url, local_name, down_type, "utf-8")
 
             if f:
                 process(grabber, f, db)
 
 
 class Program(Base.Base):
-    def __init__(self, grabber, channel, date, hour, pid, length, title, desc, h264, tablet, smartPhone):
-        super(Program, self).__init__()
+    def __init__(self, grabber, channel, date, hour, pid, length, title, desc, h264, tablet, smart_phone):
+        super().__init__()
 
         self.pid = pid
         self.title = title
@@ -118,7 +119,7 @@ class Program(Base.Base):
         if tablet:    # higher quality normally
             self.ts = tablet
         else:
-            self.ts = smartPhone
+            self.ts = smart_phone
 
         self.datetime = datetime.datetime.strptime(date + " " + hour, "%Y-%m-%d %H:%M")
 

@@ -6,31 +6,32 @@ from asi import Utils
 from asi import Config
 from asi.services import Base
 
-programsUrl = "http://api.tf1.fr/tf1-programs/iphone/limit/100/"
-newsUrl = "http://api.tf1.fr/tf1-homepage-news/iphone/"
-homepageUrl = "http://api.tf1.fr/tf1-homepage/iphone/"
+programs_url = "http://api.tf1.fr/tf1-programs/iphone/limit/100/"
+news_url = "http://api.tf1.fr/tf1-homepage-news/iphone/"
+homepage_url = "http://api.tf1.fr/tf1-homepage/iphone/"
 
-def getDataUrl(progId, item):
-    url = "http://api.tf1.fr/tf1-vods/iphone//integral/{0}/program_id/{1}".format(item, progId)
+
+def get_data_url(prog_id, item):
+    url = "http://api.tf1.fr/tf1-vods/iphone//integral/{0}/program_id/{1}".format(item, prog_id)
     return url
 
 
-def getWatLink(watId):
-    url = "http://www.wat.tv/get/iphone/{0}.m3u8?bwmin=100000&bwmax=490000".format(watId)
+def get_wat_link(wat_id):
+    url = "http://www.wat.tv/get/iphone/{0}.m3u8?bwmin=100000&bwmax=490000".format(wat_id)
     return url
 
 
-def parseItem(grabber, prog, name, db):
-    pid      = str(prog["id"])
-    desc     = prog["longTitle"]
-    pubDate  = prog["publicationDate"]
+def parse_item(grabber, prog, name, db):
+    pid = str(prog["id"])
+    desc = prog["longTitle"]
+    pub_date = prog["publicationDate"]
     duration = prog["duration"]
-    name     = name + " - " + prog["shortTitle"]
-    wat      = prog["watId"]
+    name = name + " - " + prog["shortTitle"]
+    wat = prog["watId"]
     category = prog["videoCategory"]
 
-    length = datetime.timedelta(seconds = duration)
-    date = datetime.datetime.strptime(pubDate, "%Y-%m-%d %H:%M:%S")
+    length = datetime.timedelta(seconds=duration)
+    date = datetime.datetime.strptime(pub_date, "%Y-%m-%d %H:%M:%S")
 
     # ignore the countless "extract", "bonus", "short" which last just a few minutes
     if category == "fullvideo":
@@ -39,21 +40,21 @@ def parseItem(grabber, prog, name, db):
         Utils.add_to_db(db, p)
 
 
-def processGroup(grabber, f, name, db):
+def process_group(grabber, f, name, db):
     o = json.load(f)
 
     for prog in o:
-        parseItem(grabber, prog, name, db)
+        parse_item(grabber, prog, name, db)
 
 
-def processNews(grabber, f, folder, progress, downType, db):
+def process_news(grabber, f, folder, progress, down_type, db):
     o = json.load(f)
 
     for prog in o:
         name = prog["programName"]
-        groupId = prog["programId"]
+        group_id = prog["programId"]
 
-        downloadGroup(grabber, name, groupId, folder, progress, downType, db)
+        download_group(grabber, name, group_id, folder, progress, down_type, db)
 
         # this group contains the info of the most recent Item
         # we add an other item with the group name
@@ -63,66 +64,65 @@ def processNews(grabber, f, folder, progress, downType, db):
         wat = prog["linkAttributes"]["watId"]
         category = prog["linkAttributes"]["videoCategory"]
 
-        pid = Utils.get_new_pid(db, groupId)
+        pid = Utils.get_new_pid(db, group_id)
         p = Program(grabber, datetime.datetime.now(), None, pid, name, title, wat, category)
         Utils.add_to_db(db, p)
 
 
-def processPrograms(grabber, f, folder, progress, downType, db):
+def process_programs(grabber, f, folder, progress, down_type, db):
     o = json.load(f)
 
     for prog in o:
         name = prog["shortTitle"]
-        groupId = prog["id"]
+        group_id = prog["id"]
 
         # here, we do not know the most recent item
         # we simply have to go through them all
 
-        downloadGroup(grabber, name, groupId, folder, progress, downType, db)
+        download_group(grabber, name, group_id, folder, progress, down_type, db)
 
 
-def downloadGroup(grabber, name, groupId, folder, progress, downType, db):
-
+def download_group(grabber, name, group_id, folder, progress, down_type, db):
     # we set it to True as this is a group
     # and subject to continuous changes
-    checkTimestamp = True
+    check_timestamp = True
 
     # .0
-    url_0 = getDataUrl(groupId, 0)
-    localName_0 = os.path.join(folder, str(groupId) + ".0.json")
-    f_0 = Utils.download(grabber, progress, url_0, localName_0, downType, "utf-8", checkTimestamp)
+    url_0 = get_data_url(group_id, 0)
+    local_name_0 = os.path.join(folder, str(group_id) + ".0.json")
+    f_0 = Utils.download(grabber, progress, url_0, local_name_0, down_type, "utf-8", check_timestamp)
 
     if f_0:
-        processGroup(grabber, f_0, name, db)
+        process_group(grabber, f_0, name, db)
 
     # .1
-    url_1 = getDataUrl(groupId, 1)
-    localName_1 = os.path.join(folder, str(groupId) + ".1.json")
-    f_1 = Utils.download(grabber, progress, url_1, localName_1, downType, "utf-8", checkTimestamp)
+    url_1 = get_data_url(group_id, 1)
+    local_name_1 = os.path.join(folder, str(group_id) + ".1.json")
+    f_1 = Utils.download(grabber, progress, url_1, local_name_1, down_type, "utf-8", check_timestamp)
 
     if f_1:
-        processGroup(grabber, f_1, name, db)
+        process_group(grabber, f_1, name, db)
 
 
-def download(db, grabber, downType):
+def download(db, grabber, down_type):
     progress = Utils.get_progress()
 
     folder = Config.tf1_folder
 
-    localName = os.path.join(folder, "news.json")
-    f = Utils.download(grabber, progress, newsUrl, localName, downType, "utf-8", True)
+    local_name = os.path.join(folder, "news.json")
+    f = Utils.download(grabber, progress, news_url, local_name, down_type, "utf-8", True)
 
-    processNews(grabber, f, folder, progress, downType, db)
+    process_news(grabber, f, folder, progress, down_type, db)
 
-    localName = os.path.join(folder, "programs.json")
-    f = Utils.download(grabber, progress, programsUrl, localName, downType, "utf-8", True)
+    local_name = os.path.join(folder, "programs.json")
+    f = Utils.download(grabber, progress, programs_url, local_name, down_type, "utf-8", True)
 
-    processPrograms(grabber, f, folder, progress, downType, db)
+    process_programs(grabber, f, folder, progress, down_type, db)
 
 
 class Program(Base.Base):
     def __init__(self, grabber, datetime, length, pid, title, desc, wat, category):
-        super(Program, self).__init__()
+        super().__init__()
 
         self.pid = pid
         self.title = title
@@ -134,14 +134,13 @@ class Program(Base.Base):
 
         self.length = length
         self.grabber = grabber
-        self.ts = getWatLink(self.wat)
+        self.ts = get_wat_link(self.wat)
 
         name = Utils.make_filename(self.title)
         self.filename = self.pid + "-" + name
 
-
     def display(self, width):
-        super(Program, self).display(width)
+        super().display(width)
 
         print()
         print("Category:", self.category)

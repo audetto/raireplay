@@ -11,7 +11,7 @@ def process(grabber, filename, pid):
 
 class Program(Base.Base):
     def __init__(self, grabber, filename, pid):
-        super(Program, self).__init__()
+        super().__init__()
 
         self.pid = pid
         self.title = filename

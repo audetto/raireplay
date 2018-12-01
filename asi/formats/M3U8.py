@@ -81,7 +81,7 @@ def download_m3u8(grabber_program, folder, url, options, pid, filename, title, r
 
 
 def load_m3u8_from_url(grabber, uri):
-    request = urllib.request.Request(uri, headers=asi.Utils.httpHeaders)
+    request = urllib.request.Request(uri, headers=asi.Utils.http_headers)
     logging.info('M3U8: {}'.format(uri))
     stream = grabber.open(request)
 

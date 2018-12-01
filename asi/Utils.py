@@ -22,8 +22,8 @@ class Obj:
 
 # got from the iphone
 # required for TF1 - www.wat.tv
-userAgent = "AppleCoreMedia/1.0.0.9B206 (iPod; U; CPU OS 5_1_1 like Mac OS X; en_us)"
-httpHeaders = {"User-Agent": userAgent}
+user_agent = "AppleCoreMedia/1.0.0.9B206 (iPod; U; CPU OS 5_1_1 like Mac OS X; en_us)"
+http_headers = {"User-Agent": user_agent}
 
 
 def http_filename(url):
@@ -31,12 +31,12 @@ def http_filename(url):
     return name
 
 
-# simply download a file and saves it to localName
+# simply download a file and saves it to local_name
 def download_file(grabber_metadata, grabber_program, progress, url, local_name):
     if progress:
         progress.set_name(local_name)
 
-    request = urllib.request.Request(url, headers=httpHeaders)
+    request = urllib.request.Request(url, headers=http_headers)
 
     logging.info('URL {}'.format(url))
     with grabber_metadata.open(request) as response:
@@ -73,12 +73,12 @@ def download_file(grabber_metadata, grabber_program, progress, url, local_name):
                 progress.done()
 
 
-# def downloadFile(grabberMetadata, grabberProgram, progress, url, localName):
+# def downloadFile(grabberMetadata, grabberProgram, progress, url, local_name):
 #    if progress:
-#        progress.setName(localName)
+#        progress.setName(local_name)
 #    request = urllib.request.Request(url, headers = httpHeaders)
 #
-#    urllib.request.urlretrieve(url, filename = localName, reporthook = progress)
+#    urllib.request.urlretrieve(url, filename = local_name, reporthook = progress)
 #    if progress:
 #        progress.done()
 
@@ -88,7 +88,7 @@ def download_file(grabber_metadata, grabber_program, progress, url, local_name):
 def download(grabber, progress, url, local_name, down_type, encoding, check_time=False):
     try:
         if down_type == "shm":
-            request = urllib.request.Request(url, headers=httpHeaders)
+            request = urllib.request.Request(url, headers=http_headers)
             logging.info('URL {}'.format(url))
             f = grabber.open(request)
             if encoding:

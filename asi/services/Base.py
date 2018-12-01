@@ -8,23 +8,23 @@ import asi.formats.M3U8
 import logging
 
 
-class Base(object):
+class Base:
     def __init__(self):
-        self.pid           = None
-        self.title         = None
-        self.channel       = None
-        self.description   = None
-        self.grabber       = None
+        self.pid = None
+        self.title = None
+        self.channel = None
+        self.description = None
+        self.grabber = None
 
-        self.datetime      = None
+        self.datetime = None
 
-        self.length        = None
-        self.filename      = None
-        self.h264          = {}
-        self.ts            = None
-        self.mms           = None
-        self.m3            = None
-        self.canFollow     = False
+        self.length = None
+        self.filename = None
+        self.h264 = {}
+        self.ts = None
+        self.mms = None
+        self.m3 = None
+        self.canFollow = False
 
     def short(self, fmt):
         if self.datetime:
@@ -35,17 +35,17 @@ class Base(object):
         str1 = fmt.format(self.pid, ts, self.channel, self.title)
         return str1
 
-    def getTS(self):
+    def get_ts(self):
         return self.ts
 
-    def getH264(self):
+    def get_h264(self):
         return self.h264
 
-    def getTabletPlaylist(self):
+    def get_tablet_playlist(self):
         if self.m3:
             return self.m3
 
-        ts = self.getTS()
+        ts = self.get_ts()
         if ts:
             try:
                 self.m3 = asi.formats.M3U8.load_m3u8_from_url(self.grabber, ts)
@@ -66,10 +66,10 @@ class Base(object):
 
     def get_url_and_format(self, options):
         if not options.format:
-            if self.getH264():
+            if self.get_h264():
                 video_format = "h264"
             else:
-                m3 = self.getTabletPlaylist()
+                m3 = self.get_tablet_playlist()
                 if m3:
                     video_format = "tsmp4"
                 elif self.mms:
@@ -78,10 +78,10 @@ class Base(object):
             video_format = options.format
 
         if video_format == "h264":
-            h264 = self.getH264()
+            h264 = self.get_h264()
             url = asi.Utils.find_url_by_bandwidth(h264, options.bwidth)
         elif video_format in ["ts", "tsmp4"]:
-            m3 = self.getTabletPlaylist()
+            m3 = self.get_tablet_playlist()
             if not m3.is_variant:
                 raise NotImplementedError
             playlist = asi.Utils.find_playlist(m3, options.bwidth)
@@ -100,44 +100,43 @@ class Base(object):
         logging.info('URL: {}'.format(url))
 
         if video_format == "h264":
-            self.downloadH264(folder, options, grabber, url)
+            self.download_h264(folder, options, grabber, url)
         elif video_format == "ts":
-            self.downloadTablet(folder, options, grabber, url, False)
+            self.download_tablet(folder, options, grabber, url, False)
         elif video_format == "tsmp4":
-            self.downloadTablet(folder, options, grabber, url, True)
+            self.download_tablet(folder, options, grabber, url, True)
         elif video_format == "mms":
-            self.downloadMMS(folder, options, grabber)
+            self.download_mms(folder, options, grabber)
 
-    def downloadTablet(self, folder, options, grabber, url, remux):
+    def download_tablet(self, folder, options, grabber, url, remux):
         asi.formats.M3U8.download_m3u8(grabber, folder, url, options, self.pid, self.filename, self.title, remux)
 
-    def downloadH264(self, folder, options, grabber, url):
+    def download_h264(self, folder, options, grabber, url):
         asi.formats.H264.download_h264(self.grabber, grabber, folder, url, options, self.pid, self.filename, self.title)
 
-    def downloadMMS(self, folder, options, url):
+    def download_mms(self, folder, options, url):
         try:
             import libmimms.core
 
-            localFilename = os.path.join(folder, self.filename + ".wmv")
+            local_filename = os.path.join(folder, self.filename + ".wmv")
 
-            if (not options.overwrite) and os.path.exists(localFilename):
-                print("{0} already there as {1}".format(self.pid, localFilename))
+            if (not options.overwrite) and os.path.exists(local_filename):
+                print("{0} already there as {1}".format(self.pid, local_filename))
                 return
 
             opt = asi.Utils.Obj()
-            opt.quiet        = False
-            opt.url          = url
-            opt.resume       = False
-            opt.bandwidth    = 1e6
-            opt.filename     = localFilename
-            opt.clobber      = True
-            opt.time         = 0
+            opt.quiet = False
+            opt.url = url
+            opt.resume = False
+            opt.bandwidth = 1e6
+            opt.filename = local_filename
+            opt.clobber = True
+            opt.time = 0
 
             libmimms.core.download(opt)
 
         except ImportError:
             print("\nMissing libmimms.\nCannot download: {0}.".format(mms))
-
 
     def display(self, width):
         print("=" * width)
@@ -158,12 +157,12 @@ class Base(object):
             print("Follow: ENABLED")
             print()
 
-        m3 = self.getTabletPlaylist()
+        m3 = self.get_tablet_playlist()
 
-        asi.formats.H264.display_h264(self.getH264())
-        if self.getTS() or self.mms:
-            if self.getTS():
-                print("ts:", self.getTS())
+        asi.formats.H264.display_h264(self.get_h264())
+        if self.get_ts() or self.mms:
+            if self.get_ts():
+                print("ts:", self.get_ts())
             if self.mms:
                 print("mms:", self.mms)
             print()
