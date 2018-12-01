@@ -4,7 +4,7 @@ import sys
 import platform
 import codecs
 import argparse
-import logging
+import logging.config
 
 import Driver
 
@@ -52,12 +52,15 @@ def main():
     parser.add_argument("--cast", action = "store_true", default = False, help = "cast")
     parser.add_argument("--info", action = "store_true", default = False, help = "display program info")
     parser.add_argument("--re", action = "store_true", default = False, help = "filters are RegExp")
+    parser.add_argument("--logging", action = "store", default = None, help = "logging configuration")
 
     parser.add_argument("pid", nargs = "*")
 
-    logging.basicConfig(level=logging.INFO)
-
     args = parser.parse_args()
+
+    # this function is totally undocumented
+    if args.logging:
+        logging.config.fileConfig(args.logging)
 
     Driver.process(args)
 

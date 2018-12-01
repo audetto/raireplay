@@ -32,6 +32,7 @@ def downloadM3U8(grabberProgram, folder, url, options, pid, filename, title, rem
 
     try:
         numberOfFiles = len(item.segments)
+        logging.debug('{} segments'.format(numberOfFiles))
         progress = asi.Utils.getProgress(numberOfFiles, filename + ".ts")
 
         with open(localFilenameTS, "wb") as out:
@@ -41,6 +42,7 @@ def downloadM3U8(grabberProgram, folder, url, options, pid, filename, title, rem
                 while True:
                     try:
                         attempt = attempt + 1
+                        logging.debug('#{}: {}'.format(attempt, uri))
                         with grabberProgram.open(uri) as s:
                             b = s.read()
                             size = len(b)
