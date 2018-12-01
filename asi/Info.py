@@ -7,8 +7,9 @@ from asi import Tor
 userIP = "https://api.ipify.org"
 geoIP = "https://freegeoip.net/json/"
 
-def searchTor(grabber, width, country, attemptsAndSkip):
-    args = attemptsAndSkip.split(",")
+
+def search_tor(grabber, width, country, attempts_and_skip):
+    args = attempts_and_skip.split(",")
     attempts = int(args[0])
 
     if len(args) > 1:
@@ -19,9 +20,9 @@ def searchTor(grabber, width, country, attemptsAndSkip):
     excludes = ""
 
     for a in range(attempts):
-        Tor.setTorExcludeNodes(excludes)
+        Tor.set_tor_exclude_nodes(excludes)
 
-        ip, geo = getGeoIp(grabber)
+        ip, geo = get_geo_ip(grabber)
 
         if geo.upper() == country.upper():
             if skip > 0:
@@ -30,7 +31,7 @@ def searchTor(grabber, width, country, attemptsAndSkip):
                 skip -= 1
             else:
                 print(ip, geo, "ACCEPTED")
-                Tor.setTorExitNodes(ip)
+                Tor.set_tor_exit_nodes(ip)
                 break
 
         if excludes:
@@ -39,8 +40,8 @@ def searchTor(grabber, width, country, attemptsAndSkip):
             excludes = ip
 
 
-def getGeoIp(grabber):
-    geo = Utils.getStringFromUrl(grabber, geoIP)
+def get_geo_ip(grabber):
+    geo = Utils.get_string_from_url(grabber, geoIP)
     data = json.loads(geo)
     ip = data['ip']
     country = data['country_code']
@@ -48,18 +49,18 @@ def getGeoIp(grabber):
 
 
 def display(grabber, width):
-    ip, country = getGeoIp(grabber)
+    ip, country = get_geo_ip(grabber)
 
-    exitNodes = Tor.getTorExitNodes()
-    excluded = Tor.getTorExcludeNodes()
+    exit_nodes = Tor.get_tor_exit_nodes()
+    excluded = Tor.get_tor_exclude_nodes()
 
     print("=" * width)
 
-    print("Root folder:", Config.rootFolder)
-    print("Location:   ", Config.programFolder)
+    print("Root folder:", Config.root_folder)
+    print("Location:   ", Config.program_folder)
     print("IP:         ", ip)
     print("Country:    ", country)
-    print("Exit:       ", exitNodes)
+    print("Exit:       ", exit_nodes)
     print("Excluded:   ", excluded)
 
     print()

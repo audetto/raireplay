@@ -1,6 +1,7 @@
 import logging
 
-def setTorExitNodes(country):
+
+def set_tor_exit_nodes(country):
     import stem
     import stem.connection
 
@@ -13,7 +14,7 @@ def setTorExitNodes(country):
         controller.set_conf("ExitNodes", value)
 
 
-def setTorExcludeNodes(skip):
+def set_tor_exclude_nodes(skip):
     import stem
     import stem.connection
 
@@ -22,7 +23,7 @@ def setTorExcludeNodes(skip):
         controller.set_conf("ExcludeNodes", skip)
 
 
-def getTorExitNodes():
+def get_tor_exit_nodes():
     try:
         import stem
         import stem.connection
@@ -36,7 +37,7 @@ def getTorExitNodes():
         return None
 
 
-def getTorExcludeNodes():
+def get_tor_exclude_nodes():
     try:
         import stem
         import stem.connection

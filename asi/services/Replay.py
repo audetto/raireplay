@@ -23,7 +23,7 @@ def extractH264Ext(value):
         url = value[k]
         if m and url:
             bwidth = int(m.group(1))
-            H264.addH264Url(res, bwidth, url)
+            H264.add_h264_url(res, bwidth, url)
 
     return res
 
@@ -43,7 +43,7 @@ def parseItem(grabber, channel, date, time, value, db):
     # if the detailed h264 is not found, try with "h264"
     if not h264:
         single = value["h264"]
-        H264.addH264Url(h264, 0, single)
+        H264.add_h264_url(h264, 0, single)
 
     tablet = value["urlTablet"]
     smartPhone = value["urlSmartPhone"]
@@ -62,9 +62,9 @@ def parseItem(grabber, channel, date, time, value, db):
     pid = value["i"]
 
     if h264 or tablet or smartPhone:
-        pid = Utils.getNewPID(db, pid)
+        pid = Utils.get_new_pid(db, pid)
         p = Program(grabber, channels[channel], date, time, pid, length, name, desc, h264, tablet, smartPhone)
-        Utils.addToDB(db, p)
+        Utils.add_to_db(db, p)
 
 
 def process(grabber, f, db):
@@ -84,11 +84,11 @@ def process(grabber, f, db):
 
 
 def download(db, grabber, downType):
-    progress = Utils.getProgress()
+    progress = Utils.get_progress()
 
     today = datetime.date.today()
 
-    folder = Config.replayFolder
+    folder = Config.replay_folder
 
     for x in range(1, 8):
         day = today - datetime.timedelta(days = x)
@@ -125,5 +125,5 @@ class Program(Base.Base):
         self.grabber = grabber
         self.length = length
 
-        name = Utils.makeFilename(self.title)
+        name = Utils.make_filename(self.title)
         self.filename = self.pid + "-" + name

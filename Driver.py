@@ -49,7 +49,7 @@ def item_do_actions(item, nolist, actions, options, grabber, fmt):
 
     if Action.GET in actions:
         try:
-            item.download(Config.programFolder, options, grabber)
+            item.download(Config.program_folder, options, grabber)
         except Exception as e:
             logging.info('Exception: {0}'.format(e))
             print()
@@ -125,7 +125,7 @@ def find(db, pid, isre, subset):
                     subset[ppid] = p
             else:
                 s = title.lower()
-                s = Utils.removeAccents(s)
+                s = Utils.remove_accents(s)
                 if s.find(match) != -1:
                     subset[ppid] = p
 
@@ -136,13 +136,13 @@ def process(args):
     proxy = None
 
     if args.location:
-        Config.programFolder = Config.createFolder(args.location)
+        Config.program_folder = Config.create_folder(args.location)
 
     if args.here:
-        Config.programFolder = os.getcwd()
+        Config.program_folder = os.getcwd()
 
     if args.tor:
-        Tor.setTorExitNodes(args.tor)
+        Tor.set_tor_exit_nodes(args.tor)
 
     if args.tor or args.tor_proxy:
         # we use privoxy to access tor
@@ -170,7 +170,7 @@ def process(args):
 
     if args.tor_search and args.tor:
         width = Console.terminal_width()
-        Info.searchTor(grabber, width, args.tor, args.tor_search)
+        Info.search_tor(grabber, width, args.tor, args.tor_search)
         return
 
     if args.ip:

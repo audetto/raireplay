@@ -30,9 +30,9 @@ def parseItem(grabber, downType, channel, value, db, dup):
 
             pathID = value["pathID"]
 
-            pid = Utils.getNewPID(db, None)
+            pid = Utils.get_new_pid(db, None)
             p = Program(grabber, downType, channel, date, time, pid, length, name, desc, pathID)
-            Utils.addToDB(db, p)
+            Utils.add_to_db(db, p)
 
 
 def process(grabber, downType, f, db, dup):
@@ -51,9 +51,9 @@ def process(grabber, downType, f, db, dup):
 
 
 def download(db, grabber, downType):
-    progress = Utils.getProgress()
+    progress = Utils.get_progress()
 
-    folder = Config.raiplayFolder
+    folder = Config.raiplay_folder
 
     dup = set()
 
@@ -91,7 +91,7 @@ class Program(Base.Base):
         self.grabber = grabber
         self.length = length
 
-        name = Utils.makeFilename(self.title)
+        name = Utils.make_filename(self.title)
         self.filename = name
 
 
@@ -99,10 +99,10 @@ class Program(Base.Base):
         if self.ts:
             return self.ts
 
-        folder = Config.raiplayFolder
-        name = Utils.httpFilename(self.url)
+        folder = Config.raiplay_folder
+        name = Utils.http_filename(self.url)
         localName = os.path.join(folder, name)
-        progress = Utils.getProgress()
+        progress = Utils.get_progress()
 
         f = Utils.download(self.grabber, progress, self.url, localName, self.downType, "utf-8", True)
 

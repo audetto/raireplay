@@ -12,20 +12,20 @@ def process(grabber, f, db):
     o = json.load(f)
 
     for v in o:
-        pid = Utils.getNewPID(db, None)
+        pid = Utils.get_new_pid(db, None)
         p = Group(grabber, pid, v["title"], v["linkDemand"], v["date"], v["editore"])
-        Utils.addToDB(db, p)
+        Utils.add_to_db(db, p)
 
 
 def download(db, grabber, downType):
-    page = Utils.httpFilename(RAIUrls.onDemand)
+    page = Utils.http_filename(RAIUrls.on_demand)
 
-    folder = Config.demandFolder
+    folder = Config.demand_folder
     localFilename = os.path.join(folder, page)
 
-    progress = Utils.getProgress()
+    progress = Utils.get_progress()
 
-    f = Utils.download(grabber, progress, RAIUrls.onDemand, localFilename, downType, "raw-unicode-escape", True)
+    f = Utils.download(grabber, progress, RAIUrls.on_demand, localFilename, downType, "raw-unicode-escape", True)
 
     process(grabber, f, db)
 

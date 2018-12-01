@@ -1,24 +1,26 @@
 import os.path
 
-def createFolder(name):
+
+def create_folder(name):
     if not os.path.exists(name):
         os.makedirs(name)
     return name
 
-homeFolder    = os.path.expanduser("~")
 
-rootFolder    = createFolder(os.path.join(homeFolder, ".raireplay"))
-dataFolder    = createFolder(os.path.join(rootFolder, "data"))
+home_folder = os.path.expanduser("~")
 
-replayFolder  = createFolder(os.path.join(dataFolder, "replay"))
-raiplayFolder = createFolder(os.path.join(dataFolder, "raiplay"))
-itemFolder    = createFolder(os.path.join(dataFolder, "items"))
-pageFolder    = createFolder(os.path.join(dataFolder, "pages"))
-demandFolder  = createFolder(os.path.join(dataFolder, "demand"))
-tgFolder      = createFolder(os.path.join(dataFolder, "tg"))
-mediasetFolder = createFolder(os.path.join(dataFolder, "mediaset"))
-pluzzFolder   = createFolder(os.path.join(dataFolder, "pluzz"))
-tf1Folder     = createFolder(os.path.join(dataFolder, "tf1"))
-m6Folder      = createFolder(os.path.join(dataFolder, "m6"))
+root_folder = create_folder(os.path.join(home_folder, ".raireplay"))
+data_folder = create_folder(os.path.join(root_folder, "data"))
 
-programFolder = createFolder(os.path.join(rootFolder, "programs"))
+replay_folder = create_folder(os.path.join(data_folder, "replay"))
+raiplay_folder = create_folder(os.path.join(data_folder, "raiplay"))
+item_folder = create_folder(os.path.join(data_folder, "items"))
+page_folder = create_folder(os.path.join(data_folder, "pages"))
+demand_folder = create_folder(os.path.join(data_folder, "demand"))
+tg_folder = create_folder(os.path.join(data_folder, "tg"))
+mediaset_folder = create_folder(os.path.join(data_folder, "mediaset"))
+pluzz_folder = create_folder(os.path.join(data_folder, "pluzz"))
+tf1_folder = create_folder(os.path.join(data_folder, "tf1"))
+m6_folder = create_folder(os.path.join(data_folder, "m6"))
+
+program_folder = create_folder(os.path.join(root_folder, "programs"))

@@ -1,5 +1,6 @@
 import sys
 
+
 # Code from http://mail.python.org/pipermail/python-list/2000-May/033365.html
 def terminal_width_linux(fd=1):
     """ Get the real terminal width """
@@ -16,8 +17,9 @@ def terminal_width_linux(fd=1):
             return 80
         # Add minimum too?
         return ret
-    except: # IOError
+    except:  # IOError
         return 80
+
 
 def terminal_width_native():
     import shutil
@@ -25,6 +27,7 @@ def terminal_width_native():
     size = shutil.get_terminal_size((80, 24))
 
     return size.columns
+
 
 def terminal_width():
     ver = sys.version_info

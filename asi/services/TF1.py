@@ -34,9 +34,9 @@ def parseItem(grabber, prog, name, db):
 
     # ignore the countless "extract", "bonus", "short" which last just a few minutes
     if category == "fullvideo":
-        pid = Utils.getNewPID(db, pid)
+        pid = Utils.get_new_pid(db, pid)
         p = Program(grabber, date, length, pid, name, desc, wat, category)
-        Utils.addToDB(db, p)
+        Utils.add_to_db(db, p)
 
 
 def processGroup(grabber, f, name, db):
@@ -63,9 +63,9 @@ def processNews(grabber, f, folder, progress, downType, db):
         wat = prog["linkAttributes"]["watId"]
         category = prog["linkAttributes"]["videoCategory"]
 
-        pid = Utils.getNewPID(db, groupId)
+        pid = Utils.get_new_pid(db, groupId)
         p = Program(grabber, datetime.datetime.now(), None, pid, name, title, wat, category)
-        Utils.addToDB(db, p)
+        Utils.add_to_db(db, p)
 
 
 def processPrograms(grabber, f, folder, progress, downType, db):
@@ -105,9 +105,9 @@ def downloadGroup(grabber, name, groupId, folder, progress, downType, db):
 
 
 def download(db, grabber, downType):
-    progress = Utils.getProgress()
+    progress = Utils.get_progress()
 
-    folder = Config.tf1Folder
+    folder = Config.tf1_folder
 
     localName = os.path.join(folder, "news.json")
     f = Utils.download(grabber, progress, newsUrl, localName, downType, "utf-8", True)
@@ -136,7 +136,7 @@ class Program(Base.Base):
         self.grabber = grabber
         self.ts = getWatLink(self.wat)
 
-        name = Utils.makeFilename(self.title)
+        name = Utils.make_filename(self.title)
         self.filename = self.pid + "-" + name
 
 

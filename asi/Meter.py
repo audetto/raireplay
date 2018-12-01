@@ -3,10 +3,13 @@ import os
 
 from asi import Console
 
+
 def format_time(seconds, use_hours=0):
     if seconds is None or seconds < 0:
-        if use_hours: return '--:--:--'
-        else:         return '--:--'
+        if use_hours:
+            return '--:--:--'
+        else:
+            return '--:--'
     elif seconds == float('inf'):
         return 'Infinite'
     else:
@@ -21,20 +24,22 @@ def format_time(seconds, use_hours=0):
             return '%02i:%02i' % (minutes, seconds)
 
 
-def format_number(number, SI=0, space=' '):
+def format_number(number, si=False, space=' '):
     """Turn numbers into human-readable metric-like numbers"""
     symbols = ['',  # (none)
-               'k', # kilo
-               'M', # mega
-               'G', # giga
-               'T', # tera
-               'P', # peta
-               'E', # exa
-               'Z', # zetta
-               'Y'] # yotta
+               'k',  # kilo
+               'M',  # mega
+               'G',  # giga
+               'T',  # tera
+               'P',  # peta
+               'E',  # exa
+               'Z',  # zetta
+               'Y']  # yotta
 
-    if SI: step = 1000.0
-    else: step = 1024.0
+    if si:
+        step = 1000.0
+    else:
+        step = 1024.0
 
     thresh = 999
     depth = 0
@@ -44,79 +49,81 @@ def format_number(number, SI=0, space=' '):
     # of our list.  In that event, the formatting will be screwed up,
     # but it'll still show the right number.
     while number > thresh and depth < max_depth:
-        depth  = depth + 1
+        depth = depth + 1
         number = number / step
 
     if isinstance(number, int):
         # it's an int or a long, which means it didn't get divided,
         # which means it's already short enough
-        format = '%i%s%s'
+        fmt = '%i%s%s'
     elif number < 9.95:
         # must use 9.95 for proper sizing.  For example, 9.99 will be
         # rounded to 10.0 with the .1f format string (which is too long)
-        format = '%.1f%s%s'
+        fmt = '%.1f%s%s'
     else:
-        format = '%.0f%s%s'
+        fmt = '%.0f%s%s'
 
-    return(format % (float(number or 0), space, symbols[depth]))
+    return fmt % (float(number or 0), space, symbols[depth])
 
 
-class ReportHook():
+class ReportHook:
 
-    def __init__(self, numberOfFiles = 1):
+    def __init__(self, number_of_files=1):
         self.name = None
-        self.numberOfFiles = numberOfFiles
+        self.start_time = None
+        self.files_read = None
+        self.total_size_so_far = None
+        self.read_so_far = None
+        self.estimated_size = None
+
+        self.numberOfFiles = number_of_files
         self.reset()
 
-
     def reset(self):
-        self.startTime = None
-        self.filesRead = 0
-        self.totalSizeSoFar = 0
-        self.readSoFar = 0
-        self.estimatedSize = None
+        self.start_time = None
+        self.files_read = 0
+        self.total_size_so_far = 0
+        self.read_so_far = 0
+        self.estimated_size = None
 
-
-    def setName(self, name):
+    def set_name(self, name):
         self.name = os.path.basename(name)
         self.reset()
 
-
-    def start(self, totalSize):
-        if not self.startTime:
-            self.startTime = time.time()
-        self.totalSizeSoFar = self.totalSizeSoFar + totalSize
-        self.filesRead      = self.filesRead + 1
-        self.estimatedSize  = self.totalSizeSoFar / self.filesRead * self.numberOfFiles
+    def start(self, total_size):
+        if not self.start_time:
+            self.start_time = time.time()
+        self.total_size_so_far = self.total_size_so_far + total_size
+        self.files_read = self.files_read + 1
+        self.estimated_size = self.total_size_so_far / self.files_read * self.numberOfFiles
         return
 
+    def update(self, amount_read):
+        current_time = time.time()
+        elapsed_time = current_time - self.start_time
 
-    def update(self, amountRead):
-        currentTime = time.time()
-        elapsedTime = currentTime - self.startTime
+        self.read_so_far = self.read_so_far + amount_read
 
-        self.readSoFar = self.readSoFar + amountRead
-
-        if elapsedTime > 0:
-            speed = self.readSoFar / elapsedTime
+        if elapsed_time > 0:
+            speed = self.read_so_far / elapsed_time
         else:
             speed = float("inf")
 
-        terminalWidth = Console.terminal_width()
+        terminal_width = Console.terminal_width()
 
-        nameWidth = terminalWidth - 33
+        name_width = terminal_width - 33
 
-        status = "{0:{nameWidth}}: {1:>6}B {2:>6}B/s".format(self.name[:nameWidth], format_number(self.readSoFar), format_number(speed), nameWidth = nameWidth)
+        status = "{0:{name_width}}: {1:>6}B {2:>6}B/s".format(self.name[:name_width], format_number(self.read_so_far),
+                                                              format_number(speed), name_width=name_width)
 
-        if self.estimatedSize > 0:
-            self.readSoFar = min(self.estimatedSize, self.readSoFar)
-            pct = self.readSoFar / self.estimatedSize
-            timeToGo = elapsedTime * (1 - pct) / pct
-            output = " {0:4.0%} {1:>6}".format(pct, format_time(timeToGo))
+        if self.estimated_size > 0:
+            self.read_so_far = min(self.estimated_size, self.read_so_far)
+            pct = self.read_so_far / self.estimated_size
+            time_to_go = elapsed_time * (1 - pct) / pct
+            output = " {0:4.0%} {1:>6}".format(pct, format_time(time_to_go))
             status = status + output
 
-        print("\r", status, end = "")
-
+        print("\r", status, end="")
 
     def done(self):
         print()

@@ -56,19 +56,19 @@ def process(grabber, downType, f, channel, db):
 
         length = datetime.timedelta(seconds = int(seconds))
 
-        pid = Utils.getNewPID(db, k)
+        pid = Utils.get_new_pid(db, k)
         p = Program(grabber, downType, channel, date, pid, k, length, title, desc)
-        Utils.addToDB(db, p)
+        Utils.add_to_db(db, p)
 
 
 def download(db, grabber, downType):
-    progress = Utils.getProgress()
+    progress = Utils.get_progress()
 
     for channel in channels:
         url = getCatalogueUrl(channel)
-        name = Utils.httpFilename(url) + "." + channel
+        name = Utils.http_filename(url) + "." + channel
 
-        folder = Config.m6Folder
+        folder = Config.m6_folder
         localName = os.path.join(folder, name)
 
         f = Utils.download(grabber, progress, url, localName, downType, "utf-8", True)
@@ -96,7 +96,7 @@ class Program(Base.Base):
         self.grabber = grabber
         self.length = length
 
-        name = Utils.makeFilename(self.title)
+        name = Utils.make_filename(self.title)
         self.filename = self.pid + "-" + name
 
 
@@ -111,10 +111,10 @@ class Program(Base.Base):
         if self.ts:
             return self.ts
 
-        folder = Config.m6Folder
-        name = Utils.httpFilename(self.url)
+        folder = Config.m6_folder
+        name = Utils.http_filename(self.url)
         localName = os.path.join(folder, name)
-        progress = Utils.getProgress()
+        progress = Utils.get_progress()
 
         f = Utils.download(self.grabber, progress, self.url, localName, self.downType, "utf-8", True)
         if f:

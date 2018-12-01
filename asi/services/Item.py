@@ -84,7 +84,7 @@ class VideoHTMLParser(HTMLParser):
 
             val = self.extract(attrs, "idPageProgramma")
             if val:
-                self.values.page = RAIUrls.base + RAIUrls.getWebFromID(val)
+                self.values.page = RAIUrls.base + RAIUrls.get_web_from_id(val)
 
         elif tag == "param":
             if len(attrs) > 0:
@@ -112,13 +112,13 @@ class Demand(Base.Base):
 
         parts = urllib.parse.urlparse(url)
         if not parts.scheme:
-            url = RAIUrls.getItemUrl(url)
+            url = RAIUrls.get_item_url(url)
 
         self.url = url
         self.pid = pid
 
-        folder = Config.itemFolder
-        localFilename = os.path.join(folder, Utils.httpFilename(self.url))
+        folder = Config.item_folder
+        localFilename = os.path.join(folder, Utils.http_filename(self.url))
 
         f = Utils.download(grabber, None, self.url, localFilename, downType, "utf-8")
 
@@ -131,7 +131,7 @@ class Demand(Base.Base):
         self.title = self.values.title
         self.ts = self.values.videoUrlM3U8
 
-        H264.addH264Url(self.h264, 0, self.values.videoUrlH264)
+        H264.add_h264_url(self.h264, 0, self.values.videoUrlH264)
 
         if self.values.date:
             self.datetime = datetime.datetime.strptime(self.values.date, "%d/%m/%Y")
@@ -152,7 +152,7 @@ class Demand(Base.Base):
             self.values.videoUrl = self.values.videoUrl.replace("relinkerServlet.mp4", "relinkerServlet.htm")
 
         #make a nice filename
-        self.filename = Utils.makeFilename(self.title)
+        self.filename = Utils.make_filename(self.title)
 
         self.mms = self.values.videoUrl
 

@@ -25,9 +25,9 @@ def processSet(grabber, downType, f, db):
 
         pathID = value["pathID"]
 
-        pid = Utils.getNewPID(db, None)
+        pid = Utils.get_new_pid(db, None)
         p = RaiPlay.Program(grabber, downType, channel, date, time, pid, length, name, desc, pathID)
-        Utils.addToDB(db, p)
+        Utils.add_to_db(db, p)
 
 
 def process(grabber, progress, folder, downType, f, db):
@@ -49,9 +49,9 @@ def process(grabber, progress, folder, downType, f, db):
 
 
 def download(db, grabber, programma, downType):
-    progress = Utils.getProgress()
+    progress = Utils.get_progress()
 
-    folder = Config.raiplayFolder
+    folder = Config.raiplay_folder
 
     o = urllib.parse.urlparse(programma)
     filename = o.path.replace("/", "_")

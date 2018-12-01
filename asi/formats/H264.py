@@ -4,12 +4,12 @@ import asi.RAIUrls
 import logging
 
 
-def downloadH264(grabberMetadata, grabberProgram, folder, url, options, pid, filename, title):
-    localFilename = os.path.join(folder, filename + ".mp4")
+def download_h264(grabber_metadata, grabber_program, folder, url, options, pid, filename, title):
+    local_filename = os.path.join(folder, filename + ".mp4")
 
-    if (not options.overwrite) and os.path.exists(localFilename):
+    if (not options.overwrite) and os.path.exists(local_filename):
         print()
-        print("{0} already there as {1}".format(pid, localFilename))
+        print("{0} already there as {1}".format(pid, local_filename))
         print()
         return
 
@@ -17,18 +17,18 @@ def downloadH264(grabberMetadata, grabberProgram, folder, url, options, pid, fil
     print(url)
 
     print()
-    print("Saving {0} as {1}".format(pid, localFilename))
+    print("Saving {0} as {1}".format(pid, local_filename))
 
     try:
-        progress = asi.Utils.getProgress()
-        asi.Utils.downloadFile(grabberMetadata, grabberProgram, progress, url, localFilename)
+        progress = asi.Utils.get_progress()
+        asi.Utils.download_file(grabber_metadata, grabber_program, progress, url, local_filename)
 
-        size = os.path.getsize(localFilename)
+        size = os.path.getsize(local_filename)
         for a in asi.RAIUrls.invalidMP4:
             if size == len(a):
                 raise Exception("{0} only available in Italy".format(url))
 
-        asi.Utils.setMP4Tag(localFilename, title)
+        asi.Utils.set_mp4_tag(local_filename, title)
 
         print()
         print("Saved {0} as {1}".format(pid, filename))
@@ -36,20 +36,20 @@ def downloadH264(grabberMetadata, grabberProgram, folder, url, options, pid, fil
 
     except BaseException as e:
         logging.info('Exception: {0}'.format(e))
-        logging.info('Will remove: {0}'.format(localFilename))
-        if os.path.exists(localFilename):
-            os.remove(localFilename)
+        logging.info('Will remove: {0}'.format(local_filename))
+        if os.path.exists(local_filename):
+            os.remove(local_filename)
         raise
 
 
-def displayH264(h264):
+def display_h264(h264):
     if h264:
         for k, v in h264.items():
             print("h264[{0}]: {1}".format(k, v))
         print()
 
 
-def addH264Url(h264, bwidth, url):
+def add_h264_url(h264, bwidth, url):
     # we do not want to add a None
     # so that
     # "if h264:"

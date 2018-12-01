@@ -46,9 +46,9 @@ def processSet(grabber, title, time, f, db):
         date          = isThereADate(date, description)
         datetime      = date + " " + time
 
-        pid = Utils.getNewPID(db, None)
+        pid = Utils.get_new_pid(db, None)
         p = Program(grabber, url, channel, datetime, pid, title, description, h264, m3u8)
-        Utils.addToDB(db, p)
+        Utils.add_to_db(db, p)
     else:
         # get the list
         lst = o.get("list")
@@ -66,15 +66,15 @@ def processSet(grabber, title, time, f, db):
                 aTitle        = title + "-" + prg["name"]
                 description   = prg["desc"]
 
-                pid = Utils.getNewPID(db, None)
+                pid = Utils.get_new_pid(db, None)
                 p = Program(grabber, url, channel, dt, pid, aTitle, description, h264, m3u8)
-                Utils.addToDB(db, p)
+                Utils.add_to_db(db, p)
 
 
 def processItem(grabber, progress, downType, title, time, url, db):
-    folder = Config.tgFolder
+    folder = Config.tg_folder
 
-    name = Utils.httpFilename(url)
+    name = Utils.http_filename(url)
     localName = os.path.join(folder, name)
 
     f = Utils.download(grabber, progress, url, localName, downType, "utf-8", True)
@@ -106,10 +106,10 @@ def process(grabber, progress, downType, f, db):
 
 
 def download(db, grabber, downType):
-    progress = Utils.getProgress()
-    name = Utils.httpFilename(RAIUrls.info)
+    progress = Utils.get_progress()
+    name = Utils.http_filename(RAIUrls.info)
 
-    folder = Config.tgFolder
+    folder = Config.tg_folder
     localName = os.path.join(folder, name)
 
     f = Utils.download(grabber, progress, RAIUrls.info, localName, downType, "utf-8", True)
@@ -127,13 +127,13 @@ class Program(Base.Base):
         self.channel = channel
         strtime = date.replace("-", "/")
         self.datetime = datetime.datetime.strptime(strtime, "%d/%m/%Y %H:%M")
-        H264.addH264Url(self.h264, 0, h264)
+        H264.add_h264_url(self.h264, 0, h264)
         if m3u8:
             self.ts = m3u8
 
         self.grabber = grabber
 
-        name = Utils.makeFilename(self.title)
+        name = Utils.make_filename(self.title)
         self.filename = name + "-" + self.datetime.strftime("%Y-%m-%d")
         self.canFollow = True
 
@@ -146,6 +146,6 @@ class Program(Base.Base):
 
 
     def follow(self, db, downType):
-        pid = Utils.getNewPID(db, self.pid)
+        pid = Utils.get_new_pid(db, self.pid)
         p = Item.Demand(self.grabber, self.url, downType, pid)
-        Utils.addToDB(db, p)
+        Utils.add_to_db(db, p)

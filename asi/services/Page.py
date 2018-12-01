@@ -31,7 +31,7 @@ class Elem(Base.Base):
 
         # extra experimental data
         h264               = data.findtext("h264")
-        H264.addH264Url(self.h264, 0, h264)
+        H264.add_h264_url(self.h264, 0, h264)
 
         self.ts            = data.findtext("m3u8")
 
@@ -39,10 +39,10 @@ class Elem(Base.Base):
         self.length        = data.findtext("durata")
         web =  data.findtext("web")
         if not web:
-            web = RAIUrls.getWebFromID(self.id)
+            web = RAIUrls.get_web_from_id(self.id)
         self.url           = RAIUrls.base + web
 
-        self.filename      = Utils.makeFilename(self.title)
+        self.filename      = Utils.make_filename(self.title)
 
         self.canFollow     = True
 
@@ -55,27 +55,27 @@ class Elem(Base.Base):
 
 
     def follow(self, db, downType):
-        pid = Utils.getNewPID(db, self.pid)
+        pid = Utils.get_new_pid(db, self.pid)
         p = Item.Demand(self.grabber, self.url, downType, pid)
-        Utils.addToDB(db, p)
+        Utils.add_to_db(db, p)
 
 
 def download(db, grabber, url, downType):
-    page = Utils.httpFilename(url)
+    page = Utils.http_filename(url)
     page = os.path.splitext(page)[0]
 
-    dataUrl = RAIUrls.getPageDataUrl(page)
+    dataUrl = RAIUrls.get_page_data_url(page)
 
-    folder = Config.pageFolder
+    folder = Config.page_folder
     localFilename = os.path.join(folder, page + ".xml")
     f = Utils.download(grabber, None, dataUrl, localFilename, downType, "utf-8")
 
     # ElementTree does not like unicode, it prefers byte strings
     s = f.read().strip()
-    s = Utils.removeInvalidXMLCharacters(s)
+    s = Utils.remove_invalid_xml_characters(s)
     root = ElementTree.fromstring(s)
 
     for child in root.findall("content"):
-        pid = Utils.getNewPID(db, None)
+        pid = Utils.get_new_pid(db, None)
         it = Elem(pid, grabber, child)
-        Utils.addToDB(db, it)
+        Utils.add_to_db(db, it)

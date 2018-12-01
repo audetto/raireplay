@@ -15,6 +15,7 @@ from xml.etree import ElementTree
 from asi import Meter
 from asi import RAIUrls
 
+
 class Obj:
     pass
 
@@ -22,34 +23,34 @@ class Obj:
 # got from the iphone
 # required for TF1 - www.wat.tv
 userAgent = "AppleCoreMedia/1.0.0.9B206 (iPod; U; CPU OS 5_1_1 like Mac OS X; en_us)"
-httpHeaders = {"User-Agent" : userAgent }
+httpHeaders = {"User-Agent": userAgent}
 
 
-def httpFilename(url):
+def http_filename(url):
     name = os.path.basename(urllib.parse.urlsplit(url).path)
     return name
 
 
 # simply download a file and saves it to localName
-def downloadFile(grabberMetadata, grabberProgram, progress, url, localName):
+def download_file(grabber_metadata, grabber_program, progress, url, local_name):
     if progress:
-        progress.setName(localName)
+        progress.set_name(local_name)
 
-    request = urllib.request.Request(url, headers = httpHeaders)
+    request = urllib.request.Request(url, headers=httpHeaders)
 
     logging.info('URL {}'.format(url))
-    with grabberMetadata.open(request) as response:
-        actualUrl = response.geturl()
-        if actualUrl != url and grabberMetadata != grabberProgram:
-            logging.info('REDIRECTION: {}'.format(actualUrl))
-            return downloadFile(grabberProgram, grabberProgram, progress, actualUrl, localName)
+    with grabber_metadata.open(request) as response:
+        actual_url = response.geturl()
+        if actual_url != url and grabber_metadata != grabber_program:
+            logging.info('REDIRECTION: {}'.format(actual_url))
+            return download_file(grabber_program, grabber_program, progress, actual_url, local_name)
 
-        with open(localName, "wb") as f:
+        with open(local_name, "wb") as f:
             # same length as shutil.copyfileobj
 
             # the rest is the same logic as urllib.request.urlretrieve
             # which unfortunately does not work with proxies
-            blockSize = 1024 * 16
+            block_size = 1024 * 16
             size = -1
 
             headers = response.info()
@@ -60,19 +61,19 @@ def downloadFile(grabberMetadata, grabberProgram, progress, url, localName):
                 progress.start(size)
 
             while 1:
-                buf = response.read(blockSize)
+                buf = response.read(block_size)
                 if not buf:
                     break
-                amountRead = len(buf)
+                amount_read = len(buf)
                 f.write(buf)
                 if progress:
-                    progress.update(amountRead)
+                    progress.update(amount_read)
 
             if progress:
                 progress.done()
 
 
-#def downloadFile(grabberMetadata, grabberProgram, progress, url, localName):
+# def downloadFile(grabberMetadata, grabberProgram, progress, url, localName):
 #    if progress:
 #        progress.setName(localName)
 #    request = urllib.request.Request(url, headers = httpHeaders)
@@ -84,10 +85,10 @@ def downloadFile(grabberMetadata, grabberProgram, progress, url, localName):
 
 # download a file and returns a file object
 # with optional encoding, checking if it exists already...
-def download(grabber, progress, url, localName, downType, encoding, checkTime = False):
+def download(grabber, progress, url, local_name, down_type, encoding, check_time=False):
     try:
-        if downType == "shm":
-            request = urllib.request.Request(url, headers = httpHeaders)
+        if down_type == "shm":
+            request = urllib.request.Request(url, headers=httpHeaders)
             logging.info('URL {}'.format(url))
             f = grabber.open(request)
             if encoding:
@@ -98,26 +99,26 @@ def download(grabber, progress, url, localName, downType, encoding, checkTime = 
                 f = io.BytesIO(f.read())
         else:
             # here we need to download (maybe), copy local and open
-            exists = os.path.exists(localName)
-            exists = exists and os.path.getsize(localName) > 0
+            exists = os.path.exists(local_name)
+            exists = exists and os.path.getsize(local_name) > 0
 
-            if downType == "never" and not exists:
-                raise Exception("Will not download missing file: {0} -> {1}".format(url, localName))
+            if down_type == "never" and not exists:
+                raise Exception("Will not download missing file: {0} -> {1}".format(url, local_name))
 
-            if exists and checkTime:
+            if exists and check_time:
                 # if it is from yesterday or before, we re-download it
                 today = datetime.date.today()
-                fileTime = datetime.datetime.fromtimestamp(os.path.getmtime(localName))
-                exists = today == fileTime.date()
+                file_time = datetime.datetime.fromtimestamp(os.path.getmtime(local_name))
+                exists = today == file_time.date()
 
-            if downType == "always" or (downType == "update" and not exists):
-                downloadFile(grabber, grabber, progress, url, localName)
+            if down_type == "always" or (down_type == "update" and not exists):
+                download_file(grabber, grabber, progress, url, local_name)
 
             # now the file exists on the local filesystem
             if not encoding:
-                f = open(localName, "rb")
+                f = open(local_name, "rb")
             else:
-                f = codecs.open(localName, "r", encoding = encoding)
+                f = codecs.open(local_name, "r", encoding=encoding)
 
         return f
 
@@ -126,7 +127,7 @@ def download(grabber, progress, url, localName, downType, encoding, checkTime = 
         return None
 
 
-def findPlaylist(m3, bandwidth):
+def find_playlist(m3, bandwidth):
     data = {}
 
     # bandwidth is alaways in Kb.
@@ -136,12 +137,12 @@ def findPlaylist(m3, bandwidth):
         b = int(p.stream_info.bandwidth) // 1000
         data[b] = p
 
-    opt = findUrlByBandwidth(data, bandwidth)
+    opt = find_url_by_bandwidth(data, bandwidth)
 
     return opt
 
 
-def findUrlByBandwidth(data, bandwidth):
+def find_url_by_bandwidth(data, bandwidth):
     if len(data) == 1:
         return next(iter(data.values()))
 
@@ -164,63 +165,63 @@ def findUrlByBandwidth(data, bandwidth):
     return opt
 
 
-def remuxToMP4(inFile, outFile, title):
+def remux_to_mp4(inFile, outFile, title):
     # -absf aac_adtstoasc
     # seems to be needed by ffmpeg (Fedora), not by avconv (Pi)
-    cmdLine = ["ffmpeg", "-i", inFile, "-vcodec", "copy", "-acodec", "copy", "-absf", "aac_adtstoasc", "-y", outFile]
-    code = subprocess.call(cmdLine)
+    cmd_line = ["ffmpeg", "-i", inFile, "-vcodec", "copy", "-acodec", "copy", "-absf", "aac_adtstoasc", "-y", outFile]
+    code = subprocess.call(cmd_line)
     if code != 0:
         raise Exception("ffmpeg failed: exit code {0}".format(code))
-    setMP4Tag(outFile, title)
+    set_mp4_tag(outFile, title)
 
 
 # sometimes RAI sends invalid XML
 # we get "reference to invalid character number"
-def removeInvalidXMLCharacters(s):
+def remove_invalid_xml_characters(s):
     s = s.replace("&#0", "xx")
     s = s.replace("&#1", "xx")
     s = s.replace("&#22", "xx")
     return s
 
 
-def removeAccents(input_str):
+def remove_accents(input_str):
     nkfd_form = unicodedata.normalize('NFKD', input_str)
     result = "".join([c for c in nkfd_form if not unicodedata.combining(c)])
     return result
 
 
-def makeFilename(value):
+def make_filename(value):
     if not value:
         return value
 
-    translateTo = "_"
-    charactersToRemove = " /:^,|'\\."
-    translateTable = dict((ord(char), translateTo) for char in charactersToRemove)
-    name = value.translate(translateTable)
-    name = removeAccents(name)
+    translate_to = "_"
+    characters_to_remove = " /:^,|'\\."
+    translate_table = dict((ord(char), translate_to) for char in characters_to_remove)
+    name = value.translate(translate_table)
+    name = remove_accents(name)
     name = re.sub("_+", "_", name)
     return name
 
 
-def getResolution(p):
+def get_resolution(p):
     if not p.stream_info.resolution:
         return "N/A"
     res = "{0:>4}x{1:>4}".format(p.stream_info.resolution[0], p.stream_info.resolution[1])
     return res
 
 
-def getProgress(numberOfFiles = 1, filename = None):
+def get_progress(number_of_files=1, filename=None):
     # only use a progress meter if we are not redirected
     if sys.stdout.isatty():
-        p = Meter.ReportHook(numberOfFiles)
+        p = Meter.ReportHook(number_of_files)
         if filename:
-            p.setName(filename)
+            p.set_name(filename)
         return p
     else:
         return None
 
 
-def getNewPID(db, pid):
+def get_new_pid(db, pid):
     # 0 is not a valid pid
     if not pid:
         pid = len(db) + 1
@@ -235,7 +236,7 @@ def getNewPID(db, pid):
     return pid
 
 
-def addToDB(db, prog):
+def add_to_db(db, prog):
     if not prog:
         return
 
@@ -247,28 +248,28 @@ def addToDB(db, prog):
     db[pid] = prog
 
 
-def getStringFromUrl(grabber, url):
+def get_string_from_url(grabber, url):
     logging.info('String: {}'.format(url))
     with grabber.open(url) as f:
         content = f.read().decode("ascii")
         return content
 
 
-def strDate(date):
+def str_date(date):
     s = date.strftime("%Y-%m-%d %H:%M")
     return s
 
 
-def getMMSUrl(grabber, url):
+def get_mms_url(grabber, url):
     mms = None
 
-    urlScheme = urllib.parse.urlsplit(url).scheme
-    if urlScheme == "mms":
+    url_scheme = urllib.parse.urlsplit(url).scheme
+    if url_scheme == "mms":
         # if it is already mms, don't look further
         mms = url
     else:
         # search for the mms url
-        content = getStringFromUrl(grabber, url)
+        content = get_string_from_url(grabber, url)
 
         if content in RAIUrls.invalidMP4:
             # is this the case of videos only available in Italy?
@@ -280,11 +281,11 @@ def getMMSUrl(grabber, url):
 
                 if asf:
                     # use urlgrab to make it work with ConfigParser
-                    urlScheme = urllib.parse.urlsplit(asf).scheme
-                    if urlScheme == "mms":
+                    url_scheme = urllib.parse.urlsplit(asf).scheme
+                    if url_scheme == "mms":
                         mms = asf
                     else:
-                        content = getStringFromUrl(grabber, asf)
+                        content = get_string_from_url(grabber, asf)
                         config = configparser.ConfigParser()
                         config.read_string(content)
                         mms = config.get("Reference", "ref1")
@@ -306,7 +307,7 @@ def getMMSUrl(grabber, url):
 # we could as well remove it
 # btw, the ones that are remux don't have the tag, so they are not wrong
 # for symmetry we set the title tag to all of them
-def setMP4Tag(filename, title):
+def set_mp4_tag(filename, title):
     # this is allowed to fail as mutagen(x) is somehow hard to obtain
     try:
         import mutagen.easymp4

@@ -28,7 +28,7 @@ class Base(object):
 
     def short(self, fmt):
         if self.datetime:
-            ts = asi.Utils.strDate(self.datetime)
+            ts = asi.Utils.str_date(self.datetime)
         else:
             ts = None
 
@@ -79,15 +79,15 @@ class Base(object):
 
         if video_format == "h264":
             h264 = self.getH264()
-            url = asi.Utils.findUrlByBandwidth(h264, options.bwidth)
+            url = asi.Utils.find_url_by_bandwidth(h264, options.bwidth)
         elif video_format in ["ts", "tsmp4"]:
             m3 = self.getTabletPlaylist()
             if not m3.is_variant:
                 raise NotImplementedError
-            playlist = asi.Utils.findPlaylist(m3, options.bwidth)
+            playlist = asi.Utils.find_playlist(m3, options.bwidth)
             url = playlist.absolute_uri
         elif video_format == "mms":
-            url = asi.Utils.getMMSUrl(self.grabber, self.mms)
+            url = asi.Utils.get_mms_url(self.grabber, self.mms)
 
         return video_format, url
 
@@ -109,10 +109,10 @@ class Base(object):
             self.downloadMMS(folder, options, grabber)
 
     def downloadTablet(self, folder, options, grabber, url, remux):
-        asi.formats.M3U8.downloadM3U8(grabber, folder, url, options, self.pid, self.filename, self.title, remux)
+        asi.formats.M3U8.download_m3u8(grabber, folder, url, options, self.pid, self.filename, self.title, remux)
 
     def downloadH264(self, folder, options, grabber, url):
-        asi.formats.H264.downloadH264(self.grabber, grabber, folder, url, options, self.pid, self.filename, self.title)
+        asi.formats.H264.download_h264(self.grabber, grabber, folder, url, options, self.pid, self.filename, self.title)
 
     def downloadMMS(self, folder, options, url):
         try:
@@ -147,7 +147,7 @@ class Base(object):
         if self.description:
             print("Description:", self.description)
         if self.datetime:
-            print("Date:", asi.Utils.strDate(self.datetime))
+            print("Date:", asi.Utils.str_date(self.datetime))
         if self.length:
             print("Length:", self.length)
         if self.filename:
@@ -160,7 +160,7 @@ class Base(object):
 
         m3 = self.getTabletPlaylist()
 
-        asi.formats.H264.displayH264(self.getH264())
+        asi.formats.H264.display_h264(self.getH264())
         if self.getTS() or self.mms:
             if self.getTS():
                 print("ts:", self.getTS())
@@ -168,4 +168,4 @@ class Base(object):
                 print("mms:", self.mms)
             print()
 
-        asi.formats.M3U8.displayM3U8(m3)
+        asi.formats.M3U8.display_m3u8(m3)

@@ -52,9 +52,9 @@ def processFullVideo(grabber, f, tag, conf, folder, progress, downType, db):
         category = v["subbrand"]["name"]
 
         if category == "full":
-            pid = Utils.getNewPID(db, num)
+            pid = Utils.get_new_pid(db, num)
             p = Program(grabber, conf, date, length, pid, title, desc, num, channel)
-            Utils.addToDB(db, p)
+            Utils.add_to_db(db, p)
 
 
 def processProgramList(grabber, f, conf, folder, progress, downType, db):
@@ -73,7 +73,7 @@ def processProgram(grabber, f, conf, folder, progress, downType, db):
 
 
 def downloadItems(grabber, url, which, conf, folder, progress, downType, db):
-    name = Utils.httpFilename(url)
+    name = Utils.http_filename(url)
     localName = os.path.join(folder, name)
 
     f = Utils.download(grabber, progress, url, localName, downType, "utf-8", True)
@@ -90,10 +90,10 @@ def downloadItems(grabber, url, which, conf, folder, progress, downType, db):
 
 
 def download(db, grabber, downType, mediasetType):
-    progress = Utils.getProgress()
-    name = Utils.httpFilename(configUrl)
+    progress = Utils.get_progress()
+    name = Utils.http_filename(configUrl)
 
-    folder = Config.mediasetFolder
+    folder = Config.mediaset_folder
     localName = os.path.join(folder, name)
 
     f = Utils.download(grabber, progress, configUrl, localName, downType, None, True)
@@ -131,7 +131,7 @@ class Program(Base.Base):
 
         self.url = getMediasetLink(conf, num)
 
-        name = Utils.makeFilename(self.title)
+        name = Utils.make_filename(self.title)
         self.filename = self.pid + "-" + name
 
 
@@ -139,11 +139,11 @@ class Program(Base.Base):
         if self.h264:
             return self.h264
 
-        content = Utils.getStringFromUrl(self.grabber, self.url)
+        content = Utils.get_string_from_url(self.grabber, self.url)
         root = ElementTree.fromstring(content)
         if root.tag == "smil":
             url = root.find("body").find("switch").find("video").attrib.get("src")
-            H264.addH264Url(self.h264, 0, url)
+            H264.add_h264_url(self.h264, 0, url)
         return self.h264
 
 
