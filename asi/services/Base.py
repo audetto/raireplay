@@ -66,6 +66,7 @@ class Base:
         print('URL: {}'.format(url))
 
     def get_url_and_format(self, options):
+        video_format = None
         if not options.format:
             if self.get_h264():
                 video_format = "h264"
@@ -78,7 +79,9 @@ class Base:
         else:
             video_format = options.format
 
-        if video_format == "h264":
+        if video_format is None:
+            raise Exception("No video format detected for {}".format(self.pid))
+        elif video_format == "h264":
             h264 = self.get_h264()
             url = asi.Utils.find_url_by_bandwidth(h264, options.bwidth)
         elif video_format in ["ts", "tsmp4"]:
@@ -92,7 +95,7 @@ class Base:
 
         return video_format, url
 
-    def download(self, folder, options, grabber):
+    def download_video(self, folder, options, grabber):
         if not os.path.exists(folder):
             os.makedirs(folder)
 

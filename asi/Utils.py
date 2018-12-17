@@ -37,7 +37,7 @@ def download_file(grabber_metadata, grabber_program, progress, url, local_name):
     with grabber_metadata.open(request) as response:
         actual_url = response.geturl()
         if actual_url != url and grabber_metadata != grabber_program:
-            logging.info('REDIRECTION: {}'.format(actual_url))
+            logging.info('Redirection: {}'.format(actual_url))
             return download_file(grabber_program, grabber_program, progress, actual_url, local_name)
 
         with open(local_name, "wb") as f:
@@ -108,6 +108,8 @@ def download(grabber, progress, url, local_name, down_type, encoding, check_time
 
             if down_type == "always" or (down_type == "update" and not exists):
                 download_file(grabber, grabber, progress, url, local_name)
+            else:
+                logging.info('Exist {}'.format(url))
 
             # now the file exists on the local filesystem
             if not encoding:
