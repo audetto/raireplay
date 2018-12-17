@@ -1,6 +1,6 @@
 from asi import Utils
 from asi import Info
-from asi.services import Demand, Mediaset, Page, TG, RaiPlay, TF1, M6, Item, Programma, Replay, Playlist
+from asi.services import Demand, Mediaset, Page, RaiPlay, TF1, M6, Item, Programma, Replay, Playlist
 from asi import Config
 from asi import Console
 from asi import Tor
@@ -183,9 +183,6 @@ def process(args):
 
     if args.ondemand:
         Demand.download(db, grabber, args.download)
-
-    if args.tg:
-        TG.download(db, grabber, args.download)
 
     if args.follow:
         follows = args.follow
