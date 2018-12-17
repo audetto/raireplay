@@ -29,7 +29,6 @@ def get_cli_args(defaults):
     parser.add_argument("--here", action="store_true", help="download to current folder")
     parser.add_argument("--ts-tries", action="store", default=20)
 
-    parser.add_argument("--page", action="store", help="RAI On Demand Page")
     parser.add_argument("--replay", action="store_true", default=False, help="RAI Replay")
     parser.add_argument("--raiplay", action="store_true", default=False, help="RaiPlay")
     parser.add_argument("--programma", action="store", default=False, help="RaiPlay Program URL")
@@ -39,7 +38,6 @@ def get_cli_args(defaults):
     parser.add_argument("--tg5", action="store_true", default=False, help="TG Mediaset")
     parser.add_argument("--m6", action="store_true", default=False, help="M6")
     parser.add_argument("--tf1", action="store_true", default=False, help="MY TF1")
-    parser.add_argument("--item", action="store", help="RAI On Demand Item")
 
     parser.add_argument("--m3u8", action="store", help="Playlist")
 

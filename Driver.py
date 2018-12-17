@@ -1,6 +1,6 @@
 from asi import Utils
 from asi import Info
-from asi.services import Demand, Mediaset, Page, RaiPlay, TF1, M6, Item, Programma, Replay, Playlist
+from asi.services import Demand, Mediaset, RaiPlay, TF1, M6, Programma, Replay, Playlist
 from asi import Config
 from asi import Console
 from asi import Tor
@@ -178,9 +178,6 @@ def process(args):
         Info.display(grabber, width)
         return
 
-    if args.page:
-        Page.download(db, grabber, args.page, args.download)
-
     if args.ondemand:
         Demand.download(db, grabber, args.download)
 
@@ -215,10 +212,6 @@ def process(args):
 
     if args.tg5:
         Mediaset.download(db, grabber, args.download, "tg5")
-
-    if args.item:
-        p = Item.Demand(grabber, args.item, args.download, len(db))
-        db[p.pid] = p
 
     if args.m3u8:
         p = Playlist.process(grabber, args.m3u8, len(db))
