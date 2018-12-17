@@ -99,31 +99,34 @@ class ReportHook:
         return
 
     def update(self, amount_read):
-        current_time = time.time()
-        elapsed_time = current_time - self.start_time
-
-        self.read_so_far = self.read_so_far + amount_read
-
-        if elapsed_time > 0:
-            speed = self.read_so_far / elapsed_time
+        if not self.start_time:
+            self.reset()
         else:
-            speed = float("inf")
+            current_time = time.time()
+            elapsed_time = current_time - self.start_time
 
-        terminal_width = Console.terminal_width()
+            self.read_so_far = self.read_so_far + amount_read
 
-        name_width = terminal_width - 33
+            if elapsed_time > 0:
+                speed = self.read_so_far / elapsed_time
+            else:
+                speed = float("inf")
 
-        status = "{0:{name_width}}: {1:>6}B {2:>6}B/s".format(self.name[:name_width], format_number(self.read_so_far),
-                                                              format_number(speed), name_width=name_width)
+            terminal_width = Console.terminal_width()
 
-        if self.estimated_size > 0:
-            self.read_so_far = min(self.estimated_size, self.read_so_far)
-            pct = self.read_so_far / self.estimated_size
-            time_to_go = elapsed_time * (1 - pct) / pct
-            output = " {0:4.0%} {1:>6}".format(pct, format_time(time_to_go))
-            status = status + output
+            name_width = terminal_width - 33
 
-        print("\r", status, end="")
+            status = "{0:{name_width}}: {1:>6}B {2:>6}B/s".format(self.name[:name_width], format_number(self.read_so_far),
+                                                                  format_number(speed), name_width=name_width)
+
+            if self.estimated_size > 0:
+                self.read_so_far = min(self.estimated_size, self.read_so_far)
+                pct = self.read_so_far / self.estimated_size
+                time_to_go = elapsed_time * (1 - pct) / pct
+                output = " {0:4.0%} {1:>6}".format(pct, format_time(time_to_go))
+                status = status + output
+
+            print("\r", status, end="")
 
     def done(self):
         print()

@@ -55,7 +55,7 @@ def download_m3u8(grabber_program, folder, url, options, pid, filename, title, r
                                 progress.update(size)
                         break
                     except urllib.error.HTTPError:
-                        if attempt <= max_attempts:
+                        if (attempt <= max_attempts) and progress:
                             progress.update(0)
                         else:
                             raise
