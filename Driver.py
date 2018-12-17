@@ -160,7 +160,7 @@ def process(args):
     urllib.request.install_opener(grabber)
 
     grabberForDownload = None
-    if proxy and not args.tor_only:
+    if proxy and not args.proxy_all:
         # we do not want to use tor/proxy for the actual download
         # only for the metadata
         grabberForDownload = urllib.request.build_opener()
