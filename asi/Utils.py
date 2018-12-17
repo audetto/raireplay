@@ -206,7 +206,7 @@ def add_to_db(db, prog):
     pid = prog.pid
 
     if pid in db:
-        print("WARNING: duplicate pid {0}".format(prog.pid))
+        logging.warning("duplicate pid {0}".format(prog.pid))
 
     db[pid] = prog
 
