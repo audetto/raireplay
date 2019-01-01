@@ -7,6 +7,26 @@ import asi.formats.MP4
 import m3u8
 import gzip
 import logging
+from Cryptodome.Cipher import AES
+
+
+def decrypt(data, key, media_sequence, grabber):
+    if key is not None:
+        if key.method == 'AES-128' and key.iv is None:
+            uri = key.uri
+            request = urllib.request.Request(uri, headers=asi.Utils.http_headers)
+            stream = grabber.open(request)
+            logging.debug('AES-128 key: {}'.format(uri))
+
+            aes_key = stream.read()
+            iv = media_sequence.to_bytes(16, 'big')
+            aes = AES.new(aes_key, AES.MODE_CBC, IV=iv)
+            clear = aes.decrypt(data)
+            return clear
+        else:
+            raise Exception('M3U8 unsupported key: {}'.format(key))
+    else:
+        return data
 
 
 def download_m3u8(grabber_program, folder, url, options, pid, filename, title, remux):
@@ -51,6 +71,7 @@ def download_m3u8(grabber_program, folder, url, options, pid, filename, title, r
                             size = len(b)
                             if progress:
                                 progress.start(size)
+                            b = decrypt(b, seg.key, item.media_sequence, grabber_program)
                             out.write(b)
                             if progress:
                                 progress.update(size)

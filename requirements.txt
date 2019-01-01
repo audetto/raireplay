@@ -1,2 +1,3 @@
 m3u8
+pycryptodome
 # stem optional for Tor
