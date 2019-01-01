@@ -39,13 +39,13 @@ def download_m3u8(grabber_program, folder, url, options, pid, filename, title, r
 
         with open(local_filename_ts, "wb") as out:
             for seg in item.segments:
-                uri = seg.absolute_uri
-                request = urllib.request.Request(url, headers=asi.Utils.http_headers)
+                segment_uri = seg.absolute_uri
+                request = urllib.request.Request(segment_uri, headers=asi.Utils.http_headers)
                 attempt = 0
                 while True:
                     try:
                         attempt = attempt + 1
-                        logging.debug('#{}: {}'.format(attempt, uri))
+                        logging.debug('#{}: {}'.format(attempt, segment_uri))
                         with grabber_program.open(request) as s:
                             b = s.read()
                             size = len(b)
