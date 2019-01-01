@@ -33,7 +33,7 @@ def download_file(grabber_metadata, grabber_program, progress, url, local_name):
 
     request = urllib.request.Request(url, headers=http_headers)
 
-    logging.info('URL {}'.format(url))
+    logging.info('URL: {}'.format(url))
     with grabber_metadata.open(request) as response:
         actual_url = response.geturl()
         if actual_url != url and grabber_metadata != grabber_program:
@@ -84,7 +84,7 @@ def download(grabber, progress, url, local_name, down_type, encoding, check_time
     try:
         if down_type == "shm":
             request = urllib.request.Request(url, headers=http_headers)
-            logging.info('URL {}'.format(url))
+            logging.info('URL: {}'.format(url))
             f = grabber.open(request)
             if encoding:
                 decoder = codecs.getreader(encoding)
@@ -109,7 +109,7 @@ def download(grabber, progress, url, local_name, down_type, encoding, check_time
             if down_type == "always" or (down_type == "update" and not exists):
                 download_file(grabber, grabber, progress, url, local_name)
             else:
-                logging.info('Exist {}'.format(url))
+                logging.info('Exist: {}'.format(url))
 
             # now the file exists on the local filesystem
             if not encoding:
