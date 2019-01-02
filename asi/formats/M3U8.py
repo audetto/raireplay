@@ -10,15 +10,17 @@ import logging
 from Cryptodome.Cipher import AES
 
 
-def decrypt(data, key, media_sequence, grabber):
+def decrypt(data, key, media_sequence, grabber, key_cache):
     if key is not None:
         if key.method == 'AES-128' and key.iv is None:
             uri = key.uri
-            request = urllib.request.Request(uri, headers=asi.Utils.http_headers)
-            stream = grabber.open(request)
-            logging.debug('AES-128 key: {}'.format(uri))
+            if uri not in key_cache:
+                request = urllib.request.Request(uri, headers=asi.Utils.http_headers)
+                stream = grabber.open(request)
+                logging.debug('AES-128 key: {}'.format(uri))
+                key_cache[uri] = stream.read()
 
-            aes_key = stream.read()
+            aes_key = key_cache[uri]
             iv = media_sequence.to_bytes(16, 'big')
             aes = AES.new(aes_key, AES.MODE_CBC, IV=iv)
             clear = aes.decrypt(data)
@@ -56,12 +58,14 @@ def download_m3u8(grabber_program, folder, url, options, pid, filename, title, r
         number_of_files = len(item.segments)
         logging.debug('{} segments'.format(number_of_files))
         progress = asi.Utils.get_progress(number_of_files, filename + ".ts")
+        key_cache = {}
 
         with open(local_filename_ts, "wb") as out:
             for seg in item.segments:
                 segment_uri = seg.absolute_uri
                 request = urllib.request.Request(segment_uri, headers=asi.Utils.http_headers)
                 attempt = 0
+
                 while True:
                     try:
                         attempt = attempt + 1
@@ -71,7 +75,7 @@ def download_m3u8(grabber_program, folder, url, options, pid, filename, title, r
                             size = len(b)
                             if progress:
                                 progress.start(size)
-                            b = decrypt(b, seg.key, item.media_sequence, grabber_program)
+                            b = decrypt(b, seg.key, item.media_sequence, grabber_program, key_cache)
                             out.write(b)
                             if progress:
                                 progress.update(size)
