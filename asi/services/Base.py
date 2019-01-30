@@ -91,7 +91,7 @@ class Base:
             playlist = asi.formats.M3U8.find_playlist(m3, options.bwidth)
             url = playlist.absolute_uri
         elif video_format == "mms":
-            url = asi.Utils.get_mms_url(self.grabber, self.mms)
+            url = asi.formats.MMS.get_mms_url(self.grabber, self.mms)
 
         return video_format, url
 
