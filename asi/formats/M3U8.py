@@ -7,12 +7,12 @@ import asi.formats.MP4
 import m3u8
 import gzip
 import logging
-from Cryptodome.Cipher import AES
 
 
 def decrypt(data, key, media_sequence, grabber, key_cache):
     if key is not None:
         if key.method == 'AES-128' and key.iv is None:
+            from Cryptodome.Cipher import AES
             uri = key.uri
             if uri not in key_cache:
                 request = urllib.request.Request(uri, headers=asi.Utils.http_headers)
