@@ -18,8 +18,8 @@ def process_set(grabber, down_type, f, db):
         desc = ""
         secs = value["duration"]
 
-        date = value["datePublished"]
-        time = value["timePublished"]
+        date = value["datePublished"].strip()
+        time = value["timePublished"].strip()
 
         length = secs
 

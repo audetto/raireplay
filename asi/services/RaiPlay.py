@@ -17,15 +17,15 @@ def parse_item(grabber, down_type, channel, value, db, dup):
 
         id = value["ID"]
 
-        if not id in dup:
+        if id not in dup:
             dup.add(id)
 
             name = value["name"]
             desc = value["description"]
             secs = value["duration"]
 
-            date = value["datePublished"]
-            time = value["timePublished"]
+            date = value["datePublished"].strip()
+            time = value["timePublished"].strip()
 
             length = secs
 
