@@ -172,6 +172,7 @@ def make_filename(value):
     name = value.translate(translate_table)
     name = remove_accents(name)
     name = re.sub("_+", "_", name)
+    name = re.sub("_-_", "_", name)
     return name
 
 
