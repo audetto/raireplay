@@ -2,7 +2,6 @@ import logging
 
 
 def set_tor_exit_nodes(country):
-    import stem
     import stem.connection
 
     with stem.control.Controller.from_port() as controller:
@@ -15,7 +14,6 @@ def set_tor_exit_nodes(country):
 
 
 def set_tor_exclude_nodes(skip):
-    import stem
     import stem.connection
 
     with stem.control.Controller.from_port() as controller:
@@ -26,26 +24,24 @@ def set_tor_exclude_nodes(skip):
 def get_tor_exit_nodes():
     try:
         import stem
-        import stem.connection
 
         with stem.control.Controller.from_port() as controller:
             controller.authenticate()
             res = controller.get_conf("ExitNodes")
             return res
-    except Exception as e:
-        logging.info('Exception: {0}'.format(e))
+    except Exception:
+        logging.exception('TOR exit nodes')
         return None
 
 
 def get_tor_exclude_nodes():
     try:
         import stem
-        import stem.connection
 
         with stem.control.Controller.from_port() as controller:
             controller.authenticate()
             res = controller.get_conf("ExcludeNodes")
             return res
-    except Exception as e:
-        logging.info('Exception: {0}'.format(e))
+    except Exception:
+        logging.exception('TOR exclude nodes')
         return None

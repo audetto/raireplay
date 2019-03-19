@@ -36,10 +36,10 @@ def download_h264(grabber_metadata, grabber_program, folder, url, options, pid, 
         print("Saved {0} as {1}".format(pid, filename))
         print()
 
-    except BaseException as e:
-        logging.info('Exception: {0}'.format(e))
-        logging.info('Will remove: {0}'.format(local_filename))
+    except BaseException:
+        logging.exception(f'H264: {url}')
         if os.path.exists(local_filename):
+            logging.info('Removing: {0}'.format(local_filename))
             os.remove(local_filename)
         raise
 

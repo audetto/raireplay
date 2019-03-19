@@ -50,8 +50,8 @@ class Base:
         if ts:
             try:
                 self.m3 = asi.formats.M3U8.load_m3u8_from_url(self.grabber, ts)
-            except urllib.error.HTTPError as e:
-                logging.info('Exception: {0}'.format(e))
+            except urllib.error.HTTPError:
+                logging.exception(f'M3U8: {ts}')
                 pass
 
         return self.m3

@@ -50,9 +50,8 @@ def item_do_actions(item, nolist, actions, options, grabber, fmt):
     if Action.GET in actions:
         try:
             item.download_video(Config.program_folder, options, grabber)
-        except Exception as e:
-            logging.info('Exception: {0}'.format(e))
-            print()
+        except Exception:
+            logging.exception(f'GET: {item.short(fmt)}')
 
 
 def list_do_actions(items, nolist, actions, options, grabber):

@@ -1,6 +1,7 @@
 import configparser
 import os
 import urllib
+import logging
 from xml.etree import ElementTree
 
 import asi.Utils
@@ -29,7 +30,7 @@ def download_mms(folder, url, options, pid, filename):
         libmimms.core.download(opt)
 
     except ImportError:
-        print("\nMissing libmimms.\nCannot download: {0}.".format(url))
+        logging.exception(f'MMS: {url}')
 
 
 def get_mms_url(grabber, url):

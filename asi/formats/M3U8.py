@@ -97,13 +97,13 @@ def download_m3u8(grabber_program, folder, url, options, pid, filename, title, r
         print("Saved {0} as {1}".format(pid, local_filename))
         print()
 
-    except BaseException as e:
-        logging.info('Exception: {0}'.format(e))
-        logging.info('Will remove: {0}'.format(local_filename))
-        logging.info('Will remove: {0}'.format(local_filename_ts))
+    except BaseException:
+        logging.exception(f'M3U8: {local_filename}')
         if os.path.exists(local_filename):
+            logging.info('Removing: {0}'.format(local_filename))
             os.remove(local_filename)
         if remux and os.path.exists(local_filename_ts):
+            logging.info('Removing: {0}'.format(local_filename_ts))
             os.remove(local_filename_ts)
         raise
 

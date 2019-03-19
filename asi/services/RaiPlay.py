@@ -67,9 +67,8 @@ def download(db, grabber, down_type):
 
             if f:
                 process(grabber, down_type, f, db, dup)
-        except json.decoder.JSONDecodeError as e:
-            logging.info('While precessing channel: {0}'.format(channel))
-            logging.info('Exception: {0}'.format(e))
+        except json.decoder.JSONDecodeError:
+            logging.exception(f'JSON: {channel}')
 
 
 class Program(Base.Base):

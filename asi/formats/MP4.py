@@ -27,6 +27,5 @@ def set_mp4_tag(filename, title):
         a = mutagen.easymp4.EasyMP4(filename)
         a["title"] = title
         a.save()
-    except Exception as e:
-        logging.info('Exception: {0}'.format(e))
-        print("Failed to set MP4 tag to : {0}".format(filename))
+    except Exception:
+        logging.exception(f'MP4 tag: {filename}')

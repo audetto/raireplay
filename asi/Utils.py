@@ -119,8 +119,8 @@ def download(grabber, progress, url, local_name, down_type, encoding, check_time
 
         return f
 
-    except Exception as e:
-        logging.info('Exception: {0}'.format(e))
+    except Exception:
+        logging.exception(f'URL: {url}')
         return None
 
 
