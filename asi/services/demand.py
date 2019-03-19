@@ -2,30 +2,30 @@ import json
 import os.path
 import datetime
 
-from asi import Utils
-from asi import Config
+from asi import utils
+from asi import config
 from asi.services import base, page
-from asi import RAIUrls
+from asi import raiurls
 
 
 def process(grabber, f, db):
     o = json.load(f)
 
     for v in o:
-        pid = Utils.get_new_pid(db, None)
+        pid = utils.get_new_pid(db, None)
         p = Group(grabber, pid, v["title"], v["linkDemand"], v["date"], v["editore"])
-        Utils.add_to_db(db, p)
+        utils.add_to_db(db, p)
 
 
 def download(db, grabber, down_type):
-    page = Utils.http_filename(RAIUrls.on_demand)
+    page = utils.http_filename(raiurls.on_demand)
 
-    folder = Config.demand_folder
+    folder = config.demand_folder
     local_filename = os.path.join(folder, page)
 
-    progress = Utils.get_progress()
+    progress = utils.get_progress()
 
-    f = Utils.download(grabber, progress, RAIUrls.on_demand, local_filename, down_type, "raw-unicode-escape", True)
+    f = utils.download(grabber, progress, raiurls.on_demand, local_filename, down_type, "raw-unicode-escape", True)
 
     process(grabber, f, db)
 
@@ -40,7 +40,7 @@ class Group(base.Base):
         self.datetime = datetime.datetime.fromtimestamp(int(date) / 1000)
         self.channel = channel
 
-        self.url = RAIUrls.base + link
+        self.url = raiurls.base + link
         self.canFollow = True
 
     def display(self, width):

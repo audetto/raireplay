@@ -8,7 +8,7 @@ import io
 import re
 import logging
 
-from asi import Meter
+from asi import meter
 
 
 class Obj:
@@ -179,7 +179,7 @@ def make_filename(value):
 def get_progress(number_of_files=1, filename=None):
     # only use a progress meter if we are not redirected
     if sys.stdout.isatty():
-        p = Meter.ReportHook(number_of_files)
+        p = meter.ReportHook(number_of_files)
         if filename:
             p.set_name(filename)
         return p

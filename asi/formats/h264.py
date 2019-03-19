@@ -1,6 +1,6 @@
 import os.path
-import asi.Utils
-import asi.RAIUrls
+import asi.utils
+import asi.raiurls
 import logging
 
 import asi.formats.mp4
@@ -22,11 +22,11 @@ def download_h264(grabber_metadata, grabber_program, folder, url, options, pid, 
     print(f"Saving {pid} as {local_filename}")
 
     try:
-        progress = asi.Utils.get_progress()
-        asi.Utils.download_file(grabber_metadata, grabber_program, progress, url, local_filename)
+        progress = asi.utils.get_progress()
+        asi.utils.download_file(grabber_metadata, grabber_program, progress, url, local_filename)
 
         size = os.path.getsize(local_filename)
-        for a in asi.RAIUrls.invalidMP4:
+        for a in asi.raiurls.invalidMP4:
             if size == len(a):
                 raise Exception(f"{url} only available in Italy")
 

@@ -4,9 +4,9 @@ import datetime
 
 from xml.etree import ElementTree
 
-from asi import Utils
+from asi import utils
 from asi.services import base
-from asi import Config
+from asi import config
 from asi.formats import h264
 
 config_url = "http://app.mediaset.it/app/videomediaset/iPhone/2.0.2/videomediaset_iphone_config.plist"
@@ -53,9 +53,9 @@ def process_full_video(grabber, f, tag, conf, folder, progress, down_type, db):
         category = v["subbrand"]["name"]
 
         if category == "full":
-            pid = Utils.get_new_pid(db, num)
+            pid = utils.get_new_pid(db, num)
             p = Program(grabber, conf, date, length, pid, title, desc, num, channel)
-            Utils.add_to_db(db, p)
+            utils.add_to_db(db, p)
 
 
 def process_program_list(grabber, f, conf, folder, progress, down_type, db):
@@ -74,10 +74,10 @@ def process_program(grabber, f, conf, folder, progress, down_type, db):
 
 
 def download_items(grabber, url, which, conf, folder, progress, down_type, db):
-    name = Utils.http_filename(url)
+    name = utils.http_filename(url)
     local_name = os.path.join(folder, name)
 
-    f = Utils.download(grabber, progress, url, local_name, down_type, "utf-8", True)
+    f = utils.download(grabber, progress, url, local_name, down_type, "utf-8", True)
 
     if f:
         if which == FULL_VIDEO:
@@ -91,13 +91,13 @@ def download_items(grabber, url, which, conf, folder, progress, down_type, db):
 
 
 def download(db, grabber, down_type, mediaset_type):
-    progress = Utils.get_progress()
-    name = Utils.http_filename(config_url)
+    progress = utils.get_progress()
+    name = utils.http_filename(config_url)
 
-    folder = Config.mediaset_folder
+    folder = config.mediaset_folder
     local_name = os.path.join(folder, name)
 
-    f = Utils.download(grabber, progress, config_url, local_name, down_type, None, True)
+    f = utils.download(grabber, progress, config_url, local_name, down_type, None, True)
     s = f.read().strip()
     root = ElementTree.fromstring(s)
     conf = parse_config(root)
@@ -132,14 +132,14 @@ class Program(base.Base):
 
         self.url = get_mediaset_link(conf, num)
 
-        name = Utils.make_filename(self.title)
+        name = utils.make_filename(self.title)
         self.filename = self.pid + "-" + name
 
     def get_h264(self):
         if self.h264:
             return self.h264
 
-        content = Utils.get_string_from_url(self.grabber, self.url)
+        content = utils.get_string_from_url(self.grabber, self.url)
         root = ElementTree.fromstring(content)
         if root.tag == "smil":
             url = root.find("body").find("switch").find("video").attrib.get("src")

@@ -3,10 +3,10 @@ import datetime
 import json
 import re
 
-from asi import Utils
-from asi import Config
+from asi import utils
+from asi import config
 from asi.services import base
-from asi import RAIUrls
+from asi import raiurls
 from asi.formats import h264
 
 channels = {"1": "RaiUno", "2": "RaiDue", "3": "RaiTre", "23": "RaiGulp", "31": "RaiCinque", "32": "RaiPremium", "38": "RaiYoyo"}
@@ -63,9 +63,9 @@ def parse_item(grabber, channel, date, time, value, db):
     pid = value["i"]
 
     if h264 or tablet or smart_phone:
-        pid = Utils.get_new_pid(db, pid)
+        pid = utils.get_new_pid(db, pid)
         p = Program(grabber, channels[channel], date, time, pid, length, name, desc, h264, tablet, smart_phone)
-        Utils.add_to_db(db, p)
+        utils.add_to_db(db, p)
 
 
 def process(grabber, f, db):
@@ -85,11 +85,11 @@ def process(grabber, f, db):
 
 
 def download(db, grabber, down_type):
-    progress = Utils.get_progress()
+    progress = utils.get_progress()
 
     today = datetime.date.today()
 
-    folder = Config.replay_folder
+    folder = config.replay_folder
 
     for x in range(1, 8):
         day = today - datetime.timedelta(days = x)
@@ -97,10 +97,10 @@ def download(db, grabber, down_type):
 
         for channel in channels.values():
             filename = channel + str_date + ".html"
-            url = RAIUrls.replay + "/" + filename
+            url = raiurls.replay + "/" + filename
             local_name = os.path.join(folder, filename)
 
-            f = Utils.download(grabber, progress, url, local_name, down_type, "utf-8")
+            f = utils.download(grabber, progress, url, local_name, down_type, "utf-8")
 
             if f:
                 process(grabber, f, db)
@@ -126,5 +126,5 @@ class Program(base.Base):
         self.grabber = grabber
         self.length = length
 
-        name = Utils.make_filename(self.title)
+        name = utils.make_filename(self.title)
         self.filename = self.pid + "-" + name

@@ -2,8 +2,8 @@ import os
 import urllib.parse
 import json
 
-from asi import Utils
-from asi import Config
+from asi import utils
+from asi import config
 from asi.services import raiplay
 
 
@@ -25,9 +25,9 @@ def process_set(grabber, down_type, f, db):
 
         path_id = value["pathID"]
 
-        pid = Utils.get_new_pid(db, None)
+        pid = utils.get_new_pid(db, None)
         p = raiplay.Program(grabber, down_type, channel, date, time, pid, length, name, desc, path_id)
-        Utils.add_to_db(db, p)
+        utils.add_to_db(db, p)
 
 
 def process(grabber, progress, folder, down_type, f, db):
@@ -44,19 +44,19 @@ def process(grabber, progress, folder, down_type, f, db):
                 filename = path.replace("/", "_")
                 local_name = os.path.join(folder, filename + ".json")
 
-                f = Utils.download(grabber, progress, url, local_name, down_type, "utf-8", True)
+                f = utils.download(grabber, progress, url, local_name, down_type, "utf-8", True)
                 process_set(grabber, down_type, f, db)
 
 
 def download(db, grabber, programma, down_type):
-    progress = Utils.get_progress()
+    progress = utils.get_progress()
 
-    folder = Config.raiplay_folder
+    folder = config.raiplay_folder
 
     o = urllib.parse.urlparse(programma)
     filename = o.path.replace("/", "_")
     url = programma + "/?json"
     local_name = os.path.join(folder, filename + ".json")
 
-    f = Utils.download(grabber, progress, url, local_name, down_type, "utf-8", True)
+    f = utils.download(grabber, progress, url, local_name, down_type, "utf-8", True)
     process(grabber, progress, folder, down_type, f, db)

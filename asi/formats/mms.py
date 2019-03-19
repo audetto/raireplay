@@ -4,8 +4,8 @@ import urllib
 import logging
 from xml.etree import ElementTree
 
-import asi.Utils
-import asi.RAIUrls
+import asi.utils
+import asi.raiurls
 
 
 def download_mms(folder, url, options, pid, filename):
@@ -18,7 +18,7 @@ def download_mms(folder, url, options, pid, filename):
             print(f"{pid} already there as {local_filename}")
             return
 
-        opt = asi.Utils.Obj()
+        opt = asi.utils.Obj()
         opt.quiet = False
         opt.url = url
         opt.resume = False
@@ -42,9 +42,9 @@ def get_mms_url(grabber, url):
         mms = url
     else:
         # search for the mms url
-        content = asi.Utils.get_string_from_url(grabber, url)
+        content = asi.utils.get_string_from_url(grabber, url)
 
-        if content in asi.RAIUrls.invalidMP4:
+        if content in asi.raiurls.invalidMP4:
             # is this the case of videos only available in Italy?
             mms = content
         else:
@@ -58,7 +58,7 @@ def get_mms_url(grabber, url):
                     if url_scheme == "mms":
                         mms = asf
                     else:
-                        content = asi.Utils.get_string_from_url(grabber, asf)
+                        content = asi.utils.get_string_from_url(grabber, asf)
                         config = configparser.ConfigParser()
                         config.read_string(content)
                         mms = config.get("Reference", "ref1")

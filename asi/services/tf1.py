@@ -2,8 +2,8 @@ import os
 import datetime
 import json
 
-from asi import Utils
-from asi import Config
+from asi import utils
+from asi import config
 from asi.services import base
 
 programs_url = "http://api.tf1.fr/tf1-programs/iphone/limit/100/"
@@ -35,9 +35,9 @@ def parse_item(grabber, prog, name, db):
 
     # ignore the countless "extract", "bonus", "short" which last just a few minutes
     if category == "fullvideo":
-        pid = Utils.get_new_pid(db, pid)
+        pid = utils.get_new_pid(db, pid)
         p = Program(grabber, date, length, pid, name, desc, wat, category)
-        Utils.add_to_db(db, p)
+        utils.add_to_db(db, p)
 
 
 def process_group(grabber, f, name, db):
@@ -64,9 +64,9 @@ def process_news(grabber, f, folder, progress, down_type, db):
         wat = prog["linkAttributes"]["watId"]
         category = prog["linkAttributes"]["videoCategory"]
 
-        pid = Utils.get_new_pid(db, group_id)
+        pid = utils.get_new_pid(db, group_id)
         p = Program(grabber, datetime.datetime.now(), None, pid, name, title, wat, category)
-        Utils.add_to_db(db, p)
+        utils.add_to_db(db, p)
 
 
 def process_programs(grabber, f, folder, progress, down_type, db):
@@ -90,7 +90,7 @@ def download_group(grabber, name, group_id, folder, progress, down_type, db):
     # .0
     url_0 = get_data_url(group_id, 0)
     local_name_0 = os.path.join(folder, str(group_id) + ".0.json")
-    f_0 = Utils.download(grabber, progress, url_0, local_name_0, down_type, "utf-8", check_timestamp)
+    f_0 = utils.download(grabber, progress, url_0, local_name_0, down_type, "utf-8", check_timestamp)
 
     if f_0:
         process_group(grabber, f_0, name, db)
@@ -98,24 +98,24 @@ def download_group(grabber, name, group_id, folder, progress, down_type, db):
     # .1
     url_1 = get_data_url(group_id, 1)
     local_name_1 = os.path.join(folder, str(group_id) + ".1.json")
-    f_1 = Utils.download(grabber, progress, url_1, local_name_1, down_type, "utf-8", check_timestamp)
+    f_1 = utils.download(grabber, progress, url_1, local_name_1, down_type, "utf-8", check_timestamp)
 
     if f_1:
         process_group(grabber, f_1, name, db)
 
 
 def download(db, grabber, down_type):
-    progress = Utils.get_progress()
+    progress = utils.get_progress()
 
-    folder = Config.tf1_folder
+    folder = config.tf1_folder
 
     local_name = os.path.join(folder, "news.json")
-    f = Utils.download(grabber, progress, news_url, local_name, down_type, "utf-8", True)
+    f = utils.download(grabber, progress, news_url, local_name, down_type, "utf-8", True)
 
     process_news(grabber, f, folder, progress, down_type, db)
 
     local_name = os.path.join(folder, "programs.json")
-    f = Utils.download(grabber, progress, programs_url, local_name, down_type, "utf-8", True)
+    f = utils.download(grabber, progress, programs_url, local_name, down_type, "utf-8", True)
 
     process_programs(grabber, f, folder, progress, down_type, db)
 
@@ -136,7 +136,7 @@ class Program(base.Base):
         self.grabber = grabber
         self.ts = get_wat_link(self.wat)
 
-        name = Utils.make_filename(self.title)
+        name = utils.make_filename(self.title)
         self.filename = self.pid + "-" + name
 
     def display(self, width):

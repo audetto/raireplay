@@ -3,8 +3,8 @@ import datetime
 
 from xml.etree import ElementTree
 
-from asi import Utils
-from asi import Config
+from asi import utils
+from asi import config
 from asi.services import base
 
 # this comes from M6group.groovy
@@ -55,22 +55,22 @@ def process(grabber, down_type, f, channel, db):
 
         length = datetime.timedelta(seconds=int(seconds))
 
-        pid = Utils.get_new_pid(db, k)
+        pid = utils.get_new_pid(db, k)
         p = Program(grabber, down_type, channel, date, pid, k, length, title, desc)
-        Utils.add_to_db(db, p)
+        utils.add_to_db(db, p)
 
 
 def download(db, grabber, down_type):
-    progress = Utils.get_progress()
+    progress = utils.get_progress()
 
     for channel in channels:
         url = get_catalogue_url(channel)
-        name = Utils.http_filename(url) + "." + channel
+        name = utils.http_filename(url) + "." + channel
 
-        folder = Config.m6_folder
+        folder = config.m6_folder
         local_name = os.path.join(folder, name)
 
-        f = Utils.download(grabber, progress, url, local_name, down_type, "utf-8", True)
+        f = utils.download(grabber, progress, url, local_name, down_type, "utf-8", True)
         if f:
             process(grabber, down_type, f, channel, db)
 
@@ -95,7 +95,7 @@ class Program(base.Base):
         self.grabber = grabber
         self.length = length
 
-        name = Utils.make_filename(self.title)
+        name = utils.make_filename(self.title)
         self.filename = self.pid + "-" + name
 
     def display(self, width):
@@ -108,12 +108,12 @@ class Program(base.Base):
         if self.ts:
             return self.ts
 
-        folder = Config.m6_folder
-        name = Utils.http_filename(self.url)
+        folder = config.m6_folder
+        name = utils.http_filename(self.url)
         local_name = os.path.join(folder, name)
-        progress = Utils.get_progress()
+        progress = utils.get_progress()
 
-        f = Utils.download(self.grabber, progress, self.url, local_name, self.down_type, "utf-8", True)
+        f = utils.download(self.grabber, progress, self.url, local_name, self.down_type, "utf-8", True)
         if f:
             root = ElementTree.parse(f).getroot()
             asset = root.find("asset")

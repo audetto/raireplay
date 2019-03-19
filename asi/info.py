@@ -1,8 +1,8 @@
 import json
 
-from asi import Utils
-from asi import Config
-from asi import Tor
+from asi import utils
+from asi import config
+from asi import tor
 
 userIP = "https://api.ipify.org"
 geoIP = "https://freegeoip.net/json/"
@@ -20,7 +20,7 @@ def search_tor(grabber, width, country, attempts_and_skip):
     excludes = ""
 
     for a in range(attempts):
-        Tor.set_tor_exclude_nodes(excludes)
+        tor.set_tor_exclude_nodes(excludes)
 
         ip, geo = get_geo_ip(grabber)
 
@@ -31,7 +31,7 @@ def search_tor(grabber, width, country, attempts_and_skip):
                 skip -= 1
             else:
                 print(ip, geo, "ACCEPTED")
-                Tor.set_tor_exit_nodes(ip)
+                tor.set_tor_exit_nodes(ip)
                 break
 
         if excludes:
@@ -41,7 +41,7 @@ def search_tor(grabber, width, country, attempts_and_skip):
 
 
 def get_geo_ip(grabber):
-    geo = Utils.get_string_from_url(grabber, geoIP)
+    geo = utils.get_string_from_url(grabber, geoIP)
     data = json.loads(geo)
     ip = data['ip']
     country = data['country_code']
@@ -51,13 +51,13 @@ def get_geo_ip(grabber):
 def display(grabber, width):
     ip, country = get_geo_ip(grabber)
 
-    exit_nodes = Tor.get_tor_exit_nodes()
-    excluded = Tor.get_tor_exclude_nodes()
+    exit_nodes = tor.get_tor_exit_nodes()
+    excluded = tor.get_tor_exclude_nodes()
 
     print("=" * width)
 
-    print("Root folder:", Config.root_folder)
-    print("Location:   ", Config.program_folder)
+    print("Root folder:", config.root_folder)
+    print("Location:   ", config.program_folder)
     print("IP:         ", ip)
     print("Country:    ", country)
     print("Exit:       ", exit_nodes)

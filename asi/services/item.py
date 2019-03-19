@@ -4,10 +4,10 @@ import datetime
 
 from html.parser import HTMLParser
 
-from asi import Utils
-from asi import Config
+from asi import utils
+from asi import config
 from asi.services import base
-from asi import RAIUrls
+from asi import raiurls
 from asi.formats import h264
 
 
@@ -30,7 +30,7 @@ class VideoHTMLParser(HTMLParser):
     def __init__(self):
         HTMLParser.__init__(self)
 
-        self.values = Utils.Obj()
+        self.values = utils.Obj()
         self.values.videoUrl = None
         self.values.videoUrlMP4 = None
         self.values.videoUrlH264 = None
@@ -83,7 +83,7 @@ class VideoHTMLParser(HTMLParser):
 
             val = self.extract(attrs, "idPageProgramma")
             if val:
-                self.values.page = RAIUrls.base + RAIUrls.get_web_from_id(val)
+                self.values.page = raiurls.base + raiurls.get_web_from_id(val)
 
         elif tag == "param":
             if len(attrs) > 0:
@@ -111,15 +111,15 @@ class Demand(base.Base):
 
         parts = urllib.parse.urlparse(url)
         if not parts.scheme:
-            url = RAIUrls.get_item_url(url)
+            url = raiurls.get_item_url(url)
 
         self.url = url
         self.pid = pid
 
-        folder = Config.item_folder
-        local_filename = os.path.join(folder, Utils.http_filename(self.url))
+        folder = config.item_folder
+        local_filename = os.path.join(folder, utils.http_filename(self.url))
 
-        f = Utils.download(grabber, None, self.url, local_filename, down_type, "utf-8")
+        f = utils.download(grabber, None, self.url, local_filename, down_type, "utf-8")
 
         parser = VideoHTMLParser()
         parser.feed(f.read())
@@ -151,7 +151,7 @@ class Demand(base.Base):
             self.values.videoUrl = self.values.videoUrl.replace("relinkerServlet.mp4", "relinkerServlet.htm")
 
         # make a nice filename
-        self.filename = Utils.make_filename(self.title)
+        self.filename = utils.make_filename(self.title)
 
         self.mms = self.values.videoUrl
 

@@ -3,10 +3,10 @@ import os.path
 
 from xml.etree import ElementTree
 
-from asi import Utils
-from asi import Config
+from asi import utils
+from asi import config
 from asi.services import base, item
-from asi import RAIUrls
+from asi import raiurls
 from asi.formats import h264
 
 
@@ -39,10 +39,10 @@ class Elem(base.Base):
         self.length = data.findtext("durata")
         web = data.findtext("web")
         if not web:
-            web = RAIUrls.get_web_from_id(self.id)
-        self.url = RAIUrls.base + web
+            web = raiurls.get_web_from_id(self.id)
+        self.url = raiurls.base + web
 
-        self.filename = Utils.make_filename(self.title)
+        self.filename = utils.make_filename(self.title)
 
         self.canFollow = True
 
@@ -53,27 +53,27 @@ class Elem(base.Base):
         print()
 
     def follow(self, db, down_type):
-        pid = Utils.get_new_pid(db, self.pid)
+        pid = utils.get_new_pid(db, self.pid)
         p = item.Demand(self.grabber, self.url, down_type, pid)
-        Utils.add_to_db(db, p)
+        utils.add_to_db(db, p)
 
 
 def download(db, grabber, url, down_type):
-    page = Utils.http_filename(url)
+    page = utils.http_filename(url)
     page = os.path.splitext(page)[0]
 
-    data_url = RAIUrls.get_page_data_url(page)
+    data_url = raiurls.get_page_data_url(page)
 
-    folder = Config.page_folder
+    folder = config.page_folder
     local_filename = os.path.join(folder, page + ".xml")
-    f = Utils.download(grabber, None, data_url, local_filename, down_type, "utf-8")
+    f = utils.download(grabber, None, data_url, local_filename, down_type, "utf-8")
 
     # ElementTree does not like unicode, it prefers byte strings
     s = f.read().strip()
-    s = Utils.remove_invalid_xml_characters(s)
+    s = utils.remove_invalid_xml_characters(s)
     root = ElementTree.fromstring(s)
 
     for child in root.findall("content"):
-        pid = Utils.get_new_pid(db, None)
+        pid = utils.get_new_pid(db, None)
         it = Elem(pid, grabber, child)
-        Utils.add_to_db(db, it)
+        utils.add_to_db(db, it)

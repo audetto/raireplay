@@ -1,7 +1,7 @@
 import time
 import os
 
-from asi import Console
+from asi import console
 
 
 def format_time(seconds, use_hours=0):
@@ -112,7 +112,7 @@ class ReportHook:
             else:
                 speed = float("inf")
 
-            terminal_width = Console.terminal_width()
+            terminal_width = console.terminal_width()
 
             name_width = terminal_width - 33
 

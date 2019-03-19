@@ -1,9 +1,9 @@
-from asi import Utils
-from asi import Info
+from asi import utils
+from asi import info
 from asi.services import demand, mediaset, raiplay, tf1, m6, programma, replay, playlist
-from asi import Config
-from asi import Console
-from asi import Tor
+from asi import config
+from asi import console
+from asi import tor
 
 import os
 import re
@@ -35,7 +35,7 @@ class Action(enum.Enum):
 
 def item_do_actions(item, nolist, actions, options, grabber, fmt):
     if Action.INFO in actions:
-        width = Console.terminal_width()
+        width = console.terminal_width()
         item.display(width)
     elif not nolist:
         # this is list
@@ -49,7 +49,7 @@ def item_do_actions(item, nolist, actions, options, grabber, fmt):
 
     if Action.GET in actions:
         try:
-            item.download_video(Config.program_folder, options, grabber)
+            item.download_video(config.program_folder, options, grabber)
         except Exception:
             logging.exception(f'GET: {item.short(fmt)}')
 
@@ -124,7 +124,7 @@ def find(db, pid, isre, subset):
                     subset[ppid] = p
             else:
                 s = title.lower()
-                s = Utils.remove_accents(s)
+                s = utils.remove_accents(s)
                 if s.find(match) != -1:
                     subset[ppid] = p
 
@@ -135,13 +135,13 @@ def process(args):
     proxy = None
 
     if args.location:
-        Config.program_folder = Config.create_folder(args.location)
+        config.program_folder = config.create_folder(args.location)
 
     if args.here:
-        Config.program_folder = os.getcwd()
+        config.program_folder = os.getcwd()
 
     if args.tor:
-        Tor.set_tor_exit_nodes(args.tor)
+        tor.set_tor_exit_nodes(args.tor)
 
     if args.tor or args.tor_proxy:
         # we use privoxy to access tor
@@ -168,13 +168,13 @@ def process(args):
         grabberForDownload = grabber
 
     if args.tor_search and args.tor:
-        width = Console.terminal_width()
-        Info.search_tor(grabber, width, args.tor, args.tor_search)
+        width = console.terminal_width()
+        info.search_tor(grabber, width, args.tor, args.tor_search)
         return
 
     if args.ip:
-        width = Console.terminal_width()
-        Info.display(grabber, width)
+        width = console.terminal_width()
+        info.display(grabber, width)
         return
 
     if args.ondemand:

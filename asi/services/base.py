@@ -1,8 +1,8 @@
 import os
 import urllib
 
-import asi.Utils
-import asi.Cast
+import asi.utils
+import asi.cast
 import asi.formats.h264
 import asi.formats.m3u8
 import asi.formats.mms
@@ -29,7 +29,7 @@ class Base:
 
     def short(self, fmt):
         if self.datetime:
-            ts = asi.Utils.str_date(self.datetime)
+            ts = asi.utils.str_date(self.datetime)
         else:
             ts = None
 
@@ -58,7 +58,7 @@ class Base:
 
     def cast(self, options):
         video_format, url = self.get_url_and_format(options)
-        asi.Cast.cast_url(url)
+        asi.cast.cast_url(url)
 
     def show(self, options):
         video_format, url = self.get_url_and_format(options)
@@ -83,7 +83,7 @@ class Base:
             raise Exception(f"No video format detected for {self.pid}")
         elif video_format == "h264":
             h264 = self.get_h264()
-            url = asi.Utils.find_url_by_bandwidth(h264, options.bwidth)
+            url = asi.utils.find_url_by_bandwidth(h264, options.bwidth)
         elif video_format in ["ts", "tsmp4"]:
             m3 = self.get_tablet_playlist()
             if not m3.is_variant:
@@ -129,7 +129,7 @@ class Base:
         if self.description:
             print("Description:", self.description)
         if self.datetime:
-            print("Date:", asi.Utils.str_date(self.datetime))
+            print("Date:", asi.utils.str_date(self.datetime))
         if self.length:
             print("Length:", self.length)
         if self.filename:
