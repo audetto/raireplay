@@ -17,7 +17,7 @@ def decrypt(data, key, media_sequence, grabber, key_cache):
             if uri not in key_cache:
                 request = urllib.request.Request(uri, headers=asi.Utils.http_headers)
                 stream = grabber.open(request)
-                logging.debug('AES-128 key: {}'.format(uri))
+                logging.debug(f'AES-128 key: {uri}')
                 key_cache[uri] = stream.read()
 
             aes_key = key_cache[uri]
@@ -26,7 +26,7 @@ def decrypt(data, key, media_sequence, grabber, key_cache):
             clear = aes.decrypt(data)
             return clear
         else:
-            raise Exception('M3U8 unsupported key: {}'.format(key))
+            raise Exception(f'M3U8 unsupported key: {key}')
     else:
         return data
 
@@ -42,21 +42,21 @@ def download_m3u8(grabber_program, folder, url, options, pid, filename, title, r
 
     if (not options.overwrite) and os.path.exists(local_filename):
         print()
-        print("{0} already there as {1}".format(pid, local_filename))
+        print(f"{pid} already there as {local_filename}")
         print()
         return
 
     item = load_m3u8_from_url(grabber_program, url)
 
     print()
-    print("Saving {0} as {1}".format(pid, local_filename))
+    print(f"Saving {pid} as {local_filename}")
 
     # maximum number of attempts per segment
     max_attempts = options.ts_tries
 
     try:
         number_of_files = len(item.segments)
-        logging.debug('{} segments'.format(number_of_files))
+        logging.debug(f'{number_of_files} segments')
         progress = asi.Utils.get_progress(number_of_files, filename + ".ts")
         key_cache = {}
 
@@ -69,7 +69,7 @@ def download_m3u8(grabber_program, folder, url, options, pid, filename, title, r
                 while True:
                     try:
                         attempt = attempt + 1
-                        logging.debug('#{}: {}'.format(attempt, segment_uri))
+                        logging.debug(f'#{attempt}: {segment_uri}')
                         with grabber_program.open(request) as s:
                             b = s.read()
                             size = len(b)
@@ -94,23 +94,23 @@ def download_m3u8(grabber_program, folder, url, options, pid, filename, title, r
             os.remove(local_filename_ts)
 
         print()
-        print("Saved {0} as {1}".format(pid, local_filename))
+        print(f"Saved {pid} as {local_filename}")
         print()
 
     except BaseException:
         logging.exception(f'M3U8: {local_filename}')
         if os.path.exists(local_filename):
-            logging.info('Removing: {0}'.format(local_filename))
+            logging.info(f'Removing: {local_filename}')
             os.remove(local_filename)
         if remux and os.path.exists(local_filename_ts):
-            logging.info('Removing: {0}'.format(local_filename_ts))
+            logging.info(f'Removing: {local_filename_ts}')
             os.remove(local_filename_ts)
         raise
 
 
 def load_m3u8_from_url(grabber, uri):
     request = urllib.request.Request(uri, headers=asi.Utils.http_headers)
-    logging.info('M3U8: {}'.format(uri))
+    logging.info(f'M3U8: {uri}')
     stream = grabber.open(request)
 
     encoding = None
@@ -155,8 +155,7 @@ def display_m3u8(m3):
         else:
             number_of_segments = len(m3.segments)
             if number_of_segments:
-                fmt = "\tPlaylist: {0} segments"
-                line = fmt.format(number_of_segments)
+                line = f"\tPlaylist: {number_of_segments} segments"
                 print(line)
                 print()
 

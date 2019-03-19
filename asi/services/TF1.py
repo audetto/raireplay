@@ -12,12 +12,12 @@ homepage_url = "http://api.tf1.fr/tf1-homepage/iphone/"
 
 
 def get_data_url(prog_id, item):
-    url = "http://api.tf1.fr/tf1-vods/iphone//integral/{0}/program_id/{1}".format(item, prog_id)
+    url = f"http://api.tf1.fr/tf1-vods/iphone//integral/{item}/program_id/{prog_id}"
     return url
 
 
 def get_wat_link(wat_id):
-    url = "http://www.wat.tv/get/iphone/{0}.m3u8?bwmin=100000&bwmax=490000".format(wat_id)
+    url = f"http://www.wat.tv/get/iphone/{wat_id}.m3u8?bwmin=100000&bwmax=490000"
     return url
 
 

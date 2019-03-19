@@ -14,18 +14,17 @@ invalidMP4 = {"http://creativemedia3.rai.it/video_no_available.mp4",
 
 
 def get_item_url(name):
-    url = "http://www.rai.tv/dl/RaiTV/programmi/media/" + name + ".html"
+    url = f"http://www.rai.tv/dl/RaiTV/programmi/media/{name}.html"
     return url
 
 
 # returns the url that requests the list of ContentItems behind a Page-xxx page
 def get_page_data_url(page):
     n = 1000  # just get them all
-    url = "http://www.rai.tv/StatisticheProxy/proxyPost.jsp?action=getLastContentByTag&numContents={0}&tags=PageOB:{1}&domain=RaiTv".format(
-        n, page)
+    url = f"http://www.rai.tv/StatisticheProxy/proxyPost.jsp?action=getLastContentByTag&numContents={n}&tags=PageOB:{page}&domain=RaiTv"
     return url
 
 
 def get_web_from_id(pid):
-    web = "/dl/RaiTV/programmi/media/{0}.html".format(pid)
+    web = f"/dl/RaiTV/programmi/media/{pid}.html"
     return web

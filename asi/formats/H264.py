@@ -11,7 +11,7 @@ def download_h264(grabber_metadata, grabber_program, folder, url, options, pid, 
 
     if (not options.overwrite) and os.path.exists(local_filename):
         print()
-        print("{0} already there as {1}".format(pid, local_filename))
+        print(f"{pid} already there as {local_filename}")
         print()
         return
 
@@ -19,7 +19,7 @@ def download_h264(grabber_metadata, grabber_program, folder, url, options, pid, 
     print(url)
 
     print()
-    print("Saving {0} as {1}".format(pid, local_filename))
+    print(f"Saving {pid} as {local_filename}")
 
     try:
         progress = asi.Utils.get_progress()
@@ -28,18 +28,18 @@ def download_h264(grabber_metadata, grabber_program, folder, url, options, pid, 
         size = os.path.getsize(local_filename)
         for a in asi.RAIUrls.invalidMP4:
             if size == len(a):
-                raise Exception("{0} only available in Italy".format(url))
+                raise Exception(f"{url} only available in Italy")
 
         asi.formats.MP4.set_mp4_tag(local_filename, title)
 
         print()
-        print("Saved {0} as {1}".format(pid, filename))
+        print(f"Saved {pid} as {filename}")
         print()
 
     except BaseException:
         logging.exception(f'H264: {url}')
         if os.path.exists(local_filename):
-            logging.info('Removing: {0}'.format(local_filename))
+            logging.info(f'Removing: {local_filename}')
             os.remove(local_filename)
         raise
 
@@ -47,7 +47,7 @@ def download_h264(grabber_metadata, grabber_program, folder, url, options, pid, 
 def display_h264(h264):
     if h264:
         for k, v in h264.items():
-            print("h264[{0}]: {1}".format(k, v))
+            print(f"h264[{k}]: {v}")
         print()
 
 

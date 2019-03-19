@@ -15,7 +15,7 @@ def download_mms(folder, url, options, pid, filename):
         local_filename = os.path.join(folder, filename + ".wmv")
 
         if (not options.overwrite) and os.path.exists(local_filename):
-            print("{0} already there as {1}".format(pid, local_filename))
+            print(f"{pid} already there as {local_filename}")
             return
 
         opt = asi.Utils.Obj()

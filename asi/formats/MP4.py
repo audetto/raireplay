@@ -8,7 +8,7 @@ def remux_to_mp4(in_file, out_file, title):
     cmd_line = ["ffmpeg", "-i", in_file, "-vcodec", "copy", "-acodec", "copy", "-absf", "aac_adtstoasc", "-y", out_file]
     code = subprocess.call(cmd_line)
     if code != 0:
-        raise Exception("ffmpeg failed: exit code {0}".format(code))
+        raise Exception(f"ffmpeg failed: exit code {code}")
     set_mp4_tag(out_file, title)
 
 

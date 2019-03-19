@@ -33,11 +33,11 @@ def download_file(grabber_metadata, grabber_program, progress, url, local_name):
 
     request = urllib.request.Request(url, headers=http_headers)
 
-    logging.info('URL: {}'.format(url))
+    logging.info(f'URL: {url}')
     with grabber_metadata.open(request) as response:
         actual_url = response.geturl()
         if actual_url != url and grabber_metadata != grabber_program:
-            logging.info('Redirection: {}'.format(actual_url))
+            logging.info(f'Redirection: {actual_url}')
             return download_file(grabber_program, grabber_program, progress, actual_url, local_name)
 
         with open(local_name, "wb") as f:
@@ -84,7 +84,7 @@ def download(grabber, progress, url, local_name, down_type, encoding, check_time
     try:
         if down_type == "shm":
             request = urllib.request.Request(url, headers=http_headers)
-            logging.info('URL: {}'.format(url))
+            logging.info(f'URL: {url}')
             f = grabber.open(request)
             if encoding:
                 decoder = codecs.getreader(encoding)
@@ -98,7 +98,7 @@ def download(grabber, progress, url, local_name, down_type, encoding, check_time
             exists = exists and os.path.getsize(local_name) > 0
 
             if down_type == "never" and not exists:
-                raise Exception("Will not download missing file: {0} -> {1}".format(url, local_name))
+                raise Exception(f"Will not download missing file: {url} -> {local_name}")
 
             if exists and check_time:
                 # if it is from yesterday or before, we re-download it
@@ -109,7 +109,7 @@ def download(grabber, progress, url, local_name, down_type, encoding, check_time
             if down_type == "always" or (down_type == "update" and not exists):
                 download_file(grabber, grabber, progress, url, local_name)
             else:
-                logging.info('Exist: {}'.format(url))
+                logging.info(f'Exist: {url}')
 
             # now the file exists on the local filesystem
             if not encoding:
@@ -209,13 +209,13 @@ def add_to_db(db, prog):
     pid = prog.pid
 
     if pid in db:
-        logging.warning("duplicate pid {0}".format(prog.pid))
+        logging.warning(f"duplicate pid {pid}")
 
     db[pid] = prog
 
 
 def get_string_from_url(grabber, url):
-    logging.info('String: {}'.format(url))
+    logging.info(f'String: {url}')
     with grabber.open(url) as f:
         content = f.read().decode("ascii")
         return content

@@ -21,7 +21,7 @@ channels = ["m6replay", "w9replay", "6terreplay", "styles", "stories", "comedy",
 
 def get_ts_url(link):
     #    ts = "https://lb.cdn.m6web.fr/c/cu/s/m6replay_iphone/iphone/{0}".format(link)
-    ts = "https://lb.cdn.m6web.fr/s/cu/prime/{0}".format(link)
+    ts = f"https://lb.cdn.m6web.fr/s/cu/prime/{link}"
     return ts
 
 
@@ -29,15 +29,13 @@ def get_catalogue_url(channel):
     # old catalogue
     #    catalogue_url = "http://static.m6replay.fr/catalog/m6group_web/{0}replay/catalogue.json"
     # iphone catalogue
-    catalogue_url = "http://static.m6replay.fr/catalog/m6group_iphone/{0}/catalogue.xml"
-    url = catalogue_url.format(channel)
+    url = f"http://static.m6replay.fr/catalog/m6group_iphone/{channel}/catalogue.xml"
     return url
 
 
 def get_info_url(channel, clip):
-    info_url = "http://static.m6replay.fr/catalog/m6group_iphone/{0}/clip/{1}/clip_infos-{2}.xml"
     clip_key = clip[-2:] + '/' + clip[-4:-2]
-    url = info_url.format(channel, clip_key, clip)
+    url = f"http://static.m6replay.fr/catalog/m6group_iphone/{channel}/clip/{clip_key}/clip_infos-{clip}.xml"
     return url
 
 

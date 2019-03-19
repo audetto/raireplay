@@ -59,10 +59,10 @@ def list_do_actions(items, nolist, actions, options, grabber):
 
     if nolist:
         print()
-        print("INFO: {0} programmes found".format(numberOfItems))
+        print(f"INFO: {numberOfItems} programmes found")
 
     if (Action.CAST in actions) and (numberOfItems > 1):
-        raise Exception("Cannot cast {} items".format(numberOfItems))
+        raise Exception(f"Cannot cast {numberOfItems} items")
 
     # dynamically select width of fields
     # as they change according to broadcaster

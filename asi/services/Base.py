@@ -62,8 +62,8 @@ class Base:
 
     def show(self, options):
         video_format, url = self.get_url_and_format(options)
-        print('Format: {}'.format(video_format))
-        print('URL: {}'.format(url))
+        print(f'Format: {video_format}')
+        print(f'URL: {url}')
 
     def get_url_and_format(self, options):
         video_format = None
@@ -80,7 +80,7 @@ class Base:
             video_format = options.format
 
         if video_format is None:
-            raise Exception("No video format detected for {}".format(self.pid))
+            raise Exception(f"No video format detected for {self.pid}")
         elif video_format == "h264":
             h264 = self.get_h264()
             url = asi.Utils.find_url_by_bandwidth(h264, options.bwidth)
@@ -100,8 +100,8 @@ class Base:
             os.makedirs(folder)
 
         video_format, url = self.get_url_and_format(options)
-        logging.info('Video Format: {}'.format(video_format))
-        logging.info('URL: {}'.format(url))
+        logging.info(f'Video Format: {video_format}')
+        logging.info(f'URL: {url}')
 
         if video_format == "h264":
             self.download_h264(folder, options, grabber, url)
