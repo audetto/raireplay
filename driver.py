@@ -1,6 +1,6 @@
 from asi import Utils
 from asi import Info
-from asi.services import Demand, Mediaset, RaiPlay, TF1, M6, Programma, Replay, Playlist
+from asi.services import demand, mediaset, raiplay, tf1, m6, programma, replay, playlist
 from asi import Config
 from asi import Console
 from asi import Tor
@@ -178,7 +178,7 @@ def process(args):
         return
 
     if args.ondemand:
-        Demand.download(db, grabber, args.download)
+        demand.download(db, grabber, args.download)
 
     if args.follow:
         follows = args.follow
@@ -192,28 +192,28 @@ def process(args):
             follows = follows[1:] # continue with one element less
 
     if args.replay:
-        Replay.download(db, grabber, args.download)
+        replay.download(db, grabber, args.download)
 
     if args.raiplay:
-        RaiPlay.download(db, grabber, args.download)
+        raiplay.download(db, grabber, args.download)
 
     if args.programma:
-        Programma.download(db, grabber, args.programma, args.download)
+        programma.download(db, grabber, args.programma, args.download)
 
     if args.tf1:
-        TF1.download(db, grabber, args.download)
+        tf1.download(db, grabber, args.download)
 
     if args.m6:
-        M6.download(db, grabber, args.download)
+        m6.download(db, grabber, args.download)
 
     if args.mediaset:
-        Mediaset.download(db, grabber, args.download, "mediaset")
+        mediaset.download(db, grabber, args.download, "mediaset")
 
     if args.tg5:
-        Mediaset.download(db, grabber, args.download, "tg5")
+        mediaset.download(db, grabber, args.download, "tg5")
 
     if args.m3u8:
-        p = Playlist.process(grabber, args.m3u8, len(db))
+        p = playlist.process(grabber, args.m3u8, len(db))
         db[p.pid] = p
 
     if args.pid:

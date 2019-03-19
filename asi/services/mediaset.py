@@ -5,9 +5,9 @@ import datetime
 from xml.etree import ElementTree
 
 from asi import Utils
-from asi.services import Base
+from asi.services import base
 from asi import Config
-from asi.formats import H264
+from asi.formats import h264
 
 config_url = "http://app.mediaset.it/app/videomediaset/iPhone/2.0.2/videomediaset_iphone_config.plist"
 
@@ -116,7 +116,7 @@ def get_mediaset_link(conf, num):
     return url
 
 
-class Program(Base.Base):
+class Program(base.Base):
     def __init__(self, grabber, conf, datetime, length, pid, title, desc, num, channel):
         super().__init__()
 
@@ -143,7 +143,7 @@ class Program(Base.Base):
         root = ElementTree.fromstring(content)
         if root.tag == "smil":
             url = root.find("body").find("switch").find("video").attrib.get("src")
-            H264.add_h264_url(self.h264, 0, url)
+            h264.add_h264_url(self.h264, 0, url)
         return self.h264
 
     def display(self, width):

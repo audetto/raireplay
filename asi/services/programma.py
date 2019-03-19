@@ -4,7 +4,7 @@ import json
 
 from asi import Utils
 from asi import Config
-from asi.services import RaiPlay
+from asi.services import raiplay
 
 
 def process_set(grabber, down_type, f, db):
@@ -26,7 +26,7 @@ def process_set(grabber, down_type, f, db):
         path_id = value["pathID"]
 
         pid = Utils.get_new_pid(db, None)
-        p = RaiPlay.Program(grabber, down_type, channel, date, time, pid, length, name, desc, path_id)
+        p = raiplay.Program(grabber, down_type, channel, date, time, pid, length, name, desc, path_id)
         Utils.add_to_db(db, p)
 
 

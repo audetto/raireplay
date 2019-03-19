@@ -6,9 +6,9 @@ from html.parser import HTMLParser
 
 from asi import Utils
 from asi import Config
-from asi.services import Base
+from asi.services import base
 from asi import RAIUrls
-from asi.formats import H264
+from asi.formats import h264
 
 
 # <meta name="videourl" content="....." />
@@ -103,7 +103,7 @@ class VideoHTMLParser(HTMLParser):
         return None
 
 
-class Demand(Base.Base):
+class Demand(base.Base):
     def __init__(self, grabber, url, down_type, pid):
         super().__init__()
 
@@ -130,7 +130,7 @@ class Demand(Base.Base):
         self.title = self.values.title
         self.ts = self.values.videoUrlM3U8
 
-        H264.add_h264_url(self.h264, 0, self.values.videoUrlH264)
+        h264.add_h264_url(self.h264, 0, self.values.videoUrlH264)
 
         if self.values.date:
             self.datetime = datetime.datetime.strptime(self.values.date, "%d/%m/%Y")

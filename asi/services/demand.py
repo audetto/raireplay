@@ -4,7 +4,7 @@ import datetime
 
 from asi import Utils
 from asi import Config
-from asi.services import Base, Page
+from asi.services import base, page
 from asi import RAIUrls
 
 
@@ -30,7 +30,7 @@ def download(db, grabber, down_type):
     process(grabber, f, db)
 
 
-class Group(Base.Base):
+class Group(base.Base):
     def __init__(self, grabber, pid, title, link, date, channel):
         super().__init__()
 
@@ -50,4 +50,4 @@ class Group(Base.Base):
         print()
 
     def follow(self, db, down_type):
-        Page.download(db, self.grabber, self.url, down_type)
+        page.download(db, self.grabber, self.url, down_type)

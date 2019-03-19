@@ -5,9 +5,9 @@ from xml.etree import ElementTree
 
 from asi import Utils
 from asi import Config
-from asi.services import Base, Item
+from asi.services import base, item
 from asi import RAIUrls
-from asi.formats import H264
+from asi.formats import h264
 
 
 # example: without xls we get a nice XML,
@@ -15,7 +15,7 @@ from asi.formats import H264
 # http://www.rai.tv/StatisticheProxy/proxyPost.jsp?action=getLastContentByTag&numContents=12&tags=PageOB:Page-054bcd53-df7e-42c3-805b-dbe6e90bc817&domain=RaiTv&xsl=rai_tv-statisticheN&_=1351111295981
 
 
-class Elem(Base.Base):
+class Elem(base.Base):
     def __init__(self, pid, grabber, data):
         super().__init__()
 
@@ -31,7 +31,7 @@ class Elem(Base.Base):
 
         # extra experimental data
         h264 = data.findtext("h264")
-        H264.add_h264_url(self.h264, 0, h264)
+        h264.add_h264_url(self.h264, 0, h264)
 
         self.ts = data.findtext("m3u8")
 
@@ -54,7 +54,7 @@ class Elem(Base.Base):
 
     def follow(self, db, down_type):
         pid = Utils.get_new_pid(db, self.pid)
-        p = Item.Demand(self.grabber, self.url, down_type, pid)
+        p = item.Demand(self.grabber, self.url, down_type, pid)
         Utils.add_to_db(db, p)
 
 

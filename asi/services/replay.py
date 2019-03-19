@@ -5,9 +5,9 @@ import re
 
 from asi import Utils
 from asi import Config
-from asi.services import Base
+from asi.services import base
 from asi import RAIUrls
-from asi.formats import H264
+from asi.formats import h264
 
 channels = {"1": "RaiUno", "2": "RaiDue", "3": "RaiTre", "23": "RaiGulp", "31": "RaiCinque", "32": "RaiPremium", "38": "RaiYoyo"}
 
@@ -24,7 +24,7 @@ def extract_h264_ext(value):
         url = value[k]
         if m and url:
             bwidth = int(m.group(1))
-            H264.add_h264_url(res, bwidth, url)
+            h264.add_h264_url(res, bwidth, url)
 
     return res
 
@@ -44,7 +44,7 @@ def parse_item(grabber, channel, date, time, value, db):
     # if the detailed h264 is not found, try with "h264"
     if not h264:
         single = value["h264"]
-        H264.add_h264_url(h264, 0, single)
+        h264.add_h264_url(h264, 0, single)
 
     tablet = value["urlTablet"]
     smart_phone = value["urlSmartPhone"]
@@ -106,7 +106,7 @@ def download(db, grabber, down_type):
                 process(grabber, f, db)
 
 
-class Program(Base.Base):
+class Program(base.Base):
     def __init__(self, grabber, channel, date, hour, pid, length, title, desc, h264, tablet, smart_phone):
         super().__init__()
 

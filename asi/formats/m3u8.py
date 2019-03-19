@@ -3,7 +3,7 @@ import os
 import urllib
 import posixpath
 
-import asi.formats.MP4
+import asi.formats.mp4
 import m3u8
 import gzip
 import logging
@@ -90,7 +90,7 @@ def download_m3u8(grabber_program, folder, url, options, pid, filename, title, r
             progress.done()
 
         if remux:
-            asi.formats.MP4.remux_to_mp4(local_filename_ts, local_filename, title)
+            asi.formats.mp4.remux_to_mp4(local_filename_ts, local_filename, title)
             os.remove(local_filename_ts)
 
         print()

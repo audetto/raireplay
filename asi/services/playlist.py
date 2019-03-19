@@ -1,7 +1,7 @@
 import os
 import m3u8
 
-from asi.services import Base
+from asi.services import base
 
 
 def process(grabber, filename, pid):
@@ -9,7 +9,7 @@ def process(grabber, filename, pid):
     return p
 
 
-class Program(Base.Base):
+class Program(base.Base):
     def __init__(self, grabber, filename, pid):
         super().__init__()
 

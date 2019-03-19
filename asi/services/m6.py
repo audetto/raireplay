@@ -5,7 +5,7 @@ from xml.etree import ElementTree
 
 from asi import Utils
 from asi import Config
-from asi.services import Base
+from asi.services import base
 
 # this comes from M6group.groovy
 # https://bitbucket.org/Illico/serviio_plugins/wiki/M6group.groovy
@@ -75,7 +75,7 @@ def download(db, grabber, down_type):
             process(grabber, down_type, f, channel, db)
 
 
-class Program(Base.Base):
+class Program(base.Base):
     def __init__(self, grabber, down_type, channel, date, pid, key, length, title, desc):
         super().__init__()
 

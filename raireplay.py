@@ -8,7 +8,7 @@ import logging.config
 import os
 import configparser
 
-import Driver
+import driver
 
 
 def get_cli_args(defaults):
@@ -80,7 +80,7 @@ def main():
     if args.logging:
         logging.config.fileConfig(args.logging)
 
-    Driver.process(args)
+    driver.process(args)
 
     print()
 

@@ -4,7 +4,7 @@ import json
 
 from asi import Utils
 from asi import Config
-from asi.services import Base
+from asi.services import base
 from asi import RAIUrls
 import logging
 
@@ -71,7 +71,7 @@ def download(db, grabber, down_type):
             logging.exception(f'JSON: {channel}')
 
 
-class Program(Base.Base):
+class Program(base.Base):
     def __init__(self, grabber, down_type, channel, date, hour, pid, length, title, desc, path_id):
         super().__init__()
 

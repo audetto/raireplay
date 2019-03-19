@@ -4,7 +4,7 @@ import json
 
 from asi import Utils
 from asi import Config
-from asi.services import Base
+from asi.services import base
 
 programs_url = "http://api.tf1.fr/tf1-programs/iphone/limit/100/"
 news_url = "http://api.tf1.fr/tf1-homepage-news/iphone/"
@@ -120,7 +120,7 @@ def download(db, grabber, down_type):
     process_programs(grabber, f, folder, progress, down_type, db)
 
 
-class Program(Base.Base):
+class Program(base.Base):
     def __init__(self, grabber, datetime, length, pid, title, desc, wat, category):
         super().__init__()
 
