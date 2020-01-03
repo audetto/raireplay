@@ -2,7 +2,9 @@ on_demand = "http://www.rai.tv/dl/RaiTV/programmi/ricerca/ContentSet-6445de64-d3
 replay = "http://www.rai.it/dl/portale/html/palinsesti/replaytv/static"
 info = "http://www.rai.tv/dl/RaiTV/iphone/assets/tg_json.js?NS=0-1-4c61b46e9a4ab09b25da2246ae52d31edb528475-5.1.1"
 base = "http://www.rai.tv"
-raiplay = "http://www.rai.it/dl/palinsesti/Page-e120a813-1b92-4057-a214-15943d95aa68-json.html?"  # canale=Rai3&giorno=08-01-2017"
+
+raiplay_base = "https://www.raiplay.it"
+raiplay = "https://www.raiplay.it/palinsesto/app/${channel}/${date}.json"
 
 # raiplay programs
 # http://www.raiplay.it/programmi/?json

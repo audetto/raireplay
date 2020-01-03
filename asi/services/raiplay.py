@@ -1,6 +1,7 @@
 import os
 import datetime
 import json
+from string import Template
 
 from asi import utils
 from asi import config
@@ -8,14 +9,13 @@ from asi.services import base
 from asi import raiurls
 import logging
 
-channels = ["Rai1", "Rai2", "Rai3", "Rai4", "Rai5", "RaiGulp", "RaiPremium", "RaiYoyo", "RaiSport1", "RaiSport2",
-            "RaiMovie", "RaiStoria", "RaiScuola"]
+channels = ["rai-1", "rai-2", "rai-3", "rai-4", "rai-5", "rai-gulp", "rai-premium", "rai-yoyo", "rai-movie",
+            "rai-storia", "rai-scuola", "rai-news-24", "rai-sport-piu-hd"]
 
 
-def parse_item(grabber, down_type, channel, value, db, dup):
-    if value and "hasVideo" in value and value["hasVideo"]:
-
-        id = value["ID"]
+def parse_item(grabber, down_type, value, db, dup):
+    if value and "has_video" in value and value["has_video"]:
+        id = value['playlist_id']
 
         if id not in dup:
             dup.add(id)
@@ -23,13 +23,14 @@ def parse_item(grabber, down_type, channel, value, db, dup):
             name = value["name"]
             desc = value["description"]
             secs = value["duration"]
+            channel = value["channel"]
 
-            date = value["datePublished"].strip()
-            time = value["timePublished"].strip()
+            date = value["date"].strip()
+            time = value["hour"].strip()
 
             length = secs
 
-            path_id = value["pathID"]
+            path_id = value["path_id"]
 
             pid = utils.get_new_pid(db, None)
             p = Program(grabber, down_type, channel, date, time, pid, length, name, desc, path_id)
@@ -37,18 +38,10 @@ def parse_item(grabber, down_type, channel, value, db, dup):
 
 
 def process(grabber, down_type, f, db, dup):
-    s = f.read()
-    s = s.replace('[an error occurred while processing this directive]', '')
-    o = json.loads(s)
+    o = json.load(f)
 
-    for k1, v1 in o.items():
-        channel = k1
-        for v2 in v1:
-            palinsesto = v2['palinsesto']
-            if palinsesto:
-                programmi = palinsesto[0]['programmi']
-                for p in programmi:
-                    parse_item(grabber, down_type, channel, p, db, dup)
+    for event in o['events']:
+        parse_item(grabber, down_type, event, db, dup)
 
 
 def download(db, grabber, down_type):
@@ -58,17 +51,24 @@ def download(db, grabber, down_type):
 
     dup = set()
 
-    for channel in channels:
-        filename = "canale=" + channel
-        url = raiurls.raiplay + filename
-        local_name = os.path.join(folder, filename + ".json")
-        try:
-            f = utils.download(grabber, progress, url, local_name, down_type, "utf-8", True)
+    template = Template(raiurls.raiplay)
+    today = datetime.date.today()
 
-            if f:
-                process(grabber, down_type, f, db, dup)
-        except json.decoder.JSONDecodeError:
-            logging.exception(f'JSON: {channel}')
+    for x in range(1, 8):
+        day = today - datetime.timedelta(days=x)
+        str_date = day.strftime("%d-%m-%Y")
+
+        for channel in channels:
+            filename = f'{channel}_{str_date}.json'
+            url = template.substitute({'channel': channel, 'date': str_date})
+            local_name = os.path.join(folder, filename)
+            try:
+                f = utils.download(grabber, progress, url, local_name, down_type, "utf-8", True)
+
+                if f:
+                    process(grabber, down_type, f, db, dup)
+            except json.decoder.JSONDecodeError:
+                logging.exception(f'JSON: {channel}')
 
 
 class Program(base.Base):
@@ -81,7 +81,7 @@ class Program(base.Base):
         self.channel = channel
         self.down_type = down_type
 
-        self.url = raiurls.base + path_id
+        self.url = raiurls.raiplay_base + path_id
 
         if date and hour:
             self.datetime = datetime.datetime.strptime(date + " " + hour, "%d/%m/%Y %H:%M")
@@ -107,7 +107,7 @@ class Program(base.Base):
 
         if f:
             o = json.load(f)
-            url = o['video']['contentUrl']
+            url = o['video']['content_url']
             if url:
                 self.ts = url
                 return self.ts
