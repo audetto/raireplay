@@ -8,7 +8,7 @@ userIP = "https://api.ipify.org"
 geoIP = "https://freegeoip.net/json/"
 
 
-def search_tor(grabber, width, country, attempts_and_skip):
+def search_tor(grabber, country, attempts_and_skip):
     args = attempts_and_skip.split(",")
     attempts = int(args[0])
 
