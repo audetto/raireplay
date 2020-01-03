@@ -25,7 +25,6 @@ class Base:
         self.ts = None
         self.mms = None
         self.m3 = None
-        self.canFollow = False
 
     def short(self, fmt):
         if self.datetime:
@@ -135,10 +134,6 @@ class Base:
         if self.filename:
             print("Filename:", self.filename)
         print()
-
-        if self.canFollow:
-            print("Follow: ENABLED")
-            print()
 
         m3 = self.get_tablet_playlist()
 

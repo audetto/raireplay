@@ -177,17 +177,6 @@ def process(args):
         info.display(grabber, width)
         return
 
-    if args.follow:
-        follows = args.follow
-        while follows:
-            subset = {}
-            find(db, follows[0], args.re, subset)
-            # continue follow calculation
-            db = {}
-            for p in subset.values():
-                p.follow(db, args.download)
-            follows = follows[1:] # continue with one element less
-
     if args.raiplay:
         raiplay.download(db, grabber, args.download)
 
