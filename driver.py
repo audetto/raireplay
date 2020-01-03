@@ -158,7 +158,6 @@ def process(args):
     # (m3u8 and urlretrieve)
     urllib.request.install_opener(grabber)
 
-    grabberForDownload = None
     if proxy and not args.proxy_all:
         # we do not want to use tor/proxy for the actual download
         # only for the metadata
@@ -168,7 +167,6 @@ def process(args):
         grabberForDownload = grabber
 
     if args.tor_search and args.tor:
-        width = console.terminal_width()
         info.search_tor(grabber, args.tor, args.tor_search)
         return
 
