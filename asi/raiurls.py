@@ -1,6 +1,4 @@
 on_demand = "http://www.rai.tv/dl/RaiTV/programmi/ricerca/ContentSet-6445de64-d321-476c-a890-ae4ed32c729e-darivedere.html"
-replay = "http://www.rai.it/dl/portale/html/palinsesti/replaytv/static"
-info = "http://www.rai.tv/dl/RaiTV/iphone/assets/tg_json.js?NS=0-1-4c61b46e9a4ab09b25da2246ae52d31edb528475-5.1.1"
 base = "http://www.rai.tv"
 
 raiplay_base = "https://www.raiplay.it"

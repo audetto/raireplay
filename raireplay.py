@@ -29,7 +29,6 @@ def get_cli_args(defaults):
     parser.add_argument("--here", action="store_true", help="download to current folder")
     parser.add_argument("--ts-tries", action="store", default=20)
 
-    parser.add_argument("--replay", action="store_true", default=False, help="RAI Replay")
     parser.add_argument("--raiplay", action="store_true", default=False, help="RaiPlay")
     parser.add_argument("--programma", action="store", default=False, help="RaiPlay Program URL")
     parser.add_argument("--ondemand", action="store_true", default=False, help="RAI On Demand List")
