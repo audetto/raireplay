@@ -1,8 +1,8 @@
 import logging
+import pychromecast
 
 
 def cast_url(url):
-    import pychromecast
 
     logging.info('Cast discovery')
     chromecasts = pychromecast.get_chromecasts()

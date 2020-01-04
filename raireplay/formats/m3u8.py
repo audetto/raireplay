@@ -1,18 +1,20 @@
 import raireplay.common.utils
 import os
-import urllib
+import urllib.error
+import urllib.parse
+import urllib.request
 import posixpath
 
 import raireplay.formats.mp4
 import m3u8
 import gzip
 import logging
+from Cryptodome.Cipher import AES
 
 
 def decrypt(data, key, media_sequence, grabber, key_cache):
     if key is not None:
         if key.method == 'AES-128' and key.iv is None:
-            from Cryptodome.Cipher import AES
             uri = key.uri
             if uri not in key_cache:
                 request = urllib.request.Request(uri, headers=raireplay.common.utils.http_headers)
