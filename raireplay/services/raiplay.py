@@ -3,10 +3,10 @@ import datetime
 import json
 from string import Template
 
-from asi import utils
-from asi import config
-from asi.services import base
-from asi import raiurls
+from raireplay.common import utils
+from raireplay.common import config
+from raireplay.services import base
+from raireplay.common import raiurls
 import logging
 
 channels = ["rai-1", "rai-2", "rai-3", "rai-4", "rai-5", "rai-gulp", "rai-premium", "rai-yoyo", "rai-movie",

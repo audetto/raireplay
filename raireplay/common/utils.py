@@ -1,5 +1,6 @@
 import sys
 import os.path
+import urllib.request
 import urllib.parse
 import codecs
 import datetime
@@ -8,7 +9,7 @@ import io
 import re
 import logging
 
-from asi import meter
+from raireplay.common import meter
 
 
 class Obj:

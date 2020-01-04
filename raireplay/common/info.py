@@ -1,8 +1,8 @@
 import json
 
-from asi import utils
-from asi import config
-from asi import tor
+from raireplay.common import utils
+from raireplay.common import config
+from raireplay.common import tor
 
 userIP = "https://api.ipify.org"
 geoIP = "https://freegeoip.net/json/"

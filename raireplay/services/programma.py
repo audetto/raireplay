@@ -2,9 +2,9 @@ import os
 import urllib.parse
 import json
 
-from asi import utils, raiurls
-from asi import config
-from asi.services import raiplay
+from raireplay.common import utils, raiurls
+from raireplay.common import config
+from raireplay.services import raiplay
 
 
 def process_set(grabber, down_type, f, db):

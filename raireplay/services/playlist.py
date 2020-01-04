@@ -1,7 +1,7 @@
 import os
 import m3u8
 
-from asi.services import base
+from raireplay.services import base
 
 
 def process(grabber, filename, pid):

@@ -3,9 +3,9 @@ import datetime
 
 from xml.etree import ElementTree
 
-from asi import utils
-from asi import config
-from asi.services import base
+from raireplay.common import utils
+from raireplay.common import config
+from raireplay.services import base
 
 # this comes from M6group.groovy
 # https://bitbucket.org/Illico/serviio_plugins/wiki/M6group.groovy

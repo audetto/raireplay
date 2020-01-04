@@ -1,9 +1,9 @@
-from asi import utils
-from asi import info
-from asi.services import mediaset, raiplay, tf1, m6, programma, playlist
-from asi import config
-from asi import console
-from asi import tor
+from raireplay.common import utils
+from raireplay.common import info
+from raireplay.services import mediaset, raiplay, tf1, m6, programma, playlist
+from raireplay.common import config
+from raireplay.common import console
+from raireplay.common import tor
 
 import os
 import re

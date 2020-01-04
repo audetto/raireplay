@@ -1,9 +1,9 @@
 import os.path
-import asi.utils
-import asi.raiurls
+import raireplay.common.utils
+import raireplay.common.raiurls
 import logging
 
-import asi.formats.mp4
+import raireplay.formats.mp4
 
 
 def download_h264(grabber_metadata, grabber_program, folder, url, options, pid, filename, title):
@@ -22,15 +22,15 @@ def download_h264(grabber_metadata, grabber_program, folder, url, options, pid, 
     print(f"Saving {pid} as {local_filename}")
 
     try:
-        progress = asi.utils.get_progress()
-        asi.utils.download_file(grabber_metadata, grabber_program, progress, url, local_filename)
+        progress = raireplay.common.utils.get_progress()
+        raireplay.common.utils.download_file(grabber_metadata, grabber_program, progress, url, local_filename)
 
         size = os.path.getsize(local_filename)
-        for a in asi.raiurls.invalidMP4:
+        for a in raireplay.common.raiurls.invalidMP4:
             if size == len(a):
                 raise Exception(f"{url} only available in Italy")
 
-        asi.formats.mp4.set_mp4_tag(local_filename, title)
+        raireplay.formats.mp4.set_mp4_tag(local_filename, title)
 
         print()
         print(f"Saved {pid} as {filename}")

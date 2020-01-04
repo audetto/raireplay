@@ -4,10 +4,10 @@ import datetime
 
 from xml.etree import ElementTree
 
-from asi import utils
-from asi.services import base
-from asi import config
-from asi.formats import h264
+from raireplay.common import utils
+from raireplay.services import base
+from raireplay.common import config
+from raireplay.formats import h264
 
 config_url = "http://app.mediaset.it/app/videomediaset/iPhone/2.0.2/videomediaset_iphone_config.plist"
 

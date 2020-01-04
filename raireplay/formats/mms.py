@@ -1,11 +1,11 @@
 import configparser
 import os
-import urllib
+import urllib.parse
 import logging
 from xml.etree import ElementTree
 
-import asi.utils
-import asi.raiurls
+import raireplay.common.utils
+import raireplay.common.raiurls
 
 
 def download_mms(folder, url, options, pid, filename):
@@ -18,7 +18,7 @@ def download_mms(folder, url, options, pid, filename):
             print(f"{pid} already there as {local_filename}")
             return
 
-        opt = asi.utils.Obj()
+        opt = raireplay.common.utils.Obj()
         opt.quiet = False
         opt.url = url
         opt.resume = False
@@ -42,9 +42,9 @@ def get_mms_url(grabber, url):
         mms = url
     else:
         # search for the mms url
-        content = asi.utils.get_string_from_url(grabber, url)
+        content = raireplay.common.utils.get_string_from_url(grabber, url)
 
-        if content in asi.raiurls.invalidMP4:
+        if content in raireplay.common.raiurls.invalidMP4:
             # is this the case of videos only available in Italy?
             mms = content
         else:
@@ -58,7 +58,7 @@ def get_mms_url(grabber, url):
                     if url_scheme == "mms":
                         mms = asf
                     else:
-                        content = asi.utils.get_string_from_url(grabber, asf)
+                        content = raireplay.common.utils.get_string_from_url(grabber, asf)
                         config = configparser.ConfigParser()
                         config.read_string(content)
                         mms = config.get("Reference", "ref1")

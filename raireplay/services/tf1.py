@@ -2,9 +2,9 @@ import os
 import datetime
 import json
 
-from asi import utils
-from asi import config
-from asi.services import base
+from raireplay.common import utils
+from raireplay.common import config
+from raireplay.services import base
 
 programs_url = "http://api.tf1.fr/tf1-programs/iphone/limit/100/"
 news_url = "http://api.tf1.fr/tf1-homepage-news/iphone/"

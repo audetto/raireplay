@@ -8,7 +8,7 @@ import logging.config
 import os
 import configparser
 
-import driver
+from raireplay import driver
 
 
 def get_cli_args(defaults):

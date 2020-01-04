@@ -1,9 +1,9 @@
-import asi.utils
+import raireplay.common.utils
 import os
 import urllib
 import posixpath
 
-import asi.formats.mp4
+import raireplay.formats.mp4
 import m3u8
 import gzip
 import logging
@@ -15,7 +15,7 @@ def decrypt(data, key, media_sequence, grabber, key_cache):
             from Cryptodome.Cipher import AES
             uri = key.uri
             if uri not in key_cache:
-                request = urllib.request.Request(uri, headers=asi.utils.http_headers)
+                request = urllib.request.Request(uri, headers=raireplay.common.utils.http_headers)
                 stream = grabber.open(request)
                 logging.debug(f'AES-128 key: {uri}')
                 key_cache[uri] = stream.read()
@@ -57,13 +57,13 @@ def download_m3u8(grabber_program, folder, url, options, pid, filename, title, r
     try:
         number_of_files = len(item.segments)
         logging.debug(f'{number_of_files} segments')
-        progress = asi.utils.get_progress(number_of_files, filename + ".ts")
+        progress = raireplay.common.utils.get_progress(number_of_files, filename + ".ts")
         key_cache = {}
 
         with open(local_filename_ts, "wb") as out:
             for seg in item.segments:
                 segment_uri = seg.absolute_uri
-                request = urllib.request.Request(segment_uri, headers=asi.utils.http_headers)
+                request = urllib.request.Request(segment_uri, headers=raireplay.common.utils.http_headers)
                 attempt = 0
 
                 while True:
@@ -90,7 +90,7 @@ def download_m3u8(grabber_program, folder, url, options, pid, filename, title, r
             progress.done()
 
         if remux:
-            asi.formats.mp4.remux_to_mp4(local_filename_ts, local_filename, title)
+            raireplay.formats.mp4.remux_to_mp4(local_filename_ts, local_filename, title)
             os.remove(local_filename_ts)
 
         print()
@@ -109,7 +109,7 @@ def download_m3u8(grabber_program, folder, url, options, pid, filename, title, r
 
 
 def load_m3u8_from_url(grabber, uri):
-    request = urllib.request.Request(uri, headers=asi.utils.http_headers)
+    request = urllib.request.Request(uri, headers=raireplay.common.utils.http_headers)
     logging.info(f'M3U8: {uri}')
     stream = grabber.open(request)
 
@@ -177,6 +177,6 @@ def find_playlist(m3, bandwidth):
         b = int(p.stream_info.bandwidth) // 1000
         data[b] = p
 
-    opt = asi.utils.find_url_by_bandwidth(data, bandwidth)
+    opt = raireplay.common.utils.find_url_by_bandwidth(data, bandwidth)
 
     return opt

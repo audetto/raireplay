@@ -1,7 +1,7 @@
 import time
 import os
 
-from asi import console
+from raireplay.common import console
 
 
 def format_time(seconds, use_hours=0):
