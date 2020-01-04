@@ -1,11 +1,13 @@
+import base64
 import json
 
 from raireplay.common import utils
 from raireplay.common import config
 from raireplay.common import tor
 
-userIP = "https://api.ipify.org"
-geoIP = "https://freegeoip.net/json/"
+# pointless attempt to hide the key
+_key = b'NzU0ZjE3YzE0NDgyMDFjODI1ZDg2ZjBkMzVjOWIzN2M='
+_geoIP = f"http://api.ipstack.com/check?access_key={base64.b64decode(_key).decode()}"
 
 
 def search_tor(grabber, country, attempts_and_skip):
@@ -41,7 +43,7 @@ def search_tor(grabber, country, attempts_and_skip):
 
 
 def get_geo_ip(grabber):
-    geo = utils.get_string_from_url(grabber, geoIP)
+    geo = utils.get_string_from_url(grabber, _geoIP)
     data = json.loads(geo)
     ip = data['ip']
     country = data['country_code']
@@ -57,7 +59,7 @@ def display(grabber, width):
     print("=" * width)
 
     print("Root folder:", config.root_folder)
-    print("Location:   ", config.program_folder)
+    print("Videos:     ", config.program_folder)
     print("IP:         ", ip)
     print("Country:    ", country)
     print("Exit:       ", exit_nodes)
