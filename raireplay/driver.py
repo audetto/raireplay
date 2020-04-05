@@ -1,6 +1,6 @@
 from raireplay.common import utils
 from raireplay.common import info
-from raireplay.services import mediaset, raiplay, tf1, m6, programma, playlist
+from raireplay.services import mediaset, raiplay, tf1, m6, programma, playlist, raiplayradio
 from raireplay.common import config
 from raireplay.common import console
 from raireplay.common import tor
@@ -180,6 +180,9 @@ def process(args):
 
     if args.programma:
         programma.download(db, grabber, args.programma, args.download)
+
+    if args.radio:
+        raiplayradio.download(db, grabber, args.radio, args.download)
 
     if args.tf1:
         tf1.download(db, grabber, args.download)

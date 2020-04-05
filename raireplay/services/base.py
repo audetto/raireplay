@@ -1,11 +1,12 @@
 import os
-import urllib
+import urllib.error
 
 import raireplay.common.utils
 import raireplay.common.cast
 import raireplay.formats.h264
 import raireplay.formats.m3u8
 import raireplay.formats.mms
+import raireplay.formats.multi
 import logging
 
 
@@ -25,6 +26,7 @@ class Base:
         self.ts = None
         self.mms = None
         self.m3 = None
+        self.urls = None
 
     def short(self, fmt):
         if self.datetime:
@@ -57,7 +59,7 @@ class Base:
 
     def cast(self, options):
         video_format, url = self.get_url_and_format(options)
-        raireplay.cast.cast_url(url)
+        raireplay.common.cast.cast_url(url)
 
     def show(self, options):
         video_format, url = self.get_url_and_format(options)
@@ -75,6 +77,8 @@ class Base:
                     video_format = "tsmp4"
                 elif self.mms:
                     video_format = "mms"
+                elif self.urls:
+                    video_format = "multi"
         else:
             video_format = options.format
 
@@ -91,6 +95,8 @@ class Base:
             url = playlist.absolute_uri
         elif video_format == "mms":
             url = raireplay.formats.mms.get_mms_url(self.grabber, self.mms)
+        elif video_format == "multi":
+            url = self.urls
 
         return video_format, url
 
@@ -110,6 +116,8 @@ class Base:
             self.download_tablet(folder, options, grabber, url, True)
         elif video_format == "mms":
             self.download_mms(folder, options, grabber)
+        elif video_format == "multi":
+            self.download_multi(folder, options, grabber, url)
 
     def download_tablet(self, folder, options, grabber, url, remux):
         raireplay.formats.m3u8.download_m3u8(grabber, folder, url, options, self.pid, self.filename, self.title, remux)
@@ -119,6 +127,9 @@ class Base:
 
     def download_mms(self, folder, options, url):
         raireplay.formats.mms.download_mms(folder, url, options, self.pid, self.filename)
+
+    def download_multi(self, folder, options, grabber, url):
+        raireplay.formats.multi.download_multi(grabber, folder, url, options, self.pid, self.filename)
 
     def display(self, width):
         print("=" * width)

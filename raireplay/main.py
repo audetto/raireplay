@@ -31,6 +31,7 @@ def get_cli_args(defaults):
 
     parser.add_argument("--raiplay", action="store_true", default=False, help="RaiPlay")
     parser.add_argument("--programma", action="store", default=False, help="RaiPlay Program URL")
+    parser.add_argument("--radio", action="store", default=False, help="RaiPlayRaio URL")
 
     parser.add_argument("--mediaset", action="store_true", default=False, help="Video Mediaset")
     parser.add_argument("--tg5", action="store_true", default=False, help="TG Mediaset")

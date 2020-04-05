@@ -14,6 +14,7 @@ data_folder = create_folder(os.path.join(root_folder, "data"))
 
 replay_folder = create_folder(os.path.join(data_folder, "replay"))
 raiplay_folder = create_folder(os.path.join(data_folder, "raiplay"))
+raiplayradio_folder = create_folder(os.path.join(data_folder, "raiplayradio"))
 item_folder = create_folder(os.path.join(data_folder, "items"))
 page_folder = create_folder(os.path.join(data_folder, "pages"))
 demand_folder = create_folder(os.path.join(data_folder, "demand"))
