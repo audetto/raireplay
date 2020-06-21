@@ -1,34 +1,59 @@
-import raireplay.common.utils
+import base64
+import gzip
+import json
+import logging
 import os
+import posixpath
 import urllib.error
 import urllib.parse
 import urllib.request
-import posixpath
 
-import raireplay.formats.mp4
 import m3u8
-import gzip
-import logging
 from Cryptodome.Cipher import AES
+
+import raireplay.common.utils
+import raireplay.formats.mp4
+
+# try this https://www.radiantmediaplayer.com/media/rmp-segment/bbb-abr-aes/playlist.m3u8
+
+# La 7
+# videoParams = {
+#     id: "player_la7_5219",
+#     geolock: true,
+#     drmSupport: true,
+#     src: {"m3u8": "https://d3iki3eydrtvsa.cloudfront.net/Chernobyl_20200618213021/HLS/Chernobyl_20200618213021.m3u8",
+#           "dash": "https://d3iki3eydrtvsa.cloudfront.net/Chernobyl_20200618213021/DASH/Chernobyl_20200618213021.mpd"}
+# }
 
 
 def decrypt(data, key, media_sequence, grabber, key_cache):
     if key is not None:
-        if key.method == 'AES-128' and key.iv is None:
+        if key.method == 'AES-128':
             uri = key.uri
             if uri not in key_cache:
-                request = urllib.request.Request(uri, headers=raireplay.common.utils.http_headers)
+                request = urllib.request.Request(key.absolute_uri, headers=raireplay.common.utils.http_headers)
                 stream = grabber.open(request)
                 logging.debug(f'AES-128 key: {uri}')
                 key_cache[uri] = stream.read()
 
             aes_key = key_cache[uri]
-            iv = media_sequence.to_bytes(16, 'big')
+            if key.iv is None:
+                iv = media_sequence.to_bytes(16, 'big')
+            else:
+                assert key.iv.startswith('0x')
+                iv = bytearray.fromhex(key.iv[2:])
             aes = AES.new(aes_key, AES.MODE_CBC, IV=iv)
             clear = aes.decrypt(data)
             return clear
-        else:
-            raise Exception(f'M3U8 unsupported key: {key}')
+
+        if key.method == 'SAMPLE-AES':
+            protocol = 'skd://'
+            assert key.uri.startswith(protocol)
+            skd = key.uri[len(protocol):]
+            info = json.loads(base64.b64decode(skd).decode())
+            logging.error(f'Unsupported SAMPLE-AED: {info}')
+
+        raise Exception(f'M3U8 unsupported key: {key}')
     else:
         return data
 
@@ -172,7 +197,7 @@ def get_resolution(p):
 def find_playlist(m3, bandwidth):
     data = {}
 
-    # bandwidth is alaways in Kb.
+    # bandwidth is always in Kb.
     # so we divide by 1000
 
     for p in m3.playlists:

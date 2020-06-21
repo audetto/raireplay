@@ -89,10 +89,11 @@ class Base:
             url = raireplay.common.utils.find_url_by_bandwidth(h264, options.bwidth)
         elif video_format in ["ts", "tsmp4"]:
             m3 = self.get_tablet_playlist()
-            if not m3.is_variant:
-                raise NotImplementedError
-            playlist = raireplay.formats.m3u8.find_playlist(m3, options.bwidth)
-            url = playlist.absolute_uri
+            if m3.is_variant:
+                playlist = raireplay.formats.m3u8.find_playlist(m3, options.bwidth)
+                url = playlist.absolute_uri
+            else:
+                url = self.get_ts()
         elif video_format == "mms":
             url = raireplay.formats.mms.get_mms_url(self.grabber, self.mms)
         elif video_format == "multi":

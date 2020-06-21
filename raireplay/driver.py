@@ -197,8 +197,7 @@ def process(args):
         mediaset.download(db, grabber, args.download, "tg5")
 
     if args.m3u8:
-        p = playlist.process(grabber, args.m3u8, len(db))
-        db[p.pid] = p
+        playlist.download(db, grabber, args.m3u8)
 
     if args.pid:
         subset = {}
