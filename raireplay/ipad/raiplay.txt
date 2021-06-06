@@ -1,0 +1,8 @@
+RaiPlaySwift/5.2.4 (it.rainet.ipad.raitv; build:3; iOS 14.6.0) Alamofire/5.4.3
+
+https://www.raiplay.it/menu.json
+https://www.raiplay.it/guidatv.json
+https://www.raiplay.it/dirette.json
+https://www.raiplay.it/palinsesto/onAir.json
+http://videowall.rai.it/cgi-bin/date
+https://www.raiplay.it/common/conf/mobile/prod/config/RaiPlayMobileConfig2020.json
